@@ -3527,64 +3527,11 @@ window.addEventListener('load', function(){
       startApp();
     } else {
       showAuthScreen();
-  }
+    }
   }, 1200);
 });
-<script>
-window.submitAndPay = function(){
-  var btn = document.getElementById('pay-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ שולח פרטים...';
-  var today        = new Date().toISOString().slice(0, 10);
-  var buildingName = ((document.getElementById('f-address') || {}).value || '').trim();
-  var contactName  = ((document.getElementById('f-name')    || {}).value || '').trim();
-  var phone        = ((document.getElementById('f-phone')   || {}).value || '').trim();
-  var units        = parseInt((document.getElementById('f-units') || {}).value) || null;
-  // 1. Formspree — כולל אימייל
-  var form = document.getElementById('reg-form');
-  var fd   = new FormData(form);
-  var formspreePromise = fetch('https://formspree.io/f/mwvrbvqa', {
-    method:  'POST',
-    body:    fd,
-    headers: { 'Accept': 'application/json' }
-  })
-  .then(function(res){
-    if(res.ok){ console.log('✅ Formspree: נשלח בהצלחה'); }
-    else { console.warn('⚠️ Formspree error:', res.status); }
-  })
-  .catch(function(err){ console.warn('❌ Formspree failed:', err); });
-  // 2. Airtable — בלי אימייל
-  var airtablePromise = fetch(
-    'https://api.airtable.com/v0/app24wqFJFlQksXFG/%D7%A9%D7%9B%D7%A0%D7%95%D7%AA%20%D7%98%D7%95%D7%91%D7%94',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer patbgCb2KggaeNIsc.b1c244c13d059c431c78f86739664a89f5850c3cfa1dd3ae5bc4be950103f711',
-        'Content-Type':  'application/json'
-      },
-      body: JSON.stringify({
-        fields: {
-          'שם הבניין':           buildingName,
-          'שם איש הקשר בוועד':   contactName,
-          'טלפון':               phone,
-          'כמות דירות':          units,
-          'סטטוס':               'נרשם',
-          'תאריך הצטרפות':       today
-        }
-      })
-    }
-  )
-  .then(function(res){
-    if(res.ok){ console.log('✅ Airtable: נשמר בהצלחה'); }
-    else { return res.text().then(function(t){ console.warn('⚠️ Airtable error:', res.status, t); }); }
-  })
-  .catch(function(err){ console.warn('❌ Airtable failed:', err); });
-  // 3. המתן לשניהם ← redirect
-  Promise.allSettled([formspreePromise, airtablePromise]).then(function(){
-    console.log('🚀 הושלם — מעביר לתשלום');
-    window.location.href = 'https://google.com';
-  });
-};
 </script>
+
+
 </body>
 </html>
