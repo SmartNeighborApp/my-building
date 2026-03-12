@@ -1427,7 +1427,7 @@ footer {
       <div class="footer-col-title">יצירת קשר</div>
       <div class="footer-contact-row">
         <span>📧</span>
-        <a href="mailto:ssmartneighbor@gmail.com">ssmartneighbor@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#2c5f5f414d5e584249454b444e435e6c4b414d4540024f4341"><span class="__cf_email__" data-cfemail="3744445a56454359525e505f55584577505a565e5b1954585a">[email&#160;protected]</span></a>
       </div>
       <div class="footer-contact-row">
         <span>💬</span>
@@ -1485,7 +1485,7 @@ footer {
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ══════════════════════════════════════
    SCROLL REVEAL
 ══════════════════════════════════════ */
@@ -1561,9 +1561,46 @@ window.addEventListener('DOMContentLoaded', function(){
 });
 
 /* ══════════════════════════════════════
-   MULTI-STEP FORM + FORMSPREE SUBMIT
+   CONFIG — AIRTABLE + FORMSPREE
 ══════════════════════════════════════ */
-var _formData = {};
+var AIRTABLE_TOKEN   = 'patbgCb2KggaeNIsc.b1c244c13d059c431c78f86739664a89f5850c3cfa1dd3ae5bc4be950103f711';
+var AIRTABLE_BASE_ID = 'app24wqFJFlQksXFG';
+var AIRTABLE_TABLE   = 'שכנות טובה';
+var FORMSPREE_URL    = 'https://formspree.io/f/mwvrbvqa';
+
+function sendToAirtable(data){
+  var today = new Date().toISOString().split('T')[0];
+  return fetch(
+    'https://api.airtable.com/v0/' + AIRTABLE_BASE_ID + '/' + encodeURIComponent(AIRTABLE_TABLE),
+    {
+      method:  'POST',
+      headers: {
+        'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify({
+        fields: {
+          'שם הבניין':            data.address,
+          'שם איש הקשר בוועד':   data.name,
+          'טלפון':               data.phone,
+          'כמות דירות':          Number(data.units),
+          'סטטוס':               'ליד חדש',
+          'לינק לאפליקציה':      '',
+          'תאריך הצטרפות':       today
+        }
+      })
+    }
+  );
+}
+
+function sendToFormspree(formEl){
+  var fd = new FormData(formEl);
+  return fetch(FORMSPREE_URL, {
+    method:  'POST',
+    body:    fd,
+    headers: { 'Accept': 'application/json' }
+  });
+}
 
 function goStep2(){
   var name  = document.getElementById('f-name').value.trim();
@@ -1596,33 +1633,28 @@ function goStep2(){
 
   goStep(2);
 }
-
 function submitAndPay(){
   var btn = document.getElementById('pay-btn');
   btn.disabled = true;
   btn.textContent = '⏳ שולח פרטים...';
 
   var form = document.getElementById('reg-form');
-  var fd   = new FormData(form);
 
-  fetch('https://formspree.io/f/mwvrbvqa', {
-    method:  'POST',
-    body:    fd,
-    headers: { 'Accept': 'application/json' }
-  })
-  .catch(function(err){ console.warn('Formspree:', err); })
-  .finally(function(){
-    // build slug for app URL
-    var slug = (_formData.address || 'building')
+  Promise.allSettled([
+    sendToAirtable(_formData),
+    sendToFormspree(form)
+  ]).then(function(results){
+    results.forEach(function(r,i){
+      if(r.status==='rejected') console.warn(i===0?'Airtable:':'Formspree:', r.reason);
+    });
+    var slug = (_formData.address||'building')
       .trim().replace(/\s+/g,'-')
-      .replace(/[^\u0590-\u05FFa-zA-Z0-9\-]/g,'').toLowerCase();
-    if(!slug) slug = 'building-' + Date.now();
-
-    document.getElementById('app-url').textContent = 'smartneighbor.app/' + slug;
+      .replace(/[^\u0590-\u05FFa-zA-Z0-9\-]/g,'\').toLowerCase();
+    if(!slug) slug = 'building-'+Date.now();
+    document.getElementById('app-url').textContent = 'smartneighbor.app/'+slug;
     document.getElementById('success-sub').innerHTML =
-      'מזל טוב <strong>' + escHtml(_formData.name) + '</strong>! האפליקציה של בניינכם (' +
-      escHtml(_formData.address) + ') פעילה.<br>שתפו את הקישור עם הדיירים ותתחילו.';
-
+      'מזל טוב <strong>'+escHtml(_formData.name)+'</strong>! האפליקציה של בניינכם ('
+      +escHtml(_formData.address)+') פעילה.<br>שתפו את הקישור עם הדיירים ותתחילו.';
     document.getElementById('success-modal').classList.add('show');
     btn.disabled = false;
     btn.textContent = '🔒 עבור לתשלום מאובטח';
@@ -1691,14 +1723,4 @@ document.querySelectorAll('.field-inp').forEach(function(inp){
 ══════════════════════════════════════ */
 function toggleFaq(el){
   var wasOpen = el.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
-  if(!wasOpen) el.classList.add('open');
-}
-
-/* close modal on Escape */
-document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape') closeModal();
-});
-</script>
-</body>
-</html>
+  document.querySelectorAll('.fa
