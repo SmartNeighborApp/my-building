@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1A3A5C">
-<title>שכנות טובה · SmartNeighbor</title>
+<title>שכנות טובה · SmartNeighbor v21</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -880,6 +880,94 @@ a{text-decoration:none;color:inherit;}
 /* ─── SOFT CARD BACKGROUND FIX ──────────────────────────────*/
 .page-scroll { background:#F8FAFC; }
 .sett-section { border-radius:var(--card-radius); }
+
+/* ─── V21: QUICK PAY CARD ─────────────────────────────────*/
+.quick-pay-card {
+  margin:14px 14px 0;border-radius:18px;padding:14px 16px;
+  background:linear-gradient(135deg,#1A3A5C 0%,#2563EB 100%);
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+}
+.qpc-icon{font-size:32px;flex-shrink:0;}
+.qpc-body{flex:1;}
+.qpc-title{font-size:14px;font-weight:900;color:#fff;}
+.qpc-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;}
+.qpc-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.qpc-btn{
+  padding:8px 16px;border:none;border-radius:10px;
+  font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);
+}
+.qpc-btn-bit{background:#fff;color:#1A3A5C;}
+.qpc-btn-paybox{background:#25D366;color:#fff;}
+
+/* ─── V21: RESIDENTS MANAGER ─────────────────────────────*/
+.res-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid #F1F5F9;
+}
+.res-row:last-child{border-bottom:none;}
+.res-unit-badge{
+  min-width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  color:#fff;font-size:11px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.res-name{font-size:13px;font-weight:800;color:var(--navy);flex:1;}
+.res-phone{font-size:11px;color:var(--slate);}
+.res-wa-btn{
+  width:34px;height:34px;border-radius:10px;background:#25D366;
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;
+  flex-shrink:0;
+}
+.res-reminder-btn{
+  padding:5px 10px;background:#EFF6FF;color:var(--blue);
+  border:none;border-radius:8px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--font);flex-shrink:0;
+}
+.res-add-form{
+  background:#F8FAFC;border-radius:14px;padding:14px;margin-top:10px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.res-inp-row{display:flex;gap:8px;}
+
+/* ─── V21: LICENSE WARNING ────────────────────────────────*/
+.lic-warn-bar{
+  background:linear-gradient(135deg,#FEF3C7,#FDE68A);
+  padding:10px 16px;margin:0 14px 10px;border-radius:14px;
+  font-size:12px;font-weight:800;color:#92400E;text-align:center;
+  display:none;
+}
+.lic-locked-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#0F2744 0%,#1A3A5C 60%,#1E4D8C 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;
+}
+.lic-locked-overlay .lock-icon{font-size:64px;margin-bottom:16px;}
+.lic-locked-overlay .lock-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;}
+.lic-locked-overlay .lock-sub{font-size:14px;color:rgba(255,255,255,.7);line-height:1.6;}
+
+/* ─── V21: INSTALL INSTRUCTIONS ──────────────────────────*/
+.install-steps{background:#F8FAFC;border-radius:14px;padding:14px;margin-top:8px;}
+.install-step{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #F1F5F9;font-size:12px;color:var(--navy);}
+.install-step:last-child{border-bottom:none;}
+.install-step-num{
+  min-width:22px;height:22px;border-radius:6px;
+  background:var(--navy);color:#fff;font-size:10px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.install-platform-tabs{display:flex;gap:8px;margin-bottom:10px;}
+.install-tab{
+  flex:1;padding:8px;border:2px solid #E2E8F0;border-radius:10px;
+  font-size:12px;font-weight:700;color:var(--slate);background:#fff;
+  cursor:pointer;font-family:var(--font);text-align:center;
+}
+.install-tab.active{border-color:var(--blue);color:var(--blue);background:#EFF6FF;}
+
+/* ─── V21: VOTED ALREADY BADGE ────────────────────────────*/
+.voted-already{
+  background:#EFF6FF;border-radius:12px;padding:10px 14px;
+  font-size:13px;font-weight:800;color:var(--blue);text-align:center;margin-bottom:8px;
+}
 </style>
 
 
@@ -911,7 +999,7 @@ a{text-decoration:none;color:inherit;}
     <div id="lic-err" class="lic-err"></div>
     <button class="lic-btn" onclick="checkLicense()">כניסה למערכת ←</button>
   </div>
-  <div class="lic-footer">SmartNeighbor · גרסה 19 · כל הזכויות שמורות</div>
+  <div class="lic-footer">SmartNeighbor · גרסה 21 · כל הזכויות שמורות</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -973,6 +1061,19 @@ a{text-decoration:none;color:inherit;}
          PAGE: HOME
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
     <div id="page-home" class="page">
+      <!-- license warning bar (shown when < 30 days left) -->
+      <div class="lic-warn-bar" id="lic-warn-bar">⚠️ הרישיון יפוג בקרוב! נא לפנות לחידוש</div>
+
+      <!-- quick pay card (Bit / Paybox) -->
+      <div class="quick-pay-card" id="quick-pay-card" style="display:none;">
+        <div class="qpc-icon">⚡</div>
+        <div class="qpc-body">
+          <div class="qpc-title">תשלום מהיר ✨</div>
+          <div class="qpc-sub">שלם ישירות עם Bit או Paybox</div>
+          <div class="qpc-btns" id="qpc-btns"></div>
+        </div>
+      </div>
+
       <!-- pay banner -->
       <div class="pay-banner unpaid" id="pay-banner">
         <div class="pb-icon-wrap"><span id="pb-icon">💳</span></div>
@@ -982,6 +1083,7 @@ a{text-decoration:none;color:inherit;}
           <div class="pb-actions">
             <button class="pay-now-btn" id="pay-now-btn" onclick="openSheet('pay')">💳 לתשלום</button>
             <button class="view-receipt-btn" id="view-receipt-btn" onclick="showMyReceipt()">🧾 קבלה</button>
+            <button id="report-paid-btn" onclick="reportPaidFromBanner()" style="padding:7px 14px;background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);display:none;">✅ דיווחתי על תשלום</button>
           </div>
         </div>
       </div>
@@ -1367,6 +1469,47 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
+      <!-- admin: residents manager -->
+      <div class="sett-section admin-only" id="residents-mgr-card">
+        <div class="admin-sec-title">👥 ניהול דיירים ו-WhatsApp</div>
+        <div style="padding:12px 16px 16px;">
+          <div id="residents-list-admin"></div>
+          <!-- add form -->
+          <div class="res-add-form" id="res-add-form">
+            <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:2px;">+ הוסף / עדכן דייר</div>
+            <div class="res-inp-row">
+              <input id="res-inp-unit" class="admin-inp" type="number" placeholder="דירה" min="1" style="width:70px;">
+              <input id="res-inp-name" class="admin-inp" type="text" placeholder="שם מלא" style="flex:1;">
+            </div>
+            <input id="res-inp-phone" class="admin-inp" type="tel" placeholder="מספר טלפון (לדוגמה: 0501234567)">
+            <button class="save-btn" onclick="saveResidentEntry()">💾 שמור דייר</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- install instructions -->
+      <div class="sett-section" id="install-card">
+        <div class="admin-sec-title">📱 התקנת האפליקציה</div>
+        <div style="padding:12px 16px 16px;">
+          <div class="install-platform-tabs">
+            <button class="install-tab active" id="tab-ios" onclick="switchInstallTab('ios')">🍎 iOS</button>
+            <button class="install-tab" id="tab-android" onclick="switchInstallTab('android')">🤖 Android</button>
+          </div>
+          <div id="install-steps-ios" class="install-steps">
+            <div class="install-step"><div class="install-step-num">1</div><div>פתח את האפליקציה ב-Safari</div></div>
+            <div class="install-step"><div class="install-step-num">2</div><div>לחץ על כפתור השיתוף <strong>⬆️</strong> בתחתית המסך</div></div>
+            <div class="install-step"><div class="install-step-num">3</div><div>גלול ולחץ על <strong>"הוסף למסך הבית"</strong></div></div>
+            <div class="install-step"><div class="install-step-num">4</div><div>לחץ <strong>"הוסף"</strong> בפינה הימנית העליונה</div></div>
+          </div>
+          <div id="install-steps-android" class="install-steps" style="display:none;">
+            <div class="install-step"><div class="install-step-num">1</div><div>פתח את האפליקציה ב-Chrome</div></div>
+            <div class="install-step"><div class="install-step-num">2</div><div>לחץ על תפריט ⋮ (שלוש נקודות) בפינה</div></div>
+            <div class="install-step"><div class="install-step-num">3</div><div>לחץ על <strong>"הוסף למסך הבית"</strong></div></div>
+            <div class="install-step"><div class="install-step-num">4</div><div>לחץ <strong>"הוסף"</strong> לאישור</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- danger zone -->
       <div style="padding:0 14px 20px;text-align:center;">
         <button class="danger-btn" onclick="if(confirm('איפוס כל הנתונים?'))resetApp()">🗑️ איפוס נתוני האפליקציה</button>
@@ -1689,7 +1832,8 @@ var _activeNoticeType = 'notice';
 var _waTrayUnit = null;
 var _waTrayMonthKey = null;
 
-var licenseData = { code:'1234', expiry:'2027-01-01', adminContact:'05XXXXXXXX' };
+var LICENSE_EXPIRY = '2027-03-12';
+var licenseData = { code:'1234', expiry: LICENSE_EXPIRY, adminContact:'05XXXXXXXX' };
 
 /* ═══════════════════════════════════════════════════════════════
    DEFAULT DB
@@ -1748,7 +1892,8 @@ function defaultDB(){
         {label:'לא נחוץ',      votes:4},
         {label:'רק בכניסה',    votes:6},
       ],
-      userVote: null
+      userVote: null,
+      votedDevices: []
     },
     docs:[
       {id:1, name:'תקנון הבית המשותף',          cat:'חוזים',     date:'01/01/2024', size:'340 KB'},
@@ -1756,7 +1901,8 @@ function defaultDB(){
       {id:3, name:'דוח תחזוקה שנתי 2025',        cat:'דוחות',     date:'31/12/2025', size:'210 KB'},
       {id:4, name:'פוליסת ביטוח בניין 2025-6',  cat:'ביטוחים',   date:'01/01/2025', size:'480 KB'},
       {id:5, name:'חוזה חברת ניקיון',            cat:'חוזים',     date:'01/03/2025', size:'95 KB'},
-    ]
+    ],
+    residentPhones: {}
   };
 }
 
@@ -1805,6 +1951,8 @@ function migrateDB(){
   if(!DB.unitPaid)          DB.unitPaid = {};
   if(!DB.user)              DB.user = d.user;
   if(!DB.finance.expenses || !DB.finance.expenses.length) DB.finance.expenses = d.finance.expenses;
+  if(!DB.residentPhones)    DB.residentPhones = {};
+  if(!DB.poll.votedDevices) DB.poll.votedDevices = [];
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1843,7 +1991,14 @@ function checkLicense(){
   }
   try{ localStorage.setItem(LIC_KEY, JSON.stringify({auth:true, ts:Date.now()})); } catch(e){}
   document.getElementById('license-screen').style.display='none';
-  showAuthScreen();
+  // check session → auto-login or show auth
+  var sess = getSession();
+  if(sess && sess.unit){
+    DB.user = { name: DB.unitNames[sess.unit]||sess.name, unit:sess.unit };
+    startApp();
+  } else {
+    showAuthScreen();
+  }
 }
 
 function isLicensed(){
@@ -1899,6 +2054,7 @@ function getSession(){
 function startApp(){
   document.getElementById('app').classList.add('visible');
   document.getElementById('bottom-nav').classList.add('visible');
+  switchTab('home'); // ← מעבר אוטומטי לדף הבית
   renderAll();
   checkDebtAlert();
 }
@@ -1943,8 +2099,12 @@ function renderHomePage(){
   var pct = Math.round(paidCount/tot*100);
   setText('donut-home', pct+'%');
 
+  // quick pay card
+  renderQuickPayCard();
+
   // pay banner
   updatePayBanner(mk, unit);
+  updateReportPaidBtn(mk, unit);
 
   // maintenance (show max 3)
   var maint = getActiveMaint().slice(0,3);
@@ -2294,25 +2454,54 @@ function renderPoll(){
   if(!poll) return;
   setText('poll-q', poll.q);
   var total = poll.opts.reduce(function(a,o){ return a+o.votes; },0);
+
+  // check device vote via localStorage
+  var pollVoteKey = 'sn21_poll_vote_'+poll.q.slice(0,20).replace(/\s/g,'_');
+  var hasVotedDevice = false;
+  try{ hasVotedDevice = !!localStorage.getItem(pollVoteKey); } catch(e){}
+  var hasVoted = hasVotedDevice || (poll.userVote !== null && poll.userVote !== undefined);
+
   var phtml = '';
-  poll.opts.forEach(function(o,i){
-    var pct = total>0 ? Math.round(o.votes/total*100) : 0;
-    var sel = poll.userVote===i ? ' selected' : '';
-    phtml += '<div class="poll-opt'+sel+'" onclick="votePoll('+i+')">'+
-      '<div style="display:flex;justify-content:space-between;">'+
-      '<span style="font-size:13px;font-weight:700;">'+escHtml(o.label)+'</span>'+
-      '<span style="font-size:12px;color:var(--slate);">'+pct+'%</span></div>'+
-      '<div class="poll-bar-bg"><div class="poll-bar-fill" style="width:'+pct+'%;background:var(--blue);"></div></div></div>';
-  });
+  if(hasVoted){
+    phtml = '<div class="voted-already">✅ הצבעת כבר בסקר זה</div>';
+    poll.opts.forEach(function(o,i){
+      var pct = total>0 ? Math.round(o.votes/total*100) : 0;
+      var sel = poll.userVote===i ? ' selected' : '';
+      phtml += '<div class="poll-opt'+sel+'" style="cursor:default;">'+
+        '<div style="display:flex;justify-content:space-between;">'+
+        '<span style="font-size:13px;font-weight:700;">'+escHtml(o.label)+'</span>'+
+        '<span style="font-size:12px;color:var(--slate);">'+pct+'%</span></div>'+
+        '<div class="poll-bar-bg"><div class="poll-bar-fill" style="width:'+pct+'%;background:var(--blue);"></div></div></div>';
+    });
+  } else {
+    poll.opts.forEach(function(o,i){
+      var pct = total>0 ? Math.round(o.votes/total*100) : 0;
+      phtml += '<div class="poll-opt" onclick="votePoll('+i+')">'+
+        '<div style="display:flex;justify-content:space-between;">'+
+        '<span style="font-size:13px;font-weight:700;">'+escHtml(o.label)+'</span>'+
+        '<span style="font-size:12px;color:var(--slate);">'+pct+'%</span></div>'+
+        '<div class="poll-bar-bg"><div class="poll-bar-fill" style="width:'+pct+'%;background:var(--blue);"></div></div></div>';
+    });
+  }
   setHTML('poll-opts', phtml);
   setText('poll-footer', total+' הצבעות');
 }
 
 function votePoll(idx){
+  var poll = DB.poll;
+  var pollVoteKey = 'sn21_poll_vote_'+poll.q.slice(0,20).replace(/\s/g,'_');
+  var hasVotedDevice = false;
+  try{ hasVotedDevice = !!localStorage.getItem(pollVoteKey); } catch(e){}
+  if(hasVotedDevice || (poll.userVote !== null && poll.userVote !== undefined)){
+    showToast('כבר הצבעת בסקר זה');
+    return;
+  }
+  try{ localStorage.setItem(pollVoteKey,'1'); } catch(e){}
   DB.poll.userVote = idx;
   DB.poll.opts[idx].votes++;
   saveDB();
   renderPoll();
+  showToast('הצבעתך נרשמה ✅');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2372,6 +2561,7 @@ function renderSettingsPage(){
     renderBudgetManager();
     renderExpCatManager();
     renderDocCatManager();
+    renderResidentsList();
   }
 }
 
@@ -3187,6 +3377,98 @@ function escAttr(s){
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   V21: QUICK PAY CARD (home page)
+═══════════════════════════════════════════════════════════════ */
+function renderQuickPayCard(){
+  var ps = DB.paySettings;
+  var card = document.getElementById('quick-pay-card');
+  var btnsEl = document.getElementById('qpc-btns');
+  if(!card || !btnsEl) return;
+  var hasAny = ps.bit || ps.paybox;
+  card.style.display = hasAny ? 'flex' : 'none';
+  var html = '';
+  if(ps.bit){
+    var phone = ps.bit.replace(/\D/g,'').replace(/^0/,'');
+    html += '<button class="qpc-btn qpc-btn-bit" onclick="window.open(\'https://www.bitpay.co.il/app/payme?phone='+phone+'\',\'_blank\')">📱 Bit</button>';
+  }
+  if(ps.paybox){
+    html += '<button class="qpc-btn qpc-btn-paybox" onclick="window.open(\''+escAttr(ps.paybox)+'\',\'_blank\')">🟢 Paybox</button>';
+  }
+  btnsEl.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   V21: REPORT PAID BUTTON (from pay banner)
+═══════════════════════════════════════════════════════════════ */
+function updateReportPaidBtn(mk, unit){
+  var btn = document.getElementById('report-paid-btn');
+  if(!btn) return;
+  var isApproved = !!DB.approvedReceipts[unit+'-'+mk];
+  var isPending  = DB.pendingPayments.some(function(p){ return p.unit===unit && p.monthKey===mk; });
+  btn.style.display = (!isApproved && !isPending) ? 'inline-flex' : 'none';
+}
+
+function reportPaidFromBanner(){
+  openSheet('pay');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   V21: RESIDENTS MANAGER
+═══════════════════════════════════════════════════════════════ */
+function renderResidentsList(){
+  var el = document.getElementById('residents-list-admin');
+  if(!el) return;
+  var mk = monthKey(getTargetDate());
+  var tot = DB.building.total_units;
+  var html = '';
+  for(var i=1;i<=tot;i++){
+    var name  = DB.unitNames[i]||('דייר '+i);
+    var phone = (DB.residentPhones && DB.residentPhones[i])||'';
+    var cleanPhone = phone.replace(/\D/g,'').replace(/^0/,'972');
+    var wa1 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
+    var reminderMsg = encodeURIComponent('שלום, נשמח להסדרת תשלום הוועד. תודה!');
+    var wa2 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'?text='+reminderMsg+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
+    html += '<div class="res-row">'+
+      '<div class="res-unit-badge">'+i+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div class="res-name">'+escHtml(name)+'</div>'+
+        (phone?'<div class="res-phone">📞 '+escHtml(phone)+'</div>':'<div class="res-phone" style="color:#CBD5E1;">אין טלפון</div>')+
+      '</div>'+
+      '<button class="res-wa-btn" onclick="'+wa1+'" title="פתח WhatsApp">💬</button>'+
+      '<button class="res-reminder-btn" onclick="'+wa2+'">📲 תזכורת</button>'+
+    '</div>';
+  }
+  el.innerHTML = html || '<div class="empty-state">אין דיירים</div>';
+}
+
+function saveResidentEntry(){
+  var unit = parseInt(document.getElementById('res-inp-unit').value)||0;
+  var name = (document.getElementById('res-inp-name').value||'').trim();
+  var phone= (document.getElementById('res-inp-phone').value||'').trim();
+  if(!unit || unit<1 || unit>DB.building.total_units){ showToast('דירה לא תקינה'); return; }
+  if(!DB.residentPhones) DB.residentPhones={};
+  if(name) DB.unitNames[unit] = name;
+  if(phone) DB.residentPhones[unit] = phone;
+  saveDB();
+  document.getElementById('res-inp-unit').value='';
+  document.getElementById('res-inp-name').value='';
+  document.getElementById('res-inp-phone').value='';
+  showToast('דייר נשמר ✅');
+  renderResidentsList();
+  renderAdminCollBoard();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   V21: INSTALL TAB SWITCH
+═══════════════════════════════════════════════════════════════ */
+function switchInstallTab(platform){
+  document.getElementById('install-steps-ios').style.display     = platform==='ios'     ? 'block':'none';
+  document.getElementById('install-steps-android').style.display = platform==='android' ? 'block':'none';
+  document.getElementById('tab-ios').className     = 'install-tab'+(platform==='ios'?' active':'');
+  document.getElementById('tab-android').className = 'install-tab'+(platform==='android'?' active':'');
+}
+
+/* ═══════════════════════════════════════════════════════════════
    BOOT SEQUENCE
 ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', function(){
@@ -3197,7 +3479,36 @@ window.addEventListener('load', function(){
     var ls = document.getElementById('loading-screen');
     if(ls){ ls.style.opacity='0'; setTimeout(function(){ ls.style.display='none'; },500); }
 
-    // check license
+    // check hard license expiry — lock app completely
+    var today = new Date().toISOString().slice(0,10);
+    if(LICENSE_EXPIRY && today > LICENSE_EXPIRY){
+      // show locked overlay
+      var lo = document.createElement('div');
+      lo.className = 'lic-locked-overlay';
+      lo.innerHTML = '<div class="lock-icon">🔒</div>'+
+        '<div class="lock-title">הרישיון פג תוקף</div>'+
+        '<div class="lock-sub">תוקף הרישיון של SmartNeighbor הסתיים.<br>לחידוש הרישיון צרו קשר עם נציג שכנות טובה.</div>';
+      document.body.appendChild(lo);
+      return;
+    }
+
+    // warn at key milestones: 30 / 14 / 7 / 1 days before expiry
+    if(LICENSE_EXPIRY){
+      var expDate   = new Date(LICENSE_EXPIRY);
+      var todayDate = new Date(today);
+      var daysLeft  = Math.round((expDate - todayDate)/(1000*60*60*24));
+      var milestones = [30, 14, 7, 1];
+      var shouldWarn = daysLeft >= 0 && milestones.some(function(m){ return daysLeft <= m; });
+      if(shouldWarn){
+        var warnMsg = daysLeft === 0
+          ? '⚠️ שים לב: המנוי יסתיים היום! נא לפנות לחידוש בהקדם'
+          : '⚠️ שים לב: המנוי יסתיים בעוד '+daysLeft+' ימים. נא לפנות לחידוש בהקדם';
+        var wb = document.getElementById('lic-warn-bar');
+        if(wb){ wb.textContent = warnMsg; wb.style.display = 'block'; }
+      }
+    }
+
+    // check license auth
     if(!isLicensed()){
       var licSc = document.getElementById('license-screen');
       if(licSc) licSc.style.display='flex';
