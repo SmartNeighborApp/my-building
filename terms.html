@@ -1,38 +1,819 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>תנאי שימוש - SmartNeighbor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Heebo', sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px 20px; background-color: #f9f9f9; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { color: #1A3A5C; border-bottom: 2px solid #1A3A5C; padding-bottom: 10px; }
-        h2 { color: #1A3A5C; margin-top: 25px; }
-        p { margin-bottom: 15px; }
-        .back-link { display: inline-block; margin-top: 30px; color: #1A3A5C; text-decoration: none; font-weight: bold; }
-        .back-link:hover { text-decoration: underline; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדיניות פרטיות ותנאי שימוש · SmartNeighbor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #1A3A5C;
+    --blue:   #2563EB;
+    --blue-mid: #1E4D8C;
+    --teal:   #14B8A6;
+    --gold:   #C9A84C;
+    --slate:  #64748B;
+    --light:  #F1F5F9;
+    --white:  #FFFFFF;
+    --border: #E2E8F0;
+    --text:   #1E293B;
+    --muted:  #94A3B8;
+    --danger: #EF4444;
+    --warn-bg:#FEF3C7;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #F8FAFC;
+    color: var(--text);
+    direction: rtl;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ───────────────────────────────────── */
+  .site-header {
+    background: linear-gradient(135deg, #0F2744 0%, #1A3A5C 50%, #1E4D8C 100%);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 24px rgba(15,39,68,.35);
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-icon { font-size: 26px; line-height: 1; }
+  .brand-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .brand-sub {
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+  .header-badge {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,.75);
+    white-space: nowrap;
+  }
+
+  /* ── HERO SECTION ─────────────────────────────── */
+  .hero {
+    background: linear-gradient(160deg, #0F2744 0%, #1A3A5C 45%, #1E4D8C 100%);
+    padding: 56px 24px 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-icon {
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 4px 16px rgba(20,184,166,.35));
+    animation: float 3.5s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+  }
+  .hero h1 {
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .hero p {
+    font-size: 14px;
+    color: rgba(255,255,255,.6);
+    max-width: 420px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    font-weight: 600;
+  }
+  .hero-meta-item span:first-child { font-size: 14px; }
+
+  /* ── TOC ──────────────────────────────────────── */
+  .toc-wrap {
+    max-width: 860px;
+    margin: -24px auto 0;
+    padding: 0 24px;
+    position: relative;
+    z-index: 10;
+  }
+  .toc-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(15,39,68,.12), 0 1px 0 rgba(15,39,68,.05);
+    padding: 24px 28px;
+    border: 1px solid var(--border);
+  }
+  .toc-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--slate);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px;
+  }
+  .toc-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .15s, color .15s;
+    border: 1.5px solid transparent;
+  }
+  .toc-link:hover {
+    background: #EFF6FF;
+    border-color: #DBEAFE;
+    color: var(--blue);
+  }
+  .toc-num {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--light);
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--slate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── MAIN CONTENT ─────────────────────────────── */
+  .content {
+    max-width: 860px;
+    margin: 32px auto 0;
+    padding: 0 24px 60px;
+  }
+
+  /* ── IMPORTANT BANNER ─────────────────────────── */
+  .important-banner {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    border: 2px solid #F59E0B;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .important-banner .ib-icon { font-size: 24px; flex-shrink: 0; margin-top: 1px; }
+  .important-banner .ib-title { font-size: 14px; font-weight: 900; color: #92400E; margin-bottom: 4px; }
+  .important-banner .ib-text  { font-size: 13px; color: #78350F; line-height: 1.55; }
+
+  /* ── SECTION ──────────────────────────────────── */
+  .section {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(15,39,68,.06);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    scroll-margin-top: 80px;
+  }
+  .section-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-num {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--navy);
+  }
+  .section-icon { font-size: 20px; }
+  .section-body {
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── SUBSECTION ───────────────────────────────── */
+  .subsection-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .subsection-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(180deg, var(--blue), var(--teal));
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.75;
+  }
+
+  /* ── BULLET LIST ──────────────────────────────── */
+  .clause-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+  }
+  .clause-list li {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.65;
+    padding-right: 24px;
+    position: relative;
+  }
+  .clause-list li::before {
+    content: '•';
+    position: absolute;
+    right: 8px;
+    color: var(--blue);
+    font-weight: 900;
+  }
+  .clause-list.check li::before {
+    content: '✓';
+    color: #16A34A;
+    font-size: 12px;
+    top: 2px;
+  }
+  .clause-list.ban li::before {
+    content: '✕';
+    color: var(--danger);
+    font-size: 12px;
+    top: 2px;
+    font-weight: 900;
+  }
+
+  /* ── HIGHLIGHT BOX ────────────────────────────── */
+  .highlight-box {
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .highlight-box.blue  { background: #EFF6FF; border: 1.5px solid #BFDBFE; color: #1E40AF; }
+  .highlight-box.green { background: #F0FDF4; border: 1.5px solid #86EFAC; color: #166534; }
+  .highlight-box.red   { background: #FEF2F2; border: 1.5px solid #FECACA; color: #991B1B; }
+  .highlight-box.gold  { background: #FFFBEB; border: 1.5px solid #FCD34D; color: #92400E; }
+  .highlight-box strong { font-weight: 800; }
+
+  /* ── TABLE ────────────────────────────────────── */
+  .terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .terms-table th {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 800;
+    padding: 11px 16px;
+    text-align: right;
+    font-size: 12px;
+  }
+  .terms-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: #374151;
+    line-height: 1.55;
+  }
+  .terms-table tr:last-child td { border-bottom: none; }
+  .terms-table tr:nth-child(even) td { background: #F8FAFC; }
+
+  /* ── DIVIDER ──────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  /* ── FOOTER ───────────────────────────────────── */
+  .page-footer {
+    background: linear-gradient(135deg, #0F2744 0%, #1A3A5C 100%);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer-inner { max-width: 860px; margin: 0 auto; }
+  .footer-brand { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .footer-sub { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 28px; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--gold) 0%, #E2C05A 100%);
+    color: var(--navy);
+    text-decoration: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 900;
+    font-family: 'Heebo', sans-serif;
+    box-shadow: 0 6px 24px rgba(201,168,76,.4);
+    transition: transform .13s, box-shadow .13s;
+  }
+  .back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(201,168,76,.5);
+  }
+  .back-btn:active { transform: scale(.97); }
+
+  .footer-copy {
+    margin-top: 24px;
+    font-size: 11px;
+    color: rgba(255,255,255,.3);
+    line-height: 1.7;
+  }
+
+  /* ── SCROLL PROGRESS ──────────────────────────── */
+  #scroll-progress {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    z-index: 9999;
+    transition: width .1s;
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 600px) {
+    .header-inner { padding: 14px 16px; }
+    .hero { padding: 40px 16px 50px; }
+    .toc-wrap { padding: 0 16px; }
+    .content { padding: 0 16px 48px; }
+    .section-header { padding: 16px 18px 14px; }
+    .section-body { padding: 16px 18px 20px; }
+    .toc-grid { grid-template-columns: 1fr 1fr; }
+    .hero-meta { gap: 14px; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>תנאי שימוש וקניין רוחני</h1>
-        <p>ברוכים הבאים לאתר <strong>SmartNeighbor</strong>.</p>
-        
-        <h2>1. קניין רוחני</h2>
-        <p>כל התוכן המופיע באתר זה, כולל אך לא רק: קוד המקור (HTML, CSS, JS), העיצוב הגרפי, הלוגו, המבנה האינטראקטיבי, הטקסטים והרעיון העסקי, הם רכושם הבלעדי של מפתחי SmartNeighbor ומוגנים על ידי חוקי זכויות יוצרים בינלאומיים ומקומיים.</p>
-        
-        <h2>2. איסור העתקה ושימוש</h2>
-        <p>חל איסור מוחלט להעתיק, לשכפל, להפיץ, להציג בפומבי, להעביר לצד שלישי או לעשות כל שימוש מסחרי או אחר בחלקי האתר או בקוד שלו ללא אישור מפורש ובכתב.</p>
-        
-        <h2>3. הגנת קוד</h2>
-        <p>הניסיון לעקוף את מנגנוני ההגנה של האתר, לבצע הנדסה לאחור (Reverse Engineering) או להעתיק את הלוגיקה הניהולית של האפליקציה מהווה הפרה של תנאי השימוש ועלול לגרור צעדים משפטיים.</p>
-        
-        <h2>4. שימוש בשירות</h2>
-        <p>השירות ניתן כפי שהוא (AS-IS) למטרת ניהול ועד בית וקהילה בלבד. כל שימוש אחר באחריות המשתמש בלבד.</p>
 
-        <a href="index.html" class="back-link">→ חזרה לאתר</a>
+<div id="scroll-progress"></div>
+
+<!-- ── HEADER ──────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-icon">🏢</span>
+      <div>
+        <div class="brand-name">שכנות טובה</div>
+        <div class="brand-sub">SmartNeighbor Pro</div>
+      </div>
     </div>
+    <div class="header-badge">מסמך רשמי · מדיניות פרטיות</div>
+  </div>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────────── -->
+<section class="hero">
+  <span class="hero-icon">⚖️</span>
+  <h1>מדיניות פרטיות ותנאי שימוש</h1>
+  <p>מסמך משפטי מחייב המסדיר את השימוש במערכת SmartNeighbor ואת זכויות הקניין הרוחני הצמודות לה</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span>📅</span><span>עודכן: מרץ 2026</span></div>
+    <div class="hero-meta-item"><span>🇮🇱</span><span>כפוף לדין הישראלי</span></div>
+    <div class="hero-meta-item"><span>🔒</span><span>כל הזכויות שמורות</span></div>
+  </div>
+</section>
+
+<!-- ── TABLE OF CONTENTS ────────────────────────────────────── -->
+<div class="toc-wrap">
+  <div class="toc-card">
+    <div class="toc-title">📋 תוכן העניינים</div>
+    <div class="toc-grid">
+      <a class="toc-link" href="#s1"><span class="toc-num">1</span>הגדרות</a>
+      <a class="toc-link" href="#s2"><span class="toc-num">2</span>קניין רוחני</a>
+      <a class="toc-link" href="#s3"><span class="toc-num">3</span>רישיון שימוש</a>
+      <a class="toc-link" href="#s4"><span class="toc-num">4</span>שימושים אסורים</a>
+      <a class="toc-link" href="#s5"><span class="toc-num">5</span>פרטיות ונתונים</a>
+      <a class="toc-link" href="#s6"><span class="toc-num">6</span>הגבלת אחריות</a>
+      <a class="toc-link" href="#s7"><span class="toc-num">7</span>הפסקת שירות</a>
+      <a class="toc-link" href="#s8"><span class="toc-num">8</span>שינויים בתנאים</a>
+      <a class="toc-link" href="#s9"><span class="toc-num">9</span>דין ושיפוט</a>
+      <a class="toc-link" href="#s10"><span class="toc-num">10</span>יצירת קשר</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENT ──────────────────────────────────────────────── -->
+<main class="content">
+
+  <div class="important-banner">
+    <span class="ib-icon">⚠️</span>
+    <div>
+      <div class="ib-title">קרא בעיון לפני שימוש</div>
+      <div class="ib-text">השימוש במערכת SmartNeighbor מהווה הסכמה מלאה ובלתי מסויגת לכל תנאי מסמך זה. אם אינך מסכים לתנאים אלו, עליך להפסיק את השימוש במערכת לאלתר. מסמך זה מהווה הסכם משפטי מחייב בינך לבין בעלי המערכת.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 1 ═══════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <span class="section-icon">📖</span>
+      <h2 class="section-title">הגדרות ופרשנות</h2>
+    </div>
+    <div class="section-body">
+      <p>במסמך זה, המונחים הבאים יפורשו כדלקמן:</p>
+      <table class="terms-table">
+        <thead>
+          <tr><th>מונח</th><th>הגדרה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>"המערכת"</strong></td><td>תוכנת SmartNeighbor / שכנות טובה, כולל כל קוד המקור, ממשקי המשתמש, מסדי הנתונים, הלוגיקה העסקית, העיצוב והנכסים הדיגיטליים הנלווים.</td></tr>
+          <tr><td><strong>"הבעלים"</strong></td><td>יוצרי ומפתחי מערכת SmartNeighbor, בעלי כל זכויות הקניין הרוחני במערכת.</td></tr>
+          <tr><td><strong>"משתמש"</strong></td><td>כל אדם, תאגיד, ועד בית, חברת ניהול או גוף אחר המשתמש במערכת בכל דרך שהיא.</td></tr>
+          <tr><td><strong>"רישיון"</strong></td><td>הרשאה מוגבלת, אישית, בלתי ניתנת להעברה, לשימוש במערכת בהתאם לתנאי מסמך זה בלבד.</td></tr>
+          <tr><td><strong>"תוכן"</strong></td><td>כל נתון, מידע, טקסט, קובץ, תמונה ומסמך המוזן למערכת על ידי המשתמש.</td></tr>
+          <tr><td><strong>"שירות"</strong></td><td>פלטפורמת ניהול ועד הבית המסופקת על ידי הבעלים, לרבות כלל הפונקציות, הממשקים והתכונות.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 2 ═══════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <span class="section-icon">🛡️</span>
+      <h2 class="section-title">קניין רוחני — הצהרה והגנה</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="highlight-box red">
+        <strong>הצהרה בדבר בעלות מוחלטת:</strong> כל זכויות היוצרים, זכויות הפטנט, הסימנים המסחריים, הסודות המסחריים, וכל זכות קניין רוחני אחרת בקשר למערכת SmartNeighbor שייכים אך ורק לבעלים. אין בשימוש במערכת כדי להקנות למשתמש כל זכות בעלות.
+      </div>
+
+      <div>
+        <div class="subsection-title">2.1 קוד המקור והארכיטקטורה</div>
+        <p>קוד המקור של המערכת (HTML, CSS, JavaScript וכל שפת תכנות אחרת), לרבות ארכיטקטורת המערכת, הלוגיקה העסקית, מבנה מסד הנתונים, ממשקי ה-API, ואלגוריתמי עיבוד הנתונים — מוגנים במלואם על פי חוק זכות יוצרים, תשס"ח-2007, וכן על פי אמנות בינלאומיות. כל העתקה, שינוי, פירוק, הנדסה לאחור (reverse engineering), או ניסיון לשחזר את קוד המקור — אסורה בהחלט.</p>
+      </div>
+
+      <div>
+        <div class="subsection-title">2.2 עיצוב וממשק משתמש</div>
+        <p>עיצוב הממשק הגרפי של SmartNeighbor, כולל פריסת המסכים, בחירת הצבעים, אייקונים מקוריים, אנימציות, רכיבי UI/UX, סכמת הניווט, ומכלול חווית המשתמש — מהווים יצירה מקורית מוגנת בזכויות יוצרים. אין להעתיקם, לחקותם, לעצב מחדש לפי דמותם, או להשתמש בהם כבסיס לפיתוח מוצרים אחרים.</p>
+      </div>
+
+      <div>
+        <div class="subsection-title">2.3 מותג וסימנים מסחריים</div>
+        <ul class="clause-list ban">
+          <li>שמות "SmartNeighbor", "שכנות טובה", "SN" ולוגו הבניין — סימנים מסחריים הרשומים לבעלים.</li>
+          <li>חל איסור מוחלט על שימוש בשמות, בסימנים ובלוגואים אלו ללא אישור כתוב מפורש מהבעלים.</li>
+          <li>חל איסור לרשום סימנים מסחריים דומים או מבלבלים בכל מדינה שהיא.</li>
+          <li>חל איסור להציג את מוצר אחר תחת שם המותג של SmartNeighbor.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="subsection-title">2.4 סודות מסחריים</div>
+        <p>המשתמש מכיר בכך שמידע טכני, נוסחות, תהליכים עסקיים, נתוני לקוחות, אסטרטגיות עסקיות, ומידע פיננסי הקשורים לפיתוח ולהפעלת SmartNeighbor — מהווים סודות מסחריים יקרי ערך ומחויב לשמור על סודיותם, גם לאחר הפסקת השימוש.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 3 ═══════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <span class="section-icon">📋</span>
+      <h2 class="section-title">רישיון שימוש — היקף ומגבלות</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="highlight-box green">
+        <strong>רישיון מוגבל:</strong> בכפוף לתשלום דמי המנוי ולעמידה בכל תנאי הסכם זה, הבעלים מעניקים למשתמש רישיון שימוש אישי, מוגבל, בלתי בלעדי, בלתי ניתן להמחאה ובלתי ניתן להסבה — לשימוש במערכת בלבד לצרכי ניהול ועד הבית עבורו ניתן הרישיון.
+      </div>
+
+      <div>
+        <div class="subsection-title">3.1 מה מותר</div>
+        <ul class="clause-list check">
+          <li>שימוש במערכת לניהול הבניין עבורו ניתן הרישיון בלבד.</li>
+          <li>הזנת נתוני הבניין והדיירים ועדכונם על בסיס שוטף.</li>
+          <li>שיתוף גישה לדיירי הבניין הרשומים במסגרת הרישיון.</li>
+          <li>ייצוא דוחות ונתונים לשימוש פנימי בוועד הבית.</li>
+          <li>שימוש בפונקציות הגבייה, המסמכים, הקהילה והתחזוקה כמיועד.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="subsection-title">3.2 קוד הרישיון</div>
+        <p>קוד הרישיון הוא אישי ומיועד לבניין ספציפי. חל איסור על שיתוף קוד הרישיון, מכירתו, העברתו לצד שלישי, או שימוש בו עבור בניינים נוספים מעבר לרישיון שנרכש. שימוש בקוד רישיון שלא כדין יפסיק את הגישה ויזכה את הבעלים בסעדים משפטיים.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 4 ═══════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <span class="section-icon">🚫</span>
+      <h2 class="section-title">שימושים אסורים</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="highlight-box red">
+        <strong>אזהרה:</strong> הפרת סעיפי השימושים האסורים מהווה עילה לסיום מידי של הרישיון, ועלולה לחשוף את המפר לתביעה אזרחית ו/או פלילית.
+      </div>
+
+      <div>
+        <div class="subsection-title">4.1 איסורים על פיתוח וקוד</div>
+        <ul class="clause-list ban">
+          <li><strong>הנדסה לאחור (Reverse Engineering):</strong> חל איסור מוחלט לנתח, לפרק, לתרגם, לפענח, לחקור, למפות, או לנסות לגלות את קוד המקור, הלוגיקה הפנימית, האלגוריתמים, מבנה מסד הנתונים, או כל חלק אחר של המערכת.</li>
+          <li><strong>פיתוח מוצר מתחרה:</strong> חל איסור להשתמש בידע שנרכש ממערכת זו, לרבות ידע על פונקציונליות, חוויית משתמש, זרימת תהליכים, ועיצוב — לצורך פיתוח מוצר מתחרה.</li>
+          <li><strong>העתקה ושכפול:</strong> חל איסור להעתיק קוד, CSS, HTML, לוגיקת JavaScript, מבנה תכנות, עיצוב מסכים, או כל נכס דיגיטלי מהמערכת.</li>
+          <li><strong>הסרת הגנות:</strong> חל איסור להסיר, לעקוף, לשנות, או לפגוע בכל מנגנון הגנה, בקרת גישה, אימות, רישוי, או אמצעי אבטחה אחר המוטמע במערכת.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="subsection-title">4.2 איסורים על שימוש</div>
+        <ul class="clause-list ban">
+          <li>שימוש המערכת לכל מטרה בלתי חוקית, לרבות הונאה, זיוף, או פגיעה בפרטיות.</li>
+          <li>הגשת מידע כוזב, מטעה, או פוגעני אודות דיירים, תשלומים, או נתוני הבניין.</li>
+          <li>ניסיון לחדור למערכת, לשנות נתוני משתמשים אחרים, או לגשת לפונקציות שלא הוענקה להן הרשאה.</li>
+          <li>שימוש במערכת לצורך שליחת הודעות ספאם, הטרדות, או תוכן פוגעני לדיירים.</li>
+          <li>מכירה, השכרה, העברה, או רישוי חוזר של הגישה למערכת לצד שלישי.</li>
+          <li>שימוש בכלים אוטומטיים לאיסוף נתונים (scraping), בוטים, או סריקות אוטומטיות.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 5 ═══════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <span class="section-icon">🔐</span>
+      <h2 class="section-title">פרטיות, נתונים ואבטחת מידע</h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <div class="subsection-title">5.1 בעלות על נתוני המשתמש</div>
+        <p>הנתונים שהמשתמש מזין למערכת — לרבות פרטי דיירים, מידע פיננסי, רשימות תחזוקה, והודעות — שייכים למשתמש. הבעלים אינם משתמשים בנתונים אלו לצרכים מסחריים, ואינם מוכרים אותם לצדדים שלישיים. עם זאת, המשתמש מאשר כי הנתונים נשמרים באחסון מקומי בדפדפן (localStorage) ואחריות הגיבוי מוטלת על המשתמש.</p>
+      </div>
+
+      <div>
+        <div class="subsection-title">5.2 חובות המשתמש כלפי פרטיות הדיירים</div>
+        <ul class="clause-list">
+          <li>המשתמש מחויב לשמור על פרטיות כל דייר שנתוניו מוזנים למערכת, בהתאם לחוק הגנת הפרטיות, תשמ"א-1981 ותקנות GDPR.</li>
+          <li>מספרי טלפון, כתובות ונתונים אישיים של דיירים ישמשו אך ורק לצורכי ניהול הבניין.</li>
+          <li>חל איסור להעביר נתוני דיירים לצדדים שלישיים ללא הסכמתם.</li>
+          <li>על המשתמש לנקוט בצעדים סבירים להגן על גישה למערכת מפני צדדים בלתי מורשים.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="subsection-title">5.3 אבטחת המנהל</div>
+        <p>קוד המנהל (PIN) מהווה מנגנון הגנה קריטי. המשתמש האחראי הינו אחראי בלעדי על שמירת הקוד בסודיות, עדכונו כשנדרש, ומניעת גישה בלתי מורשית. הבעלים לא יישאו באחריות לכל נזק הנגרם כתוצאה מגישה לא מורשית שמקורה בחוסר זהירות המשתמש.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 6 ═══════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <span class="section-icon">⚠️</span>
+      <h2 class="section-title">הגבלת אחריות ואחריות המשתמש</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="highlight-box gold">
+        <strong>הצהרת "כפי שהוא" (AS-IS):</strong> המערכת מסופקת כפי שהיא, ללא כל אחריות מפורשת או משתמעת. הבעלים עושים כמיטב יכולתם לספק שירות אמין, אך אינם מתחייבים לזמינות מלאה, לאי-הימצאות שגיאות, או להתאמה למטרה ספציפית.
+      </div>
+
+      <div>
+        <div class="subsection-title">6.1 הגבלות אחריות הבעלים</div>
+        <p>הבעלים לא יישאו באחריות לכל נזק ישיר, עקיף, מקרי, תוצאתי, מיוחד, או עונשי, לרבות אך לא רק:</p>
+        <ul class="clause-list ban">
+          <li>אובדן נתונים, כספים, הכנסות, מוניטין, או הזדמנויות עסקיות.</li>
+          <li>נזקים הנובעים מתקלות טכניות, פסקי חשמל, כשלי שרת, או הפסקות אינטרנט.</li>
+          <li>החלטות פיננסיות, משפטיות, או ניהוליות שהתקבלו בהסתמך על נתוני המערכת.</li>
+          <li>פרצות אבטחה שמקורן באמצעי הגנה מחוץ לשליטת הבעלים.</li>
+          <li>שגיאות בנתונים שהוזנו על ידי המשתמש עצמו.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="subsection-title">6.2 אחריות המשתמש</div>
+        <p>המשתמש נושא באחריות בלעדית ומלאה לכל שימוש שנעשה במערכת, לרבות: נכונות הנתונים המוזנים, ניהול תקין של כספי הוועד, עמידה בהוראות חוקי הבתים המשותפים, ולכל החלטות ניהוליות שהתקבלו. המשתמש מתחייב לשפות את הבעלים בגין כל תביעה, נזק, אובדן, אחריות, עלות, או הוצאה (לרבות שכר טרחת עורך דין) שינבעו מהפרת תנאי הסכם זה.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 7 ═══════════════ -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <span class="section-icon">🔌</span>
+      <h2 class="section-title">הפסקת שירות וסיום הסכם</h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <div class="subsection-title">7.1 סיום על ידי הבעלים</div>
+        <p>הבעלים שומרים לעצמם את הזכות להשעות או לסיים את השירות ואת הרישיון, בכל עת, ללא הודעה מוקדמת, במקרים של: הפרת תנאי הסכם זה, אי-תשלום דמי מנוי, שימוש לרעה במערכת, ניסיון גישה בלתי מורשית, פעילות בלתי חוקית, או כל סיבה אחרת לפי שיקול דעתם הבלעדי.</p>
+      </div>
+
+      <div>
+        <div class="subsection-title">7.2 אי-חידוש מנוי</div>
+        <p>עם תום תקופת הרישיון ואי-חידושו, תיפסק הגישה למערכת. המשתמש מחויב לייצא את נתוניו טרם פקיעת הרישיון. הבעלים אינם אחראים לנתונים שאבדו לאחר תום תקופת הרישיון.</p>
+      </div>
+
+      <div class="highlight-box blue">
+        <strong>המשך תוקף:</strong> סעיפי הקניין הרוחני (סעיף 2), הגבלת האחריות (סעיף 6), ושיפוי הבעלים — יישארו בתוקף גם לאחר סיום הסכם זה.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 8 ═══════════════ -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <span class="section-icon">✏️</span>
+      <h2 class="section-title">שינויים בתנאים ובמערכת</h2>
+    </div>
+    <div class="section-body">
+      <p>הבעלים רשאים לשנות תנאים אלו, תכונות המערכת, מחירי המנוי, ומדיניות השימוש — בכל עת, לפי שיקול דעתם הבלעדי. הודעה על שינויים מהותיים תינתן באמצעות הצגת הנוסח המעודכן במערכת. המשך השימוש לאחר פרסום השינויים מהווה הסכמה אליהם. אם אינך מסכים לשינויים, עליך להפסיק שימוש ולפנות לבעלים לגבי ביטול הרישיון.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 9 ═══════════════ -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <span class="section-icon">⚖️</span>
+      <h2 class="section-title">דין חל, שיפוט וסמכות</h2>
+    </div>
+    <div class="section-body">
+      <p>הסכם זה יפורש ויוחל בהתאם לדיני מדינת ישראל בלבד, ללא התחשבות בכללי ברירת הדין. כל מחלוקת הנוגעת להסכם זה תידון בבתי המשפט המוסמכים במחוז תל אביב-יפו, וצדדים מסכימים בזאת לסמכות שיפוטית בלעדית של בתי משפט אלו.</p>
+      <div>
+        <div class="subsection-title">9.1 יישוב סכסוכים</div>
+        <p>לפני פנייה לבית משפט, הצדדים מתחייבים לנסות ולהגיע להסכמה ישירה תוך 30 יום ממועד ההודעה על הסכסוך. כישלון הליך זה יאפשר נקיטת הליכים משפטיים.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SECTION 10 ═══════════════ -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <span class="section-icon">📬</span>
+      <h2 class="section-title">יצירת קשר</h2>
+    </div>
+    <div class="section-body">
+      <p>לשאלות, פניות משפטיות, דיווח על הפרות זכויות יוצרים, או כל עניין אחר הנוגע לתנאי שימוש אלו — ניתן לפנות לבעלי המערכת בדרכי ההתקשרות הרשמיות:</p>
+      <div class="highlight-box blue">
+        <strong>SmartNeighbor / שכנות טובה</strong><br>
+        לפניות בנושא קניין רוחני ורישוי — יש לשלוח פנייה בכתב לערוצי הפניה הרשמיים.<br>
+        זמן תגובה: עד 7 ימי עסקים.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIGNATURE BOX ──────────────────────────── -->
+  <div style="background: linear-gradient(135deg, #0F2744 0%, #1A3A5C 100%); border-radius: 20px; padding: 28px 28px; text-align: center; margin-top: 32px;">
+    <div style="font-size: 32px; margin-bottom: 12px;">🏢</div>
+    <div style="font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 6px;">SmartNeighbor · שכנות טובה</div>
+    <div style="font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 16px;">© 2026 כל הזכויות שמורות לבעלים. אין לשכפל, להעתיק, לשנות או להפיץ.</div>
+    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 12px; color: rgba(255,255,255,.4);">
+      <span>📅 עודכן לאחרונה: מרץ 2026</span>
+      <span>⚖️ גרסה: 21.0</span>
+      <span>🇮🇱 דין ישראלי</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">🏢 שכנות טובה</div>
+    <div class="footer-sub">SmartNeighbor · ניהול חכם לבניינים</div>
+    <a class="back-btn" href="index.html">
+      <span>🏠</span>
+      <span>חזרה לאפליקציה</span>
+    </a>
+    <div class="footer-copy">
+      © 2026 SmartNeighbor · כל הזכויות שמורות<br>
+      קוד המקור, העיצוב, הלוגיקה העסקית ושם המותג — קניינם הבלעדי של בעלי המערכת<br>
+      אין לשכפל, לשנות, להפיץ, או להשתמש ללא אישור כתוב מפורש
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', function() {
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    document.getElementById('scroll-progress').style.width = progress + '%';
+  });
+</script>
+
 </body>
 </html>
