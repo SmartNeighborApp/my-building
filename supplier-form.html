@@ -1,741 +1,212 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
+<!doctype html>
+<html lang=he dir=rtl>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta charset=UTF-8>
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>הסכם הצטרפות ספק — שכנות טובה</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
-<style>
-*{ box-sizing:border-box; margin:0; padding:0; }
-body{
-  font-family:'Heebo',sans-serif;
-  background:linear-gradient(135deg,#1A3A5C 0%,#0F2540 100%);
-  min-height:100vh; padding:20px 16px 40px;
-  color:#1E293B;
-}
-.card{
-  background:#fff; border-radius:20px;
-  max-width:520px; margin:0 auto;
-  box-shadow:0 20px 60px rgba(0,0,0,.3);
-  overflow:hidden;
-}
-.hdr{
-  background:linear-gradient(135deg,#1A3A5C,#2563EB);
-  padding:24px 24px 20px; text-align:center;
-}
-.hdr-logo{ font-size:40px; margin-bottom:8px; }
-.hdr-title{ font-size:20px; font-weight:900; color:#fff; }
-.hdr-sub{ font-size:12px; color:rgba(255,255,255,.7); margin-top:4px; }
-.hdr-gold{
-  background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.4);
-  border-radius:10px; padding:8px 14px; margin-top:12px;
-  font-size:12px; font-weight:700; color:#C9A84C;
-}
-
-.body{ padding:20px; }
-.section{
-  margin-bottom:20px;
-  border:1px solid #E2E8F0; border-radius:14px;
-  overflow:hidden;
-}
-.section-title{
-  background:#F8FAFC; padding:12px 16px;
-  font-size:13px; font-weight:800; color:#1A3A5C;
-  border-bottom:1px solid #E2E8F0;
-  display:flex; align-items:center; gap:8px;
-}
-.section-body{ padding:16px; display:flex; flex-direction:column; gap:12px; }
-
-.field-label{ font-size:12px; font-weight:700; color:#475569; margin-bottom:4px; display:block; }
-.field-input{
-  width:100%; padding:10px 12px; border-radius:10px;
-  border:1.5px solid #E2E8F0; font-size:14px;
-  font-family:'Heebo',sans-serif; background:#FAFAFA;
-  transition:border-color .2s;
-}
-.field-input:focus{ outline:none; border-color:#2563EB; background:#fff; }
-.field-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-/* checkboxes */
-.check-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-
-/* city picker */
-.city-search-wrap{ position:relative; margin-bottom:8px; }
-.city-search-input{
-  width:100%; padding:10px 12px 10px 36px;
-  border-radius:10px; border:1.5px solid #E2E8F0;
-  font-size:14px; font-family:'Heebo',sans-serif;
-  background:#FAFAFA; transition:border-color .2s;
-}
-.city-search-input:focus{ outline:none; border-color:#2563EB; background:#fff; }
-.city-search-icon{
-  position:absolute; left:11px; top:50%;
-  transform:translateY(-50%); font-size:16px; pointer-events:none;
-}
-.city-tags{
-  display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; min-height:8px;
-}
-.city-tag{
-  display:flex; align-items:center; gap:5px;
-  background:#EFF6FF; border:1px solid #BFDBFE;
-  border-radius:50px; padding:4px 10px;
-  font-size:12px; font-weight:700; color:#1D4ED8;
-}
-.city-tag-x{
-  cursor:pointer; font-size:14px; line-height:1;
-  color:#60A5FA; margin-right:-2px;
-}
-.city-dropdown{
-  display:none; position:absolute; z-index:99;
-  background:#fff; border:1.5px solid #E2E8F0;
-  border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.1);
-  max-height:200px; overflow-y:auto; width:100%;
-  top:calc(100% + 4px);
-}
-.city-dropdown.open{ display:block; }
-.city-option{
-  padding:10px 14px; font-size:13px; font-weight:600;
-  cursor:pointer; color:#1E293B; transition:background .1s;
-}
-.city-option:hover{ background:#EFF6FF; color:#1D4ED8; }
-.city-option.selected{ background:#EFF6FF; color:#1D4ED8; font-weight:800; }
-.check-item{
-  display:flex; align-items:center; gap:8px;
-  padding:8px 10px; border-radius:10px;
-  border:1.5px solid #E2E8F0; cursor:pointer;
-  font-size:13px; font-weight:600; color:#374151;
-  transition:all .15s;
-}
-.check-item input{ display:none; }
-.check-item.selected{
-  border-color:#2563EB; background:#EFF6FF; color:#1D4ED8;
-}
-.check-box{
-  width:18px; height:18px; border-radius:5px;
-  border:2px solid #CBD5E1; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:11px; transition:all .15s;
-}
-.check-item.selected .check-box{
-  background:#2563EB; border-color:#2563EB; color:#fff;
-}
-
-/* insurance note */
-.ins-note{
-  background:#FEF3C7; border-radius:10px; padding:10px 12px;
-  font-size:12px; color:#92400E; font-weight:600;
-  display:flex; gap:8px; align-items:flex-start;
-}
-
-/* agreement box */
-.agreement{
-  background:#F0FDF4; border:1px solid #BBF7D0;
-  border-radius:14px; padding:16px;
-  font-size:12px; color:#166534; line-height:1.7;
-  margin-bottom:16px;
-}
-.agreement-title{
-  font-size:13px; font-weight:900; color:#15803D; margin-bottom:8px;
-}
-
-.confirm-item{
-  display:flex; align-items:flex-start; gap:10px;
-  padding:10px 0; border-bottom:1px solid #E2E8F0;
-  cursor:pointer;
-}
-.confirm-item:last-child{ border-bottom:none; }
-.confirm-check{
-  width:22px; height:22px; border-radius:6px;
-  border:2px solid #CBD5E1; flex-shrink:0; margin-top:1px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; transition:all .15s;
-}
-.confirm-item.checked .confirm-check{
-  background:#16A34A; border-color:#16A34A; color:#fff;
-}
-.confirm-text{ font-size:13px; color:#374151; line-height:1.5; }
-
-.sig-field{
-  width:100%; padding:12px; border-radius:10px;
-  border:2px solid #2563EB; font-size:15px; font-weight:700;
-  font-family:'Heebo',sans-serif; text-align:center;
-  background:#EFF6FF; color:#1A3A5C;
-}
-.sig-field::placeholder{ color:#94A3B8; font-weight:400; }
-
-/* סעיף יב — עמלות */
-.clause-yudbet{
-  background:#F8FAFF;
-  border:1.5px solid #BFDBFE;
-  border-right:4px solid #2563EB;
-  border-radius:12px;
-  padding:14px 16px;
-  margin:16px 0 4px;
-  font-size:12px;
-  line-height:1.85;
-  color:#1E293B;
-}
-.clause-yudbet-title{
-  font-size:13px;
-  font-weight:900;
-  color:#1A3A5C;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.clause-yudbet-badge{
-  display:inline-block;
-  background:#EFF6FF;
-  color:#2563EB;
-  font-size:10px;
-  font-weight:800;
-  padding:2px 8px;
-  border-radius:50px;
-  border:1px solid #BFDBFE;
-}
-
-.submit-btn{
-  width:100%; padding:16px; border:none; border-radius:14px;
-  background:linear-gradient(135deg,#1A3A5C,#2563EB);
-  color:#fff; font-size:16px; font-weight:900;
-  font-family:'Heebo',sans-serif; cursor:pointer;
-  letter-spacing:.3px; transition:opacity .2s;
-  margin-top:8px;
-}
-.submit-btn:hover{ opacity:.9; }
-.submit-btn:disabled{ opacity:.5; cursor:not-allowed; }
-
-.err-msg{
-  color:#EF4444; font-size:12px; font-weight:700;
-  padding:8px 12px; background:#FEE2E2; border-radius:8px;
-  display:none; margin-top:8px;
-}
-
-/* success screen */
-#success-screen{
-  display:none; text-align:center; padding:40px 20px;
-}
-.success-icon{ font-size:64px; margin-bottom:16px; }
-.success-title{ font-size:22px; font-weight:900; color:#15803D; margin-bottom:8px; }
-.success-sub{ font-size:14px; color:#475569; line-height:1.6; }
-.verified-badge{
-  display:inline-flex; align-items:center; gap:8px;
-  background:#F0FDF4; border:2px solid #BBF7D0;
-  border-radius:50px; padding:10px 20px;
-  margin:16px 0; font-size:14px; font-weight:800; color:#15803D;
-}
-</style>
+<link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel=stylesheet>
+<script src=https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Heebo,sans-serif;background:linear-gradient(135deg,#1a3a5c 0,#0f2540 100%);min-height:100vh;padding:20px 16px 40px;color:#1e293b}.card{background:#fff;border-radius:20px;max-width:520px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}.hdr{background:linear-gradient(135deg,#1a3a5c,#2563eb);padding:24px 24px 20px;text-align:center}.hdr-logo{font-size:40px;margin-bottom:8px}.hdr-title{font-size:20px;font-weight:900;color:#fff}.hdr-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}.hdr-gold{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:8px 14px;margin-top:12px;font-size:12px;font-weight:700;color:#c9a84c}.body{padding:20px}.section{margin-bottom:20px;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden}.section-title{background:#f8fafc;padding:12px 16px;font-size:13px;font-weight:800;color:#1a3a5c;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px}.section-body{padding:16px;display:flex;flex-direction:column;gap:12px}.field-label{font-size:12px;font-weight:700;color:#475569;margin-bottom:4px;display:block}.field-input{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:14px;font-family:Heebo,sans-serif;background:#fafafa;transition:border-color .2s}.field-input:focus{outline:0;border-color:#2563eb;background:#fff}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.city-search-wrap{position:relative;margin-bottom:8px}.city-search-input{width:100%;padding:10px 12px 10px 36px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:14px;font-family:Heebo,sans-serif;background:#fafafa;transition:border-color .2s}.city-search-input:focus{outline:0;border-color:#2563eb;background:#fff}.city-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}.city-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:8px}.city-tag{display:flex;align-items:center;gap:5px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:50px;padding:4px 10px;font-size:12px;font-weight:700;color:#1d4ed8}.city-tag-x{cursor:pointer;font-size:14px;line-height:1;color:#60a5fa;margin-right:-2px}.city-dropdown{display:none;position:absolute;z-index:99;background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.1);max-height:200px;overflow-y:auto;width:100%;top:calc(100% + 4px)}.city-dropdown.open{display:block}.city-option{padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;color:#1e293b;transition:background .1s}.city-option:hover{background:#eff6ff;color:#1d4ed8}.city-option.selected{background:#eff6ff;color:#1d4ed8;font-weight:800}.check-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1.5px solid #e2e8f0;cursor:pointer;font-size:13px;font-weight:600;color:#374151;transition:all .15s}.check-item input{display:none}.check-item.selected{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}.check-box{width:18px;height:18px;border-radius:5px;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}.check-item.selected .check-box{background:#2563eb;border-color:#2563eb;color:#fff}.ins-note{background:#fef3c7;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e;font-weight:600;display:flex;gap:8px;align-items:flex-start}.agreement{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px;font-size:12px;color:#166534;line-height:1.7;margin-bottom:16px}.agreement-title{font-size:13px;font-weight:900;color:#15803d;margin-bottom:8px}.confirm-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #e2e8f0;cursor:pointer}.confirm-item:last-child{border-bottom:none}.confirm-check{width:22px;height:22px;border-radius:6px;border:2px solid #cbd5e1;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s}.confirm-item.checked .confirm-check{background:#16a34a;border-color:#16a34a;color:#fff}.confirm-text{font-size:13px;color:#374151;line-height:1.5}.sig-field{width:100%;padding:12px;border-radius:10px;border:2px solid #2563eb;font-size:15px;font-weight:700;font-family:Heebo,sans-serif;text-align:center;background:#eff6ff;color:#1a3a5c}.sig-field::placeholder{color:#94a3b8;font-weight:400}.clause-yudbet{background:#f8faff;border:1.5px solid #bfdbfe;border-right:4px solid #2563eb;border-radius:12px;padding:14px 16px;margin:16px 0 4px;font-size:12px;line-height:1.85;color:#1e293b}.clause-yudbet-title{font-size:13px;font-weight:900;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px}.clause-yudbet-badge{display:inline-block;background:#eff6ff;color:#2563eb;font-size:10px;font-weight:800;padding:2px 8px;border-radius:50px;border:1px solid #bfdbfe}.submit-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,#1a3a5c,#2563eb);color:#fff;font-size:16px;font-weight:900;font-family:Heebo,sans-serif;cursor:pointer;letter-spacing:.3px;transition:opacity .2s;margin-top:8px}.submit-btn:hover{opacity:.9}.submit-btn:disabled{opacity:.5;cursor:not-allowed}.err-msg{color:#ef4444;font-size:12px;font-weight:700;padding:8px 12px;background:#fee2e2;border-radius:8px;display:none;margin-top:8px}#success-screen{display:none;text-align:center;padding:40px 20px}.success-icon{font-size:64px;margin-bottom:16px}.success-title{font-size:22px;font-weight:900;color:#15803d;margin-bottom:8px}.success-sub{font-size:14px;color:#475569;line-height:1.6}.verified-badge{display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;border:2px solid #bbf7d0;border-radius:50px;padding:10px 20px;margin:16px 0;font-size:14px;font-weight:800;color:#15803d}</style>
 </head>
 <body>
-
-<div class="card">
-  <div class="hdr">
-    <div class="hdr-logo">🏢</div>
-    <div class="hdr-title">הסכם הצטרפות ספק</div>
-    <div class="hdr-sub">שכנות טובה · SmartNeighbor</div>
-    <div class="hdr-gold">✅ מילוי טופס זה הוא תנאי להופעה כספק מאומת ברשת שכנות טובה</div>
-  </div>
-
-  <div class="body">
-
-    <!-- FORM -->
-    <div id="form-screen">
-
-      <!-- א. פרטים אישיים -->
-      <div class="section">
-        <div class="section-title">👤 א. פרטים אישיים</div>
-        <div class="section-body">
-          <div>
-            <label class="field-label">שם מלא (פרטי + משפחה) *</label>
-            <input id="f-name" class="field-input" type="text" placeholder="ישראל ישראלי">
-          </div>
-          <div class="field-row">
-            <div>
-              <label class="field-label">טלפון נייד *</label>
-              <input id="f-phone" class="field-input" type="tel" placeholder="050-0000000" inputmode="numeric">
-            </div>
-            <div>
-              <label class="field-label">מספר ת.ז *</label>
-              <input id="f-id" class="field-input" type="text" placeholder="000000000" inputmode="numeric" maxlength="9">
-            </div>
-          </div>
-          <div>
-            <label class="field-label">אימייל</label>
-            <input id="f-email" class="field-input" type="email" placeholder="name@example.com">
-          </div>
-        </div>
-      </div>
-
-      <!-- ב. פרטי עסק -->
-      <div class="section">
-        <div class="section-title">🏪 ב. פרטי העסק</div>
-        <div class="section-body">
-          <div>
-            <label class="field-label">שם העסק / עוסק מורשה *</label>
-            <input id="f-bizname" class="field-input" type="text" placeholder="שיפוצי ישראל">
-          </div>
-          <div class="field-row">
-            <div>
-              <label class="field-label">מספר עוסק מורשה / ח.פ</label>
-              <input id="f-vatreg" class="field-input" type="text" placeholder="000000000" inputmode="numeric">
-            </div>
-            <div>
-              <label class="field-label">שנות ניסיון</label>
-              <input id="f-years" class="field-input" type="number" placeholder="5" min="0" max="50">
-            </div>
-          </div>
-          <div>
-            <label class="field-label">ערי שירות * <span style="font-weight:400;color:#94A3B8;font-size:11px;">בחרו את כל הערים בהן אתם נותנים שירות</span></label>
-            <div class="city-tags" id="city-tags-wrap"></div>
-            <div class="city-search-wrap">
-              <span class="city-search-icon">🔍</span>
-              <input id="f-city-search" class="city-search-input" type="text"
-                     placeholder="חפש עיר..." autocomplete="off"
-                     oninput="filterCities(this.value)"
-                     onfocus="openCityDropdown()"
-                     onblur="setTimeout(closeCityDropdown,200)">
-              <div class="city-dropdown" id="city-dropdown"></div>
-            </div>
-            <!-- שדה נסתר לתאימות אחורה -->
-            <input id="f-area" type="hidden" value="">
-          </div>
-        </div>
-      </div>
-
-      <!-- ג. תחום עיסוק -->
-      <div class="section">
-        <div class="section-title">🔧 ג. תחום עיסוק *</div>
-        <div class="section-body">
-          <div class="check-grid" id="cats-grid">
-            <div class="check-item" onclick="toggleCat(this,'אינסטלטור')">
-              <div class="check-box"></div>🚿 אינסטלטור
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'חשמלאי')">
-              <div class="check-box"></div>⚡ חשמלאי
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'מנעולן')">
-              <div class="check-box"></div>🔑 מנעולן
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'מעליות')">
-              <div class="check-box"></div>🛗 מעליות
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'גינון')">
-              <div class="check-box"></div>🌿 גינון
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'ניקיון')">
-              <div class="check-box"></div>🧹 ניקיון
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'צבע')">
-              <div class="check-box"></div>🖌️ צבע
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'מזגנים')">
-              <div class="check-box"></div>❄️ מזגנים
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'שיפוצניק')">
-              <div class="check-box"></div>🏗️ שיפוצניק
-            </div>
-            <div class="check-item" onclick="toggleCat(this,'אחר')">
-              <div class="check-box"></div>📋 אחר
-            </div>
-          </div>
-          <div>
-            <label class="field-label">מספר רישיון מקצועי (אם רלוונטי)</label>
-            <input id="f-license" class="field-input" type="text" placeholder="מספר רישיון">
-          </div>
-        </div>
-      </div>
-
-      <!-- ד. ביטוח -->
-      <div class="section">
-        <div class="section-title">🛡️ ד. ביטוח צד ג'</div>
-        <div class="section-body">
-          <div class="ins-note">
-            ⚠️ ביטוח חובה לחשמלאים, שרברבים, קבלנים וטכנאי גז. מומלץ לשאר התחומים.
-          </div>
-          <div class="field-row">
-            <div>
-              <label class="field-label">חברת ביטוח</label>
-              <input id="f-ins-co" class="field-input" type="text" placeholder="מגדל, הפניקס...">
-            </div>
-            <div>
-              <label class="field-label">מספר פוליסה</label>
-              <input id="f-ins-num" class="field-input" type="text" placeholder="000000">
-            </div>
-          </div>
-          <div>
-            <label class="field-label">תוקף הפוליסה</label>
-            <input id="f-ins-exp" class="field-input" type="date">
-          </div>
-        </div>
-      </div>
-
-      <!-- ה. הסכם והתחייבויות -->
-      <div class="section">
-        <div class="section-title">📋 ה. הסכם והתחייבויות</div>
-        <div class="section-body">
-          <div class="agreement">
-            <div class="agreement-title">תנאי ההצטרפות לרשת שכנות טובה</div>
-            <strong>זמינות ומענה:</strong> אגיב לכל פנייה תוך שעתיים בימי חול 08:00–19:00.<br>
-            <strong>הגעה בזמן:</strong> אגיע במועד שסוכם. איחור מעל 30 דקות מחייב הודעה מראש.<br>
-            <strong>שקיפות מחירים:</strong> אתן הצעת מחיר לפני תחילת עבודה. לא יהיו חיובים נסתרים.<br>
-            <strong>ביצוע מקצועי:</strong> אבצע כל עבודה בהתאם לתקנים. אחריות מינימלית 3 חודשים.<br>
-            <strong>דמי ביקור:</strong> אם הגעתי ובצעתי אבחון ממשי — ייגבו 200 ₪. אם לא בוצע ניסיון — ללא חיוב.<br>
-            <strong>הגבלת אחריות:</strong> שכנות טובה היא פלטפורמה בלבד. אחריות על העבודה היא שלי בלעדית.<br>
-            <strong>דירוג:</strong> דירוג נמוך מ-3.5 לאחר 5 עבודות → התראה → השהייה אפשרית.
-          </div>
-
-          <!-- סעיף יב — מודל עמלות -->
-          <div class="clause-yudbet">
-            <div class="clause-yudbet-title">
-              📌 יב. מדיניות עמלות — תנאי שירות מסחרי
-              <span class="clause-yudbet-badge">לעיונך</span>
-            </div>
-
-            <strong>שלב ההשקה — ללא עמלה:</strong> במהלך תקופת ההשקה של הפלטפורמה, השירות מוענק לבעל המקצוע ללא כל עלות. לא תיגבה כל עמלה בגין עבודות המבוצעות דרך שכנות טובה בתקופה זו.<br><br>
-
-            <strong>עמלת פלטפורמה עתידית:</strong> שכנות טובה שומרת לעצמה את הזכות לגבות, בעתיד, עמלת פלטפורמה בשיעור של <strong>4.5% (ארבעה וחצי אחוזים) בתוספת מע"מ כחוק</strong> מסכום כל עסקה שתיסגר באמצעות הפלטפורמה (להלן: "עמלת הפלטפורמה"). עמלה זו תיגבה מבעל המקצוע בלבד, ולא תוטל על הלקוח.<br><br>
-
-            <strong>הודעה מראש של 30 יום:</strong> כניסת עמלת הפלטפורמה לתוקף תיעשה אך ורק לאחר משלוח הודעה בכתב לבעל המקצוע, לכתובת הדואר האלקטרוני שנמסרה בהסכם זה, לא פחות מ-<strong>30 (שלושים) יום</strong> מראש.<br><br>
-
-            <strong>זכות יציאה ללא עלות:</strong> בעל מקצוע שאינו מסכים לתנאי העמלה רשאי להודיע על הפסקת פעילותו בפלטפורמה בכתב, עד <strong>7 ימים לפני</strong> מועד כניסת העמלה לתוקף. במקרה זה, פרופיל הספק יוסר ולא ייגבה ממנו דבר — לרבות בגין תקופת ההשקה.<br><br>
-
-            <strong>המשך שת"פ = הסכמה:</strong> המשך שימוש בפלטפורמה לאחר חלוף 30 הימים מיום ההודעה מהווה הסכמה מלאה ומחייבת לתנאי עמלת הפלטפורמה כאמור לעיל, ללא צורך בחתימה נוספת.<br><br>
-
-            <strong>תקרת עמלה:</strong> שיעור העמלה קבוע על 4.5% + מע"מ ולא יעלה מעבר לכך ללא חתימת בעל המקצוע על הסכם מעודכן בנפרד.
-          </div>
-
-          <div id="confirms">
-            <div class="confirm-item" onclick="toggleConfirm(this)">
-              <div class="confirm-check"></div>
-              <div class="confirm-text">קראתי את מלוא תנאי ההסכם והבנתי אותם במלואם</div>
-            </div>
-            <div class="confirm-item" onclick="toggleConfirm(this)">
-              <div class="confirm-check"></div>
-              <div class="confirm-text">כל הפרטים שמסרתי אמיתיים, מדויקים ומעודכנים</div>
-            </div>
-            <div class="confirm-item" onclick="toggleConfirm(this)">
-              <div class="confirm-check"></div>
-              <div class="confirm-text">אני מסכים לתנאי מערכת הדירוג, ההשהיה וההסרה</div>
-            </div>
-            <div class="confirm-item" onclick="toggleConfirm(this)">
-              <div class="confirm-check"></div>
-              <div class="confirm-text">ידוע לי שהפרת תנאי ההסכם עשויה להוביל להסרתי מהרשת</div>
-            </div>
-            <div class="confirm-item" onclick="toggleConfirm(this)">
-              <div class="confirm-check"></div>
-              <div class="confirm-text">קראתי והבנתי את תנאי סעיף יב — מדיניות עמלות עתידית — ואני מסכים להם</div>
-            </div>
-          </div>
-
-          <div style="margin-top:16px;">
-            <label class="field-label">שם מלא כחתימה דיגיטלית *</label>
-            <input id="f-sig" class="sig-field" type="text" placeholder="הזן שם מלא לאישור ההסכם">
-          </div>
-        </div>
-      </div>
-
-      <div id="form-err" class="err-msg"></div>
-
-      <button class="submit-btn" id="submit-btn" onclick="submitForm()">
-        ✅ שלח הסכם והצטרף לרשת שכנות טובה
-      </button>
-
-    </div><!-- /form-screen -->
-
-    <!-- SUCCESS -->
-    <div id="success-screen">
-      <div class="success-icon">🎉</div>
-      <div class="success-title">ההסכם נשלח בהצלחה!</div>
-      <div class="verified-badge">⏳ ממתין לאישור שכנות טובה</div>
-      <div class="success-sub">
-        פרטיך נשמרו ויועברו לבדיקה.<br>
-        לאחר האישור — תופיע ברשימת הספקים המאומתים עם תג:
-      </div>
-      <div class="verified-badge" style="background:#DCFCE7;border-color:#BBF7D0;color:#15803D;margin-top:12px;">
-        ✅ מאומת שכנות טובה
-      </div>
-    </div>
-
-  </div><!-- /body -->
+<div class=card>
+<div class=hdr>
+<div class=hdr-logo>🏢</div>
+<div class=hdr-title>הסכם הצטרפות ספק</div>
+<div class=hdr-sub>שכנות טובה · SmartNeighbor</div>
+<div class=hdr-gold>✅ מילוי טופס זה הוא תנאי להופעה כספק מאומת ברשת שכנות טובה</div>
 </div>
-
-<script>
-var SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk';
-var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// קרא slug מה-URL
-var urlParams = new URLSearchParams(window.location.search);
-var buildingSlug = urlParams.get('slug') || '';
-var prefillName  = urlParams.get('name') || '';
-var prefillPhone = urlParams.get('phone') || '';
-var prefillCat   = urlParams.get('cat') || '';
-
-// מלא שדות מ-URL
-if(prefillName)  document.getElementById('f-name').value  = prefillName;
-if(prefillPhone) document.getElementById('f-phone').value = prefillPhone;
-
-// סמן קטגוריה מ-URL
-if(prefillCat){
-  var items = document.querySelectorAll('.check-item');
-  items.forEach(function(item){
-    if(item.getAttribute('data-cat') === prefillCat || item.textContent.indexOf(prefillCat) !== -1){
-      item.classList.add('selected');
-      item.querySelector('.check-box').textContent = '✓';
-    }
-  });
-}
-
-var _selectedCats = prefillCat ? [prefillCat] : [];
-
-function toggleCat(el, cat){
-  el.classList.toggle('selected');
-  var cb = el.querySelector('.check-box');
-  if(el.classList.contains('selected')){
-    cb.textContent = '✓';
-    if(_selectedCats.indexOf(cat) === -1) _selectedCats.push(cat);
-  } else {
-    cb.textContent = '';
-    _selectedCats = _selectedCats.filter(function(c){ return c !== cat; });
-  }
-}
-
-function toggleConfirm(el){
-  el.classList.toggle('checked');
-  var cb = el.querySelector('.confirm-check');
-  cb.textContent = el.classList.contains('checked') ? '✓' : '';
-}
-
-function submitForm(){
-  var errEl = document.getElementById('form-err');
-  errEl.style.display = 'none';
-
-  var name    = document.getElementById('f-name').value.trim();
-  var phone   = document.getElementById('f-phone').value.trim();
-  var idNum   = document.getElementById('f-id').value.trim();
-  var email   = document.getElementById('f-email').value.trim();
-  var bizname = document.getElementById('f-bizname').value.trim();
-  var vatreg  = document.getElementById('f-vatreg').value.trim();
-  var years   = document.getElementById('f-years').value.trim();
-  var area    = document.getElementById('f-area').value.trim();
-  var license = document.getElementById('f-license').value.trim();
-  var insCo   = document.getElementById('f-ins-co').value.trim();
-  var insNum  = document.getElementById('f-ins-num').value.trim();
-  var insExp  = document.getElementById('f-ins-exp').value.trim();
-  var sig     = document.getElementById('f-sig').value.trim();
-
-  // ולידציה
-  if(!name)  { showErr('נא למלא שם מלא'); return; }
-  if(!phone) { showErr('נא למלא טלפון'); return; }
-  if(!idNum) { showErr('נא למלא מספר ת.ז'); return; }
-  if(!bizname){ showErr('נא למלא שם העסק'); return; }
-  if(_selectedCities.length === 0){ showErr('נא לבחור לפחות עיר שירות אחת'); return; }
-  if(_selectedCats.length === 0){ showErr('נא לבחור לפחות תחום עיסוק אחד'); return; }
-  if(!sig)   { showErr('נא למלא שם מלא כחתימה דיגיטלית'); return; }
-
-  // בדיקת אישורים
-  var confirms = document.querySelectorAll('.confirm-item');
-  var allChecked = true;
-  confirms.forEach(function(c){ if(!c.classList.contains('checked')) allChecked = false; });
-  if(!allChecked){ showErr('יש לסמן את כל האישורים לפני השליחה'); return; }
-
-  // שלח
-  var btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'שולח...';
-
-  // area כטקסט לתאימות אחורה, service_cities כמערך לרשת הגיאוגרפית
-  var areaText = _selectedCities.join(', ');
-  document.getElementById('f-area').value = areaText;
-
-  var record = {
-    building_slug:  buildingSlug || null,
-    name:           name,
-    phone:          phone,
-    cat:            _selectedCats[0] || 'אחר',
-    notes:          _selectedCats.join(', '),
-    area:           areaText,
-    service_cities: JSON.stringify(_selectedCities),
-    is_verified:   false,
-    is_suspended:  false,
-    rating:        0,
-    rating_count:  0,
-    // שדות הסכם נוספים בתוך jsonb
-    agreement_data: JSON.stringify({
-      name:      name,
-      phone:     phone,
-      id_num:    idNum,
-      email:     email,
-      biz_name:  bizname,
-      vat_reg:   vatreg,
-      years:     years,
-      area:      areaText,
-      license:   license,
-      ins_co:    insCo,
-      ins_num:   insNum,
-      ins_exp:   insExp,
-      all_cats:  _selectedCats,
-      signature: sig,
-      submitted_at: new Date().toISOString()
-    })
-  };
-
-  sbClient.from('professionals').insert([record]).then(function(res){
-    if(res.error){
-      btn.disabled = false;
-      btn.textContent = 'שלח הסכם והצטרף לרשת שכנות טובה';
-      showErr('שגיאה בשליחה: ' + res.error.message);
-      return;
-    }
-    document.getElementById('form-screen').style.display = 'none';
-    document.getElementById('success-screen').style.display = 'block';
-
-    // שלח אימייל ל-smartneighbor@gmail.com דרך Formspree
-    sendAgreementEmail(record);
-  });
-}
-
-function sendAgreementEmail(record){
-  var ag = {};
-  try{ ag = typeof record.agreement_data === 'string' ? JSON.parse(record.agreement_data) : record.agreement_data; }catch(e){}
-
-  var cats = Array.isArray(ag.all_cats) ? ag.all_cats.join(', ') : (ag.all_cats || record.cat || '—');
-  var submitted = ag.submitted_at ? new Date(ag.submitted_at).toLocaleString('he-IL') : new Date().toLocaleString('he-IL');
-
-  var fd = new FormData();
-  fd.append('_subject',   '📋 הסכם ספק חדש — ' + (record.name||'') + ' | שכנות טובה');
-  fd.append('_replyto',   ag.email || '');
-  fd.append('שם_מלא',     record.name || '—');
-  fd.append('טלפון',      record.phone || '—');
-  fd.append('מספר_תז',    ag.id_num || '—');
-  fd.append('אימייל',     ag.email || '—');
-  fd.append('שם_עסק',     ag.biz_name || '—');
-  fd.append('חפ_עוסק',    ag.vat_reg || '—');
-  fd.append('שנות_ניסיון', ag.years || '—');
-  fd.append('אזור_פעילות', record.area || '—');
-  fd.append('תחומים',     cats);
-  fd.append('רישיון',     ag.license || '—');
-  fd.append('חברת_ביטוח', ag.ins_co || 'לא הוזן');
-  fd.append('מספר_פוליסה', ag.ins_num || '—');
-  fd.append('תוקף_פוליסה', ag.ins_exp || '—');
-  fd.append('חתימה_דיגיטלית', ag.signature || '—');
-  fd.append('תאריך_שליחה',    submitted);
-  fd.append('בניין_slug',     record.building_slug || '—');
-
-  fetch('https://formspree.io/f/mwvrbvqa', {
-    method:  'POST',
-    body:    fd,
-    headers: { 'Accept': 'application/json' }
-  }).catch(function(err){ console.warn('Formspree email failed:', err); });
-}
-
-
-// ══════════════════════════════════════════
-// CITY PICKER — מאגר ערים ישראל
-// ══════════════════════════════════════════
-var _selectedCities = [];
-
-var ISRAEL_CITIES = [
-  'אבן יהודה','אופקים','אור יהודה','אור עקיבא','אילת','אלעד','אריאל','אשדוד','אשקלון',
-  'באקה אל-גרביה','באר שבע','באר יעקב','בית שאן','בית שמש','בני ברק','בת ים',
-  'גבעת שמואל','גבעתיים','גדרה','גני תקווה','גן יבנה',
-  'דימונה',
-  'הוד השרון','הרצליה','חדרה','חולון','חיפה',
-  'טבריה','טירת כרמל','טירה',
-  'יבנה','יהוד-מונוסון','יקנעם עילית',
-  'כפר סבא','כרמיאל',
-  'לוד',
-  'מודיעין-מכבים-רעות','מודיעין עילית',
-  'נהריה','נס ציונה','נצרת','נצרת עילית','נתיבות','נתניה',
-  'סחנין',
-  'עכו','עפולה','עראבה',
-  'פתח תקווה',
-  'צפת',
-  'קריית אונו','קריית אתא','קריית ביאליק','קריית גת','קריית ים','קריית מוצקין','קריית מלאכי','קריית שמונה',
-  'ראש העין','ראשון לציון','רהט','רחובות','רמלה','רמת גן','רמת השרון',
-  'שדרות',
-  'תל אביב-יפו','תל אביב',
-  'גוש דן','השרון','הגליל','הנגב','השפלה','המרכז'
-].sort();
-
-function filterCities(q){
-  var dd = document.getElementById('city-dropdown');
-  if(!dd) return;
-  var filtered = q
-    ? ISRAEL_CITIES.filter(function(ci){ return ci.indexOf(q) !== -1; })
-    : ISRAEL_CITIES;
-  renderCityDropdown(filtered);
-  dd.classList.add('open');
-}
-
-function renderCityDropdown(list){
-  var dd = document.getElementById('city-dropdown');
-  if(!dd) return;
-  dd.innerHTML = list.map(function(ci){
-    var sel = _selectedCities.indexOf(ci) !== -1;
-    return '<div class="city-option'+(sel?' selected':'')+'" onmousedown="toggleCity(\'' + ci + '\')">' +
-      (sel ? '✓ ' : '') + ci + '</div>';
-  }).join('') || '<div class="city-option" style="color:#94A3B8;cursor:default;">לא נמצאו תוצאות</div>';
-}
-
-function openCityDropdown(){
-  filterCities(document.getElementById('f-city-search').value || '');
-  var dd = document.getElementById('city-dropdown');
-  if(dd) dd.classList.add('open');
-}
-
-function closeCityDropdown(){
-  var dd = document.getElementById('city-dropdown');
-  if(dd) dd.classList.remove('open');
-}
-
-function toggleCity(city){
-  var idx = _selectedCities.indexOf(city);
-  if(idx === -1){
-    _selectedCities.push(city);
-  } else {
-    _selectedCities.splice(idx, 1);
-  }
-  renderCityTags();
-  filterCities(document.getElementById('f-city-search').value || '');
-}
-
-function removeCity(city){
-  _selectedCities = _selectedCities.filter(function(c){ return c !== city; });
-  renderCityTags();
-}
-
-function renderCityTags(){
-  var wrap = document.getElementById('city-tags-wrap');
-  if(!wrap) return;
-  wrap.innerHTML = _selectedCities.map(function(ci){
-    return '<div class="city-tag">'+ci+
-      '<span class="city-tag-x" onmousedown="removeCity(\'' + ci + '\')">✕</span></div>';
-  }).join('');
-}
-
-// מלא ערים מ-URL אם יש
-(function(){
-  var urlCities = urlParams.get('cities');
-  if(urlCities){
-    try{
-      var arr = JSON.parse(decodeURIComponent(urlCities));
-      if(Array.isArray(arr)) _selectedCities = arr;
-      renderCityTags();
-    }catch(e){}
-  }
-})();
-
-function showErr(msg){
-  var el = document.getElementById('form-err');
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.scrollIntoView({behavior:'smooth', block:'center'});
-}
-</script>
+<div class=body>
+<div id=form-screen>
+<div class=section>
+<div class=section-title>👤 א. פרטים אישיים</div>
+<div class=section-body>
+<div>
+<label class=field-label>שם מלא (פרטי + משפחה) *</label>
+<input id=f-name class=field-input placeholder="ישראל ישראלי">
+</div>
+<div class=field-row>
+<div>
+<label class=field-label>טלפון נייד *</label>
+<input id=f-phone class=field-input type=tel placeholder=050-0000000 inputmode=numeric>
+</div>
+<div>
+<label class=field-label>מספר ת.ז *</label>
+<input id=f-id class=field-input placeholder=000000000 inputmode=numeric maxlength=9>
+</div>
+</div>
+<div>
+<label class=field-label>אימייל</label>
+<input id=f-email class=field-input type=email placeholder=name@example.com>
+</div>
+</div>
+</div>
+<div class=section>
+<div class=section-title>🏪 ב. פרטי העסק</div>
+<div class=section-body>
+<div>
+<label class=field-label>שם העסק / עוסק מורשה *</label>
+<input id=f-bizname class=field-input placeholder="שיפוצי ישראל">
+</div>
+<div class=field-row>
+<div>
+<label class=field-label>מספר עוסק מורשה / ח.פ</label>
+<input id=f-vatreg class=field-input placeholder=000000000 inputmode=numeric>
+</div>
+<div>
+<label class=field-label>שנות ניסיון</label>
+<input id=f-years class=field-input type=number placeholder=5 min=0 max=50>
+</div>
+</div>
+<div>
+<label class=field-label>ערי שירות * <span style=font-weight:400;color:#94a3b8;font-size:11px>בחרו את כל הערים בהן אתם נותנים שירות</span></label>
+<div class=city-tags id=city-tags-wrap></div>
+<div class=city-search-wrap>
+<span class=city-search-icon>🔍</span>
+<input id=f-city-search class=city-search-input placeholder="חפש עיר..." autocomplete=off oninput=filterCities(this.value) onfocus=openCityDropdown() onblur=setTimeout(closeCityDropdown,200)>
+<div class=city-dropdown id=city-dropdown></div>
+</div>
+<input id=f-area type=hidden>
+</div>
+</div>
+</div>
+<div class=section>
+<div class=section-title>🔧 ג. תחום עיסוק *</div>
+<div class=section-body>
+<div class=check-grid id=cats-grid>
+<div class=check-item onclick='toggleCat(this,"אינסטלטור")'>
+<div class=check-box></div>🚿 אינסטלטור
+</div>
+<div class=check-item onclick='toggleCat(this,"חשמלאי")'>
+<div class=check-box></div>⚡ חשמלאי
+</div>
+<div class=check-item onclick='toggleCat(this,"מנעולן")'>
+<div class=check-box></div>🔑 מנעולן
+</div>
+<div class=check-item onclick='toggleCat(this,"מעליות")'>
+<div class=check-box></div>🛗 מעליות
+</div>
+<div class=check-item onclick='toggleCat(this,"גינון")'>
+<div class=check-box></div>🌿 גינון
+</div>
+<div class=check-item onclick='toggleCat(this,"ניקיון")'>
+<div class=check-box></div>🧹 ניקיון
+</div>
+<div class=check-item onclick='toggleCat(this,"צבע")'>
+<div class=check-box></div>🖌️ צבע
+</div>
+<div class=check-item onclick='toggleCat(this,"מזגנים")'>
+<div class=check-box></div>❄️ מזגנים
+</div>
+<div class=check-item onclick='toggleCat(this,"שיפוצניק")'>
+<div class=check-box></div>🏗️ שיפוצניק
+</div>
+<div class=check-item onclick='toggleCat(this,"אחר")'>
+<div class=check-box></div>📋 אחר
+</div>
+</div>
+<div>
+<label class=field-label>מספר רישיון מקצועי (אם רלוונטי)</label>
+<input id=f-license class=field-input placeholder="מספר רישיון">
+</div>
+</div>
+</div>
+<div class=section>
+<div class=section-title>🛡️ ד. ביטוח צד ג'</div>
+<div class=section-body>
+<div class=ins-note>
+⚠️ ביטוח חובה לחשמלאים, שרברבים, קבלנים וטכנאי גז. מומלץ לשאר התחומים.
+</div>
+<div class=field-row>
+<div>
+<label class=field-label>חברת ביטוח</label>
+<input id=f-ins-co class=field-input placeholder="מגדל, הפניקס...">
+</div>
+<div>
+<label class=field-label>מספר פוליסה</label>
+<input id=f-ins-num class=field-input placeholder=000000>
+</div>
+</div>
+<div>
+<label class=field-label>תוקף הפוליסה</label>
+<input id=f-ins-exp class=field-input type=date>
+</div>
+</div>
+</div>
+<div class=section>
+<div class=section-title>📋 ה. הסכם והתחייבויות</div>
+<div class=section-body>
+<div class=agreement>
+<div class=agreement-title>תנאי ההצטרפות לרשת שכנות טובה</div>
+<strong>זמינות ומענה:</strong> אגיב לכל פנייה תוך שעתיים בימי חול 08:00–19:00.<br>
+<strong>הגעה בזמן:</strong> אגיע במועד שסוכם. איחור מעל 30 דקות מחייב הודעה מראש.<br>
+<strong>שקיפות מחירים:</strong> אתן הצעת מחיר לפני תחילת עבודה. לא יהיו חיובים נסתרים.<br>
+<strong>ביצוע מקצועי:</strong> אבצע כל עבודה בהתאם לתקנים. אחריות מינימלית 3 חודשים.<br>
+<strong>דמי ביקור:</strong> אם הגעתי ובצעתי אבחון ממשי — ייגבו 200 ₪. אם לא בוצע ניסיון — ללא חיוב.<br>
+<strong>הגבלת אחריות:</strong> שכנות טובה היא פלטפורמה בלבד. אחריות על העבודה היא שלי בלעדית.<br>
+<strong>דירוג:</strong> דירוג נמוך מ-3.5 לאחר 5 עבודות → התראה → השהייה אפשרית.
+</div>
+<div class=clause-yudbet>
+<div class=clause-yudbet-title>
+📌 יב. מדיניות עמלות — תנאי שירות מסחרי
+<span class=clause-yudbet-badge>לעיונך</span>
+</div>
+<strong>שלב ההשקה — ללא עמלה:</strong> במהלך תקופת ההשקה של הפלטפורמה, השירות מוענק לבעל המקצוע ללא כל עלות. לא תיגבה כל עמלה בגין עבודות המבוצעות דרך שכנות טובה בתקופה זו.<br><br>
+<strong>עמלת פלטפורמה עתידית:</strong> שכנות טובה שומרת לעצמה את הזכות לגבות, בעתיד, עמלת פלטפורמה בשיעור של <strong>4.5% (ארבעה וחצי אחוזים) בתוספת מע"מ כחוק</strong> מסכום כל עסקה שתיסגר באמצעות הפלטפורמה (להלן: "עמלת הפלטפורמה"). עמלה זו תיגבה מבעל המקצוע בלבד, ולא תוטל על הלקוח.<br><br>
+<strong>הודעה מראש של 30 יום:</strong> כניסת עמלת הפלטפורמה לתוקף תיעשה אך ורק לאחר משלוח הודעה בכתב לבעל המקצוע, לכתובת הדואר האלקטרוני שנמסרה בהסכם זה, לא פחות מ-<strong>30 (שלושים) יום</strong> מראש.<br><br>
+<strong>זכות יציאה ללא עלות:</strong> בעל מקצוע שאינו מסכים לתנאי העמלה רשאי להודיע על הפסקת פעילותו בפלטפורמה בכתב, עד <strong>7 ימים לפני</strong> מועד כניסת העמלה לתוקף. במקרה זה, פרופיל הספק יוסר ולא ייגבה ממנו דבר — לרבות בגין תקופת ההשקה.<br><br>
+<strong>המשך שת"פ = הסכמה:</strong> המשך שימוש בפלטפורמה לאחר חלוף 30 הימים מיום ההודעה מהווה הסכמה מלאה ומחייבת לתנאי עמלת הפלטפורמה כאמור לעיל, ללא צורך בחתימה נוספת.<br><br>
+<strong>תקרת עמלה:</strong> שיעור העמלה קבוע על 4.5% + מע"מ ולא יעלה מעבר לכך ללא חתימת בעל המקצוע על הסכם מעודכן בנפרד.
+</div>
+<div id=confirms>
+<div class=confirm-item onclick=toggleConfirm(this)>
+<div class=confirm-check></div>
+<div class=confirm-text>קראתי את מלוא תנאי ההסכם והבנתי אותם במלואם</div>
+</div>
+<div class=confirm-item onclick=toggleConfirm(this)>
+<div class=confirm-check></div>
+<div class=confirm-text>כל הפרטים שמסרתי אמיתיים, מדויקים ומעודכנים</div>
+</div>
+<div class=confirm-item onclick=toggleConfirm(this)>
+<div class=confirm-check></div>
+<div class=confirm-text>אני מסכים לתנאי מערכת הדירוג, ההשהיה וההסרה</div>
+</div>
+<div class=confirm-item onclick=toggleConfirm(this)>
+<div class=confirm-check></div>
+<div class=confirm-text>ידוע לי שהפרת תנאי ההסכם עשויה להוביל להסרתי מהרשת</div>
+</div>
+<div class=confirm-item onclick=toggleConfirm(this)>
+<div class=confirm-check></div>
+<div class=confirm-text>קראתי והבנתי את תנאי סעיף יב — מדיניות עמלות עתידית — ואני מסכים להם</div>
+</div>
+</div>
+<div style=margin-top:16px>
+<label class=field-label>שם מלא כחתימה דיגיטלית *</label>
+<input id=f-sig class=sig-field placeholder="הזן שם מלא לאישור ההסכם">
+</div>
+</div>
+</div>
+<div id=form-err class=err-msg></div>
+<button class=submit-btn id=submit-btn onclick=submitForm()>
+✅ שלח הסכם והצטרף לרשת שכנות טובה
+</button>
+</div>
+<div id=success-screen>
+<div class=success-icon>🎉</div>
+<div class=success-title>ההסכם נשלח בהצלחה!</div>
+<div class=verified-badge>⏳ ממתין לאישור שכנות טובה</div>
+<div class=success-sub>
+פרטיך נשמרו ויועברו לבדיקה.<br>
+לאחר האישור — תופיע ברשימת הספקים המאומתים עם תג:
+</div>
+<div class=verified-badge style=background:#dcfce7;border-color:#bbf7d0;color:#15803d;margin-top:12px>
+✅ מאומת שכנות טובה
+</div>
+</div>
+</div>
+</div>
+<script>var SUPABASE_URL="https://fsvyryhtnogzyycijukp.supabase.co",SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk",sbClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),urlParams=new URLSearchParams(window.location.search),buildingSlug=urlParams.get("slug")||"",prefillName=urlParams.get("name")||"",prefillPhone=urlParams.get("phone")||"",prefillCat=urlParams.get("cat")||"";if(prefillName&&(document.getElementById("f-name").value=prefillName),prefillPhone&&(document.getElementById("f-phone").value=prefillPhone),prefillCat){var items=document.querySelectorAll(".check-item");items.forEach((function(e){e.getAttribute("data-cat")!==prefillCat&&-1===e.textContent.indexOf(prefillCat)||(e.classList.add("selected"),e.querySelector(".check-box").textContent="✓")}))}var _selectedCats=prefillCat?[prefillCat]:[];function toggleCat(e,t){e.classList.toggle("selected");var n=e.querySelector(".check-box");e.classList.contains("selected")?(n.textContent="✓",-1===_selectedCats.indexOf(t)&&_selectedCats.push(t)):(n.textContent="",_selectedCats=_selectedCats.filter((function(e){return e!==t})))}function toggleConfirm(e){e.classList.toggle("checked"),e.querySelector(".confirm-check").textContent=e.classList.contains("checked")?"✓":""}function submitForm(){document.getElementById("form-err").style.display="none";var e=document.getElementById("f-name").value.trim(),t=document.getElementById("f-phone").value.trim(),n=document.getElementById("f-id").value.trim(),i=document.getElementById("f-email").value.trim(),a=document.getElementById("f-bizname").value.trim(),s=document.getElementById("f-vatreg").value.trim(),r=document.getElementById("f-years").value.trim(),l=(document.getElementById("f-area").value.trim(),document.getElementById("f-license").value.trim()),o=document.getElementById("f-ins-co").value.trim(),c=document.getElementById("f-ins-num").value.trim(),d=document.getElementById("f-ins-exp").value.trim(),m=document.getElementById("f-sig").value.trim();if(e)if(t)if(n)if(a)if(0!==_selectedCities.length)if(0!==_selectedCats.length)if(m){var u=document.querySelectorAll(".confirm-item"),p=!0;if(u.forEach((function(e){e.classList.contains("checked")||(p=!1)})),p){var f=document.getElementById("submit-btn");f.disabled=!0,f.textContent="שולח...";var g=_selectedCities.join(", ");document.getElementById("f-area").value=g;var y={building_slug:buildingSlug||null,name:e,phone:t,cat:_selectedCats[0]||"אחר",notes:_selectedCats.join(", "),area:g,service_cities:JSON.stringify(_selectedCities),is_verified:!1,is_suspended:!1,rating:0,rating_count:0,agreement_data:JSON.stringify({name:e,phone:t,id_num:n,email:i,biz_name:a,vat_reg:s,years:r,area:g,license:l,ins_co:o,ins_num:c,ins_exp:d,all_cats:_selectedCats,signature:m,submitted_at:(new Date).toISOString()})};sbClient.from("professionals").insert([y]).then((function(e){if(e.error)return f.disabled=!1,f.textContent="שלח הסכם והצטרף לרשת שכנות טובה",void showErr("שגיאה בשליחה: "+e.error.message);document.getElementById("form-screen").style.display="none",document.getElementById("success-screen").style.display="block",sendAgreementEmail(y)}))}else showErr("יש לסמן את כל האישורים לפני השליחה")}else showErr("נא למלא שם מלא כחתימה דיגיטלית");else showErr("נא לבחור לפחות תחום עיסוק אחד");else showErr("נא לבחור לפחות עיר שירות אחת");else showErr("נא למלא שם העסק");else showErr("נא למלא מספר ת.ז");else showErr("נא למלא טלפון");else showErr("נא למלא שם מלא")}function sendAgreementEmail(e){var t={};try{t="string"==typeof e.agreement_data?JSON.parse(e.agreement_data):e.agreement_data}catch(e){}var n=Array.isArray(t.all_cats)?t.all_cats.join(", "):t.all_cats||e.cat||"—",i=t.submitted_at?new Date(t.submitted_at).toLocaleString("he-IL"):(new Date).toLocaleString("he-IL"),a=new FormData;a.append("_subject","📋 הסכם ספק חדש — "+(e.name||"")+" | שכנות טובה"),a.append("_replyto",t.email||""),a.append("שם_מלא",e.name||"—"),a.append("טלפון",e.phone||"—"),a.append("מספר_תז",t.id_num||"—"),a.append("אימייל",t.email||"—"),a.append("שם_עסק",t.biz_name||"—"),a.append("חפ_עוסק",t.vat_reg||"—"),a.append("שנות_ניסיון",t.years||"—"),a.append("אזור_פעילות",e.area||"—"),a.append("תחומים",n),a.append("רישיון",t.license||"—"),a.append("חברת_ביטוח",t.ins_co||"לא הוזן"),a.append("מספר_פוליסה",t.ins_num||"—"),a.append("תוקף_פוליסה",t.ins_exp||"—"),a.append("חתימה_דיגיטלית",t.signature||"—"),a.append("תאריך_שליחה",i),a.append("בניין_slug",e.building_slug||"—"),fetch("https://formspree.io/f/mwvrbvqa",{method:"POST",body:a,headers:{Accept:"application/json"}}).catch((function(e){console.warn("Formspree email failed:",e)}))}var _selectedCities=[],ISRAEL_CITIES=["אבן יהודה","אופקים","אור יהודה","אור עקיבא","אילת","אלעד","אריאל","אשדוד","אשקלון","באקה אל-גרביה","באר שבע","באר יעקב","בית שאן","בית שמש","בני ברק","בת ים","גבעת שמואל","גבעתיים","גדרה","גני תקווה","גן יבנה","דימונה","הוד השרון","הרצליה","חדרה","חולון","חיפה","טבריה","טירת כרמל","טירה","יבנה","יהוד-מונוסון","יקנעם עילית","כפר סבא","כרמיאל","לוד","מודיעין-מכבים-רעות","מודיעין עילית","נהריה","נס ציונה","נצרת","נצרת עילית","נתיבות","נתניה","סחנין","עכו","עפולה","עראבה","פתח תקווה","צפת","קריית אונו","קריית אתא","קריית ביאליק","קריית גת","קריית ים","קריית מוצקין","קריית מלאכי","קריית שמונה","ראש העין","ראשון לציון","רהט","רחובות","רמלה","רמת גן","רמת השרון","שדרות","תל אביב-יפו","תל אביב","גוש דן","השרון","הגליל","הנגב","השפלה","המרכז"].sort();function filterCities(e){var t=document.getElementById("city-dropdown");t&&(renderCityDropdown(e?ISRAEL_CITIES.filter((function(t){return-1!==t.indexOf(e)})):ISRAEL_CITIES),t.classList.add("open"))}function renderCityDropdown(e){var t=document.getElementById("city-dropdown");t&&(t.innerHTML=e.map((function(e){var t=-1!==_selectedCities.indexOf(e);return'<div class="city-option'+(t?" selected":"")+'" onmousedown="toggleCity(\''+e+"')\">"+(t?"✓ ":"")+e+"</div>"})).join("")||'<div class="city-option" style="color:#94A3B8;cursor:default;">לא נמצאו תוצאות</div>')}function openCityDropdown(){filterCities(document.getElementById("f-city-search").value||"");var e=document.getElementById("city-dropdown");e&&e.classList.add("open")}function closeCityDropdown(){var e=document.getElementById("city-dropdown");e&&e.classList.remove("open")}function toggleCity(e){var t=_selectedCities.indexOf(e);-1===t?_selectedCities.push(e):_selectedCities.splice(t,1),renderCityTags(),filterCities(document.getElementById("f-city-search").value||"")}function removeCity(e){_selectedCities=_selectedCities.filter((function(t){return t!==e})),renderCityTags()}function renderCityTags(){var e=document.getElementById("city-tags-wrap");e&&(e.innerHTML=_selectedCities.map((function(e){return'<div class="city-tag">'+e+'<span class="city-tag-x" onmousedown="removeCity(\''+e+"')\">✕</span></div>"})).join(""))}function showErr(e){var t=document.getElementById("form-err");t.textContent=e,t.style.display="block",t.scrollIntoView({behavior:"smooth",block:"center"})}!function(){var e=urlParams.get("cities");if(e)try{var t=JSON.parse(decodeURIComponent(e));Array.isArray(t)&&(_selectedCities=t),renderCityTags()}catch(e){}}()</script>
 </body>
 </html>
