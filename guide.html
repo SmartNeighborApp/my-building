@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדריך שכנות טובה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1A3A5C;
+  --blue: #2563EB;
+  --gold: #C9A84C;
+  --green: #16A34A;
+  --red: #DC2626;
+  --light: #F0F5FF;
+  --white: #fff;
+  --gray: #94A3B8;
+  --border: #E2E8F0;
+  --font: 'Heebo', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: #F8FAFF;
+  color: #1E293B;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.hero {
+  background: linear-gradient(135deg, #0F2540 0%, #1A3A5C 50%, #1e4a7a 100%);
+  padding: 48px 20px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(37,99,235,.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 20%, rgba(201,168,76,.15) 0%, transparent 50%);
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero-logo { font-size: 48px; margin-bottom: 10px; }
+.hero-title { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+.hero-sub { font-size: 14px; color: rgba(255,255,255,.65); margin-bottom: 24px; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 2px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.7);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  backdrop-filter: blur(4px);
+}
+.tab-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+.tab-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(201,168,76,.4);
+}
+
+/* ── CONTENT ── */
+.content { display: none; padding: 24px 16px 40px; max-width: 640px; margin: 0 auto; }
+.content.active { display: block; }
+
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--navy);
+  margin: 28px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-title::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(to left, transparent, var(--border));
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 6px;
+}
+.flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  padding-bottom: 0;
+}
+.flow-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 19px;
+  top: 44px;
+  width: 2px;
+  height: calc(100% - 10px);
+  background: linear-gradient(to bottom, var(--blue), transparent);
+}
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37,99,235,.3);
+  z-index: 1;
+}
+.step-circle.gold { background: var(--gold); box-shadow: 0 4px 12px rgba(201,168,76,.3); }
+.step-circle.green { background: var(--green); box-shadow: 0 4px 12px rgba(22,163,74,.3); }
+.step-circle.navy { background: var(--navy); }
+.step-body {
+  flex: 1;
+  background: #fff;
+  border-radius: 14px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.step-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
+.step-desc { font-size: 12px; color: #64748B; line-height: 1.6; }
+.step-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 50px;
+  margin-top: 6px;
+}
+.tag-blue { background: #EFF6FF; color: var(--blue); }
+.tag-green { background: #F0FDF4; color: var(--green); }
+.tag-gold { background: #FFFBEB; color: #92400E; }
+.tag-red { background: #FEF2F2; color: var(--red); }
+
+/* ── INFO CARD ── */
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.info-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── FEATURE GRID ── */
+.feat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.feat-item {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  transition: transform .15s, box-shadow .15s;
+  cursor: default;
+}
+.feat-item:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+.feat-icon { font-size: 26px; margin-bottom: 6px; }
+.feat-name { font-size: 12px; font-weight: 800; color: var(--navy); }
+.feat-desc { font-size: 11px; color: var(--gray); margin-top: 2px; line-height: 1.5; }
+
+/* ── TIP BOX ── */
+.tip {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.tip-blue { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.tip-yellow { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+.tip-green { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+.tip-red { background: #FEF2F2; color: var(--red); border: 1px solid #FECACA; }
+.tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── NAV BAR VISUAL ── */
+.navbar-visual {
+  background: var(--navy);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 14px;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255,255,255,.5);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: default;
+  transition: color .15s;
+}
+.nav-item.active { color: var(--gold); }
+.nav-icon { font-size: 20px; }
+
+/* ── STATUS BADGES ── */
+.status-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge-pending { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+.badge-ok { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+.badge-suspended { background: #FEF2F2; color: var(--red); border: 1px solid #FECACA; }
+
+/* ── DECISION TREE ── */
+.dtree { margin-bottom: 12px; }
+.dtree-node {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+  position: relative;
+}
+.dtree-node.question { border-color: var(--blue); background: #EFF6FF; }
+.dtree-node.answer-yes { border-color: var(--green); background: #F0FDF4; color: #15803D; margin-right: 24px; }
+.dtree-node.answer-no { border-color: #F59E0B; background: #FFFBEB; color: #92400E; margin-right: 24px; }
+.dtree-label { font-size: 10px; font-weight: 900; margin-bottom: 3px; opacity: .6; letter-spacing: .5px; }
+
+/* ── FAQ ── */
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: #fff;
+}
+.faq-q {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.faq-q:hover { background: var(--light); }
+.faq-q .arr { font-size: 16px; transition: transform .2s; color: var(--blue); }
+.faq-item.open .arr { transform: rotate(180deg); }
+.faq-a {
+  display: none;
+  padding: 0 16px 14px;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.7;
+}
+.faq-item.open .faq-a { display: block; }
+
+/* ── SCROLL TOP ── */
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+.scroll-top.visible { display: flex; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  font-size: 11px;
+  color: var(--gray);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb span { color: var(--navy); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo">🏢</div>
+    <div class="hero-title">שכנות טובה · SmartNeighbor</div>
+    <div class="hero-sub">המדריך המלא לשימוש באפליקציה</div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('resident')">👤 דייר</button>
+      <button class="tab-btn" onclick="showTab('vaad')">🔑 ועד הבית</button>
+      <button class="tab-btn" onclick="showTab('prof')">🔨 בעלי מקצוע</button>
+      <button class="tab-btn" onclick="showTab('faq')">❓ שאלות</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 1 — RESIDENT
+══════════════════════════════════════ -->
+<div id="tab-resident" class="content active">
+
+  <div class="sec-title">🚪 כניסה ראשונה לאפליקציה</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">קבלת הקישור מהוועד</div>
+        <div class="step-desc">הוועד ישלח לכם קישור ייחודי + קוד גישה בן 6 ספרות</div>
+        <span class="step-tag tag-blue">לינק: smartneighborapp.github.io/my-building/app.html?b=XXXXX</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">הזנת קוד בניין (6 ספרות)</div>
+        <div class="step-desc">יפתח מסך עם 6 תיבות — הזינו את קוד הגישה שקיבלתם</div>
+        <span class="step-tag tag-blue">המערכת תזהה את הבניין שלכם אוטומטית</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <div class="step-title">הזנת מספר דירה</div>
+        <div class="step-desc">הזינו את מספר הדירה שלכם</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle gold">4</div>
+      <div class="step-body">
+        <div class="step-title">הרשמה (פעם ראשונה בלבד)</div>
+        <div class="step-desc">שם מלא · טלפון נייד · שאלת אבטחה לשחזור קוד</div>
+        <span class="step-tag tag-gold">קוד PIN = 4 הספרות האחרונות של הנייד שהזנתם</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">נכנסתם! 🎉</div>
+        <div class="step-desc">שמרו את הקישור בסימניות — כניסה חוזרת מהירה</div>
+        <span class="step-tag tag-green">מכאן: דירה + PIN בלבד</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip tip-yellow">
+    <span class="tip-icon">🔑</span>
+    <div><strong>שכחתי PIN:</strong> לחצו "שכחתי קוד PIN" ← ענו על שאלת האבטחה ← הקוד יוצג</div>
+  </div>
+
+  <div class="sec-title">📱 מסכי האפליקציה</div>
+  <div class="navbar-visual">
+    <div class="nav-item active"><span class="nav-icon">🏠</span>בית</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>קופה</div>
+    <div class="nav-item"><span class="nav-icon">🔧</span>תקלות</div>
+    <div class="nav-item"><span class="nav-icon">🤝</span>קהילה</div>
+    <div class="nav-item"><span class="nav-icon">📁</span>מסמכים</div>
+    <div class="nav-item"><span class="nav-icon">🔨</span>מקצוענים</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span>הגדרות</div>
+  </div>
+
+  <div class="sec-title">💳 תשלום ועד הבית</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">בחרו שיטת תשלום</div>
+        <div class="step-desc">📱 ביט · 🟢 פייבוקס · 🏦 העברה בנקאית · 💵 מזומן · 📝 שיק</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">שלמו ודווחו</div>
+        <div class="step-desc">לחצו "✅ דיווחתי על תשלום" — אפשר לשלוח אישור וואטסאפ לוועד</div>
+        <span class="step-tag tag-gold">סטטוס: ⏳ ממתין לאישור ועד</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">אישור + קבלה</div>
+        <div class="step-desc">לאחר אישור הוועד — מופיע "🧾 קבלה" עם מספר קבלה, תאריך וסכום</div>
+        <span class="step-tag tag-green">ניתן להדפיס את הקבלה</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">🔧 דיווח תקלה</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">בחרו מיקום</div>
+        <div class="step-desc">לובי · מעלית · חניון · גג · גינה · דירה שלי · אחר (פרט חופשי)</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">תארו את הבעיה + דחיפות</div>
+        <div class="step-desc">דחוף 🔴 · רגיל 🟡 · נמוכה 🟢</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <div class="step-title">חיבור לבעל מקצוע (אוטומטי)</div>
+        <div class="step-desc">המערכת תציע בעלי מקצוע מתאימים מהבניין לפי קטגוריה</div>
+        <span class="step-tag tag-blue">לחצו 💬 הזמנה אישית לפתיחת וואטסאפ ישיר</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">מעקב + נעלמת אחרי תיקון</div>
+        <div class="step-desc">כשהוועד מסמן "בוצע" — מופיע טיימר 48 שעות ואז התקלה נעלמת</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">🤝 קהילה</div>
+  <div class="feat-grid">
+    <div class="feat-item">
+      <div class="feat-icon">📢</div>
+      <div class="feat-name">הודעות ועד</div>
+      <div class="feat-desc">הודעות רשמיות ועדכונים מהוועד</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🎁</div>
+      <div class="feat-name">פינת שכנים</div>
+      <div class="feat-desc">מסירות, איחולים, הודעות שכנות</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📊</div>
+      <div class="feat-name">סקרים</div>
+      <div class="feat-desc">הצבעה פר דירה — ניתן לשנות</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🗑️</div>
+      <div class="feat-name">מחיקה עצמית</div>
+      <div class="feat-desc">כל דייר מוחק פוסט שלו בלבד</div>
+    </div>
+  </div>
+
+  <div class="sec-title">🔨 בעלי מקצוע — איך זה עובד</div>
+
+  <div class="tip tip-blue">
+    <span class="tip-icon">🌐</span>
+    <div>הלשונית מציגה ספקים <strong>מהבניין שלך</strong> וגם ספקים מ<strong>רשת שכנות טובה</strong> הפועלים באזורך — אוטומטית, ללא חיפוש.</div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">🔍 חיפוש וסינון</div>
+    <div style="font-size:12px;color:#64748B;line-height:1.8;">
+      <strong>שדה חיפוש חופשי</strong> — חפש לפי שם, תחום, עיר או כל מילת מפתח<br>
+      <strong>סרגל קטגוריות</strong> — סנן לפי תחום: אינסטלטור, חשמלאי, עו"ד, מאפרת ועוד
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">⭐ תגי ספקים</div>
+    <div class="status-row">
+      <div class="status-badge badge-ok">✅ מאומת שכנות טובה</div>
+      <div class="status-badge badge-pending">⏳ ממתין לאישור</div>
+      <div class="status-badge badge-suspended">⏸ מושהה</div>
+    </div>
+    <div class="status-row" style="margin-top:6px;">
+      <div class="status-badge" style="background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">🌐 רשת שכנות טובה</div>
+    </div>
+    <div style="font-size:12px;color:#64748B;line-height:1.7;margin-top:8px;">
+      רק ספקים שחתמו על הסכם ואומתו ע"י שכנות טובה מקבלים תג ✅ ירוק.<br>
+      תג 🌐 = ספק מרשת שכנות טובה הפועל באזורך.<br>
+      לחצו <strong>💬 הזמנה אישית</strong> לשיחה ישירה.<br>
+      לאחר העבודה — לחצו <strong>📝 משוב</strong> לדירוג בכוכבים.
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">📋 קטגוריות זמינות</div>
+    <div style="font-size:12px;color:#64748B;line-height:2.0;">
+      🚿 אינסטלטור · ⚡ חשמלאי · 🔑 מנעולן · 🛗 מעליות · 🌿 גינון<br>
+      🧹 ניקיון · 🖌️ צבע · ❄️ מזגנים · 🏗️ שיפוצניק<br>
+      ⚖️ עו"ד · 📊 רו"ח · 💄 מאפרת · 🎨 מעצב/ת פנים<br>
+      📷 צלם/ת · 🌿 מטפל/ת · 🏋️ מדריך/ה · 📋 אחר
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2 — VAAD
+══════════════════════════════════════ -->
+<div id="tab-vaad" class="content">
+
+  <div class="sec-title">🔐 כניסה למצב מנהל</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle navy">1</div>
+      <div class="step-body">
+        <div class="step-title">כנסו לאפליקציה כרגיל</div>
+        <div class="step-desc">דירה + PIN אישי — בדיוק כמו כל דייר</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle navy">2</div>
+      <div class="step-body">
+        <div class="step-title">לשונית הגדרות ← כניסת מנהל</div>
+        <div class="step-desc">הזינו קוד מנהל (ברירת מחדל: 1234)</div>
+        <span class="step-tag tag-red">⚠️ שנו מ-1234 לקוד אישי מיד!</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">מצב מנהל פעיל</div>
+        <div class="step-desc">מופיעים כלי ניהול נוספים בכל הלשוניות</div>
+        <span class="step-tag tag-green">✅ מצב מנהל פעיל</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">🏢 הגדרות ראשוניות</div>
+  <div class="feat-grid">
+    <div class="feat-item">
+      <div class="feat-icon">🏠</div>
+      <div class="feat-name">שם הבניין</div>
+      <div class="feat-desc">מוצג בכל המסכים ובהודעות וואטסאפ</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">💰</div>
+      <div class="feat-name">דמי ועד חודשיים</div>
+      <div class="feat-desc">סכום לדירה — מחושב אוטומטית</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📱</div>
+      <div class="feat-name">ביט / פייבוקס</div>
+      <div class="feat-desc">פרטי התשלום שהדיירים יראו</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🏦</div>
+      <div class="feat-name">פרטי בנק</div>
+      <div class="feat-desc">לדיירים שמעדיפים העברה בנקאית</div>
+    </div>
+  </div>
+
+  <div class="sec-title">📊 זרימת גבייה</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">דייר מדווח על תשלום</div>
+        <div class="step-desc">מופיעה נקודה אדומה על כפתור הגדרות</div>
+        <span class="step-tag tag-gold">⏳ ממתין לאישור</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">הגדרות ← ניהול גבייה ← אשר</div>
+        <div class="step-desc">לחצו "✔ אשר" ← הדייר מקבל קבלה דיגיטלית עם מספר קבלה</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">אישור ידני (ללא דיווח)</div>
+        <div class="step-desc">מצאו דירה ברשימה ← לחצו "✔" לאישור מנהלי</div>
+        <span class="step-tag tag-green">ירוק = שולם · כתום = ממתין · אפור = לא שולם</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">🔧 ניהול תקלות — זרימת ועד</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">תקלה נפתחת</div>
+        <div class="step-desc">דייר מדווח → מופיעה בלשונית תקלות עם סטטוס "פתוח"</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">הזמנת בעל מקצוע (ועד)</div>
+        <div class="step-desc">לחצו 🏢 הזמנת ועד ← הזינו PIN מנהל ← נשלח WA + מתפרסם בלוח</div>
+        <span class="step-tag tag-blue">ההזמנה מתועדת אוטומטית בלוח ההודעות</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <div class="step-title">עדכון סטטוס</div>
+        <div class="step-desc">שנו ל"בטיפול" בתפריט — הדיירים רואים עדכון בזמן אמת</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">סמן כבוצע ← חשבונית</div>
+        <div class="step-desc">לחצו ✅ סמן כבוצע ← לחצו 💰 חשבונית ← הסכום נכנס להוצאות החודש ולדוח השנתי</div>
+        <span class="step-tag tag-green">תקלה נעלמת אוטומטית אחרי 48 שעות</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">💰 ניהול תקציב והוצאות</div>
+  <div class="info-card">
+    <div class="info-card-title">📋 סוגי הוצאות</div>
+    <div class="flow" style="margin-bottom:0">
+      <div class="flow-step">
+        <div class="step-circle" style="background:#6366F1;width:36px;height:36px;font-size:12px;">קבועה</div>
+        <div class="step-body" style="margin-bottom:8px;">
+          <div class="step-title">הוצאה חוזרת כל חודש</div>
+          <div class="step-desc">ניקיון, ביטוח, מעלית... מחושבת ×12 בדוח שנתי</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-circle" style="background:#F59E0B;width:36px;height:36px;font-size:10px;">חד"פ</div>
+        <div class="step-body" style="margin-bottom:0">
+          <div class="step-title">הוצאה חד פעמית</div>
+          <div class="step-desc">תיקון, קנייה ספציפית — נכנסת לחודש שבחרתם</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">📥 ייצוא דוחות</div>
+  <div class="feat-grid">
+    <div class="feat-item">
+      <div class="feat-icon">📥</div>
+      <div class="feat-name">הכנסות לאקסל</div>
+      <div class="feat-desc">כל תשלומי הדיירים לפי חודש</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📤</div>
+      <div class="feat-name">הוצאות לאקסל</div>
+      <div class="feat-desc">כל הוצאות הבניין לפי קטגוריה</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📊</div>
+      <div class="feat-name">דוח שנתי CSV</div>
+      <div class="feat-desc">הכנסות + הוצאות + תקלות + דיירים</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🖨️</div>
+      <div class="feat-name">דוח שנתי PDF</div>
+      <div class="feat-desc">מעוצב להדפסה — לרואה חשבון</div>
+    </div>
+  </div>
+
+  <div class="tip tip-green">
+    <span class="tip-icon">💡</span>
+    <div>מומלץ לייצא דוח שנתי PDF בסוף כל שנה להגשה לרואה חשבון</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 3 — PROFESSIONALS
+══════════════════════════════════════ -->
+<div id="tab-prof" class="content">
+
+  <div class="sec-title">🔨 זרימת הצטרפות ספק</div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">ועד/דייר מוסיף ספק</div>
+        <div class="step-desc">שם + טלפון + קטגוריה — ושולח לינק לספק</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">שליחת לינק הסכם בוואטסאפ</div>
+        <div class="step-desc">הכפתור היחיד — שומר + שולח בוואטסאפ אוטומטית</div>
+        <span class="step-tag tag-blue">💬 שלח לינק הסכם בוואטסאפ</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <div class="step-title">בעל המקצוע ממלא הסכם</div>
+        <div class="step-desc">פרטים · ביטוח · תחומים · ערי שירות ממאגר · התחייבויות · חתימה דיגיטלית</div>
+        <span class="step-tag tag-gold">⏳ ממתין לאישור שכנות טובה</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">4</div>
+      <div class="step-body">
+        <div class="step-title">אימייל אוטומטי לשכנות טובה</div>
+        <div class="step-desc">כל פרטי ההסכם נשלחים ל<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0edb3b3ada1b2b4aea5a9a7a8a2afb280a7ada1a9aceea3afad">[email&#160;protected]</a> לבדיקה</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">אימות ← תג ירוק</div>
+        <div class="step-desc">שכנות טובה בודקת ← לוחצת ✅ אמת באדמין ← תג ירוק מופיע</div>
+        <span class="step-tag tag-green">✅ מאומת שכנות טובה</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">🌐 רשת ספקים גיאוגרפית</div>
+  <div class="info-card">
+    <div class="info-card-title">📍 ערי שירות — איך זה עובד</div>
+    <div style="font-size:12px;color:#64748B;line-height:1.8;">
+      בעת מילוי ההסכם בוחר הספק את <strong>ערי השירות</strong> שלו ממאגר קבוע של 60+ ערים ישראל.<br>
+      הספק יופיע <strong>אוטומטית</strong> בלשונית המקצוענים של כל בניין פעיל שנמצא באחת מהערים שבחר.<br>
+      ניתן לבחור <strong>מספר ערים</strong> — למשל: רמת גן, גבעתיים, בני ברק.
+    </div>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat-item">
+      <div class="feat-icon">🏘️</div>
+      <div class="feat-name">חשיפה אוטומטית</div>
+      <div class="feat-desc">מופיע לכל בניין פעיל באזורך ללא צורך בפנייה</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📍</div>
+      <div class="feat-name">ריבוי ערים</div>
+      <div class="feat-desc">בחר כמה ערים שתרצה לאזור השירות שלך</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">⭐</div>
+      <div class="feat-name">דירוג משותף</div>
+      <div class="feat-desc">דירוג מכל הבניינים מצטבר לפרופיל אחד</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📋</div>
+      <div class="feat-name">כל הקטגוריות</div>
+      <div class="feat-desc">בניין, שירותים מקצועיים, ועוד 17 תחומים</div>
+    </div>
+  </div>
+
+  <div class="sec-title">📋 תנאי ההסכם — עיקרי</div>
+  <div class="info-card">
+    <div class="info-card-title">✍️ מה הספק מתחייב</div>
+    <div style="font-size:12px;color:#475569;line-height:2;">
+      ✔ מענה לכל פנייה תוך שעתיים (08:00–19:00)<br>
+      ✔ הגעה בזמן שסוכם — איחור מעל 30 דקות: הודעה מראש<br>
+      ✔ הצעת מחיר לפני עבודה — ללא חיובים נסתרים<br>
+      ✔ ביצוע לפי תקנים — אחריות מינימלית 3 חודשים<br>
+      ✔ דמי ביקור עם אבחון ממשי: 200 ₪ בלבד<br>
+      ✔ ביטוח צד ג׳ בתוקף לאורך כל הפעילות<br>
+      <strong style="color:#DC2626;">✔ הפרת תנאים עלולה להוביל להסרה ואף להליכים משפטיים</strong>
+    </div>
+  </div>
+
+  <div class="sec-title">⭐ מדיניות דירוג</div>
+  <div class="dtree">
+    <div class="dtree-node question">
+      <div class="dtree-label">שאלה</div>
+      דירוג ממוצע נמוך מ-3.5 אחרי 5 עבודות?
+    </div>
+    <div class="dtree-node answer-yes">
+      <div class="dtree-label">כן</div>
+      ← התראה רשמית בכתב
+    </div>
+    <div class="dtree-node question" style="margin-right:24px;">
+      <div class="dtree-label">המשך</div>
+      דירוג נמוך גם אחרי ההתראה?
+    </div>
+    <div class="dtree-node answer-yes">
+      <div class="dtree-label">כן</div>
+      ← השהיית פרופיל עד לבירור
+    </div>
+    <div class="dtree-node answer-no" style="margin-right:48px;">
+      <div class="dtree-label">הפרה חמורה</div>
+      ← הסרה מיידית ללא התראה + אפשרות ערעור תוך 14 יום
+    </div>
+  </div>
+
+  <div class="tip tip-blue">
+    <span class="tip-icon">💡</span>
+    <div>ספק שהוסר רשאי לערער תוך 14 יום באמצעות פנייה כתובה לשכנות טובה</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 4 — FAQ
+══════════════════════════════════════ -->
+<div id="tab-faq" class="content">
+
+  <div class="sec-title">❓ שאלות נפוצות — דיירים</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">שכחתי את קוד ה-PIN — מה עושים? <span class="arr">▾</span></div>
+    <div class="faq-a">לחצו "שכחתי קוד PIN" ← ענו על שאלת האבטחה שהגדרתם בהרשמה ← הקוד יוצג על המסך.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">הדיווח שלי "ממתין לאישור" — כמה זמן? <span class="arr">▾</span></div>
+    <div class="faq-a">הוועד מאשר תשלומים בדרך כלל תוך 1–2 ימים. לאחר האישור תראו "✅ שולם" ויופיע כפתור קבלה.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">האפליקציה לא נפתחת — מה עושים? <span class="arr">▾</span></div>
+    <div class="faq-a">ודאו שאתם משתמשים ב-Chrome (אנדרואיד) או Safari (אייפון). ודאו שהלינק תקין. אם הבעיה נמשכת — פנו לוועד הבית.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">איך מתקינים את האפליקציה על המסך הבית? <span class="arr">▾</span></div>
+    <div class="faq-a"><strong>iOS:</strong> Safari ← כפתור שיתוף ⬆️ ← "הוסף למסך הבית"<br><strong>Android:</strong> Chrome ← תפריט ⋮ ← "הוסף למסך הבית"</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">כמה דיירים יכולים להיות בדירה אחת? <span class="arr">▾</span></div>
+    <div class="faq-a">עד 2 דיירים לאותה דירה (למשל בני זוג). כל אחד מגדיר PIN אישי נפרד.</div>
+  </div>
+
+  <div class="sec-title">❓ שאלות נפוצות — ועד</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">דייר שנרשם לא מופיע בגבייה — למה? <span class="arr">▾</span></div>
+    <div class="faq-a">הרשמת דייר וגבייה הן מערכות נפרדות. הגבייה מתעדכנת רק כשהדייר מדווח על תשלום ואתם מאשרים אותו.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">אישרתי תשלום בטעות — אפשר לבטל? <span class="arr">▾</span></div>
+    <div class="faq-a">כרגע אין ביטול אוטומטי. לצורך תיקון — פנו לשירות הלקוחות של שכנות טובה.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">דייר שכח PIN — מה עושים? <span class="arr">▾</span></div>
+    <div class="faq-a">הדייר יכול לשחזר לבד דרך שאלת האבטחה. אם גם זה לא עובד — הדייר פונה אליכם בוואטסאפ, ואתם יכולים לראות פרטיו בניהול דיירים.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">איך מעבירים נתוני בניין בין מכשירים? <span class="arr">▾</span></div>
+    <div class="faq-a">הגדרות ← סנכרון נתונים ← "📤 ייצא נתונים (JSON)" ← שלחו למכשיר השני ← "📥 ייבא נתונים".</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">איך לקשר Google Drive לדיירים? <span class="arr">▾</span></div>
+    <div class="faq-a">הגדרות ← "🔗 קישור Google Drive" ← הדביקו את הקישור לתיקיית Drive ← שמרו. הדיירים יוכלו לראות חשבוניות וקבלות.</div>
+  </div>
+
+  <div class="tip tip-blue">
+    <span class="tip-icon">📬</span>
+    <div>לתמיכה נוספת: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5e2d2d333f2c2a303b3739363c312c1e39333f3732703d3133">[email&#160;protected]</a></strong></div>
+  </div>
+
+</div>
+
+<!-- SCROLL TOP -->
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:32px 20px;font-size:12px;color:#94A3B8;">
+  SmartNeighbor · שכנות טובה · © 2026<br>
+  <span style="color:#C9A84C;font-weight:700;">אוטומציית ניהול מלאה בכף היד</span>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function showTab(name){
+  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleFaq(el){
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// scroll top button
+window.addEventListener('scroll', function(){
+  const btn = document.getElementById('scrollTopBtn');
+  bt
