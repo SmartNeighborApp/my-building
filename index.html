@@ -782,53 +782,8 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .ns-text { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.5; }
 
 /* ══════════════════════════════════════════
-   SUCCESS MODAL (after payment)
+   SUCCESS MODAL — removed v38
 ══════════════════════════════════════════ */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 1000;
-  background: rgba(15,39,68,.7);
-  backdrop-filter: blur(6px);
-  display: none; align-items: center; justify-content: center;
-  padding: 20px;
-  animation: fadeIn .25s ease;
-}
-.modal-overlay.show { display: flex; }
-.modal-card {
-  background: #fff; border-radius: 28px; overflow: hidden;
-  width: min(92vw, 480px);
-  box-shadow: 0 32px 80px rgba(0,0,0,.3);
-  animation: fadeUp .4s ease;
-}
-.modal-hd {
-  background: linear-gradient(135deg, #0F2744, #1E4D8C);
-  padding: 32px 28px 24px; text-align: center;
-}
-.modal-check {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal), #34D399);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; margin: 0 auto 16px;
-  animation: checkPop .6s cubic-bezier(.34,1.56,.64,1) both;
-  box-shadow: 0 10px 32px rgba(20,184,166,.4);
-}
-.modal-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; }
-.modal-sub   { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.6; }
-.modal-body  { padding: 24px 28px; }
-.modal-msg {
-  background: #F0FDF4; border-radius: 14px; padding: 16px 18px;
-  font-size: 14px; color: #166534; line-height: 1.8; margin-bottom: 20px;
-  border: 1px solid #BBF7D0; font-weight: 500;
-}
-.modal-close {
-  width: 100%; padding: 14px;
-  background: linear-gradient(135deg, var(--navy), var(--blue));
-  color: #fff; border-radius: 12px;
-  font-size: 14px; font-weight: 800; cursor: pointer;
-  font-family: var(--font);
-  transition: transform .13s, box-shadow .13s;
-  box-shadow: 0 4px 16px rgba(26,58,92,.3);
-}
-.modal-close:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,58,92,.35); }
 
 /* ══════════════════════════════════════════
    FOOTER
@@ -1653,36 +1608,7 @@ footer {
 <!-- ═══════════════════════════════════
      SUCCESS MODAL
 ═══════════════════════════════════ -->
-<div class="modal-overlay" id="success-modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal-card">
-    <div class="modal-hd">
-      <div class="modal-check">✅</div>
-      <div class="modal-title">הפרטים התקבלו!</div>
-      <div class="modal-sub">ברוכים הבאים למשפחת שכנות טובה 🏢</div>
-    </div>
-    <div class="modal-body">
-      <div class="modal-msg">
-        נציג "שכנות טובה" יחזור אליך תוך <strong>24 שעות</strong> להפעלת המערכת.<br><br>
-        בינתיים, ניתן לפנות אלינו בכל שאלה דרך WhatsApp או האימייל.
-      </div>
-      <!-- כפתור העתקת לינק ייחודי לדיירים -->
-      <button id="modal-copy-link-btn" data-link=""
-        onclick="copyBuildingLink(this)"
-        style="
-          width:100%;margin-bottom:10px;padding:14px;
-          background:linear-gradient(135deg,#14B8A6,#34D399);
-          color:#0F2744;border:none;border-radius:12px;
-          font-size:14px;font-weight:900;cursor:pointer;
-          font-family:'Heebo',sans-serif;
-          box-shadow:0 4px 14px rgba(20,184,166,.35);
-          display:flex;align-items:center;justify-content:center;gap:8px;
-          transition:transform .13s,box-shadow .13s;">
-        📋 העתק לינק כניסה לדיירים
-      </button>
-      <button class="modal-close" onclick="closeModal()">מעולה, תודה! 🙌</button>
-    </div>
-  </div>
-</div>
+
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ══════════════════════════════════════
@@ -1954,21 +1880,6 @@ async function submitAndPay(){
     var enterAppBtn = document.getElementById('enter-app-btn');
     if(enterAppBtn){ enterAppBtn.href = buildingAppLink; }
 
-    var modalMsg = document.querySelector('.modal-msg');
-    if(modalMsg){
-      modalMsg.innerHTML =
-        'נציג "שכנות טובה" יחזור אליך תוך <strong>24 שעות</strong> להפעלת המערכת.<br><br>' +
-        '🔑 <strong>קוד הגישה שלכם: ' + escHtml(accessCode) + '</strong><br>' +
-        '<span style="font-size:12px;opacity:.8;">שמרו קוד זה — תזדקקו לו בכניסה הראשונה למערכת.</span><br><br>' +
-        'בינתיים, ניתן לפנות אלינו בכל שאלה דרך WhatsApp או האימייל.';
-    }
-
-    var modalCopyBtn = document.getElementById('modal-copy-link-btn');
-    if(modalCopyBtn){
-      modalCopyBtn.setAttribute('data-link', buildingAppLink);
-    }
-
-    document.getElementById('success-modal').classList.add('show');
     btn.disabled = false;
     btn.textContent = '🔒 עבור לתשלום מאובטח';
 
@@ -1979,11 +1890,6 @@ async function submitAndPay(){
     btn.disabled = false;
     btn.textContent = '🔒 עבור לתשלום מאובטח';
   }
-}
-
-function closeModal(){
-  document.getElementById('success-modal').classList.remove('show');
-  goStep(3);
 }
 
 function goStep(n){
