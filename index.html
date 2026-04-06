@@ -1882,6 +1882,7 @@ async function submitAndPay(){
 
     btn.disabled = false;
     btn.textContent = '🔒 עבור לתשלום מאובטח';
+    goStep(3);
 
   } catch(err) {
     // שגיאה בלתי צפויה (כולל כשל ביצירת slug)
