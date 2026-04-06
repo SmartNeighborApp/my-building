@@ -2731,21 +2731,36 @@ function _applyBuildingAndOpen(building){
 ═══════════════════════════════════════════════════════════════ */
 var _lockoutTimer = null;
 
-function _getLockoutState(){
-  try{
-    var raw = localStorage.getItem('sn_lockout');
-    if(!raw) return null;
-    return JSON.parse(raw);
-  } catch(e){ return null; }
-}
+/* נעילת הניסיונות שמורה בזיכרון (closure) + sessionStorage.
+   localStorage.clear() מהקונסול לא עוזר — המצב שמור בזיכרון.
+   sessionStorage.clear() מהקונסול לא עוזר — המצב שמור גם בזיכרון.
+   המשתנה הפנימי _ls אינו נגיש מחוץ ל-closure. */
+var _lockoutStore = (function(){
+  var _ls = null;
+  return {
+    get: function(){
+      if(_ls) return _ls;
+      try{
+        var raw = sessionStorage.getItem('sn_lockout_ss');
+        if(raw){ _ls = JSON.parse(raw); return _ls; }
+      } catch(e){}
+      return null;
+    },
+    set: function(obj){
+      _ls = obj;
+      try{ sessionStorage.setItem('sn_lockout_ss', JSON.stringify(obj)); } catch(e){}
+    },
+    clear: function(){
+      _ls = null;
+      try{ sessionStorage.removeItem('sn_lockout_ss'); } catch(e){}
+      try{ localStorage.removeItem('sn_lockout'); } catch(e){} // נקה מפתח ישן
+    }
+  };
+})();
 
-function _setLockoutState(obj){
-  try{ localStorage.setItem('sn_lockout', JSON.stringify(obj)); } catch(e){}
-}
-
-function _clearLockoutState(){
-  try{ localStorage.removeItem('sn_lockout'); } catch(e){}
-}
+function _getLockoutState(){ return _lockoutStore.get(); }
+function _setLockoutState(obj){ _lockoutStore.set(obj); }
+function _clearLockoutState(){ _lockoutStore.clear(); }
 
 /* מחזיר מס' שניות שנותרו לחסימה, או 0 אם אין חסימה */
 function _lockoutSecondsLeft(){
@@ -3121,7 +3136,25 @@ document.addEventListener('DOMContentLoaded', function(){
 var SESS_KEY = 'sn19_sess';
 var DB_KEY   = 'sn22_db';
 var MONTH_OFFSET = 0;
-var ADMIN_ON = false;
+/* ADMIN_ON מוגן מפני שינוי ישיר מהקונסול באמצעות closure + Object.defineProperty.
+   שימוש ב-ADMIN_ON = true מהקונסול מתעלם בשקט — הערך האמיתי שמור בתוך ה-closure. */
+var _adminOn = (function(){
+  var _active = false;
+  return {
+    get: function(){ return _active; },
+    on:  function(){ _active = true; },
+    off: function(){ _active = false; }
+  };
+})();
+try{
+  Object.defineProperty(window, 'ADMIN_ON', {
+    get: function(){ return _adminOn.get(); },
+    set: function(){ /* no-op — מונע ADMIN_ON = true מהקונסול */ },
+    configurable: false
+  });
+} catch(e){ /* fallback ישן שלא תומך ב-defineProperty */ window.ADMIN_ON = false; }
+function _activateAdmin(){   _adminOn.on();  }
+function _deactivateAdmin(){ _adminOn.off(); }
 var _payMethod = null;
 var _activeNoticeType = 'notice';
 var _waTrayUnit = null;
@@ -3879,7 +3912,7 @@ function handleLogout(){
     localStorage.removeItem('sn_access_verified');
     localStorage.removeItem('sn_building_data');
   } catch(e){}
-  ADMIN_ON = false;
+  _deactivateAdmin();
   window.location.href = '/my-building/index.html';
 }
 
@@ -4562,6 +4595,12 @@ function votePoll(idx){
   if(!unit){ showToast('נא להיכנס קודם'); return; }
   var unitKey = String(unit);
   if(!poll.unitVotes) poll.unitVotes = {};
+  // מניעת הצבעה כפולה — גם אם votePoll נקראת ישירות מהקונסול
+  if(poll.unitVotes[unitKey] !== undefined){
+    showToast('דירה '+unit+' כבר הצביעה בסקר זה');
+    renderPoll(); // רענן תצוגה למקרה שה-UI לא עודכן
+    return;
+  }
   // עדכון מקומי מיידי לתצוגה
   poll.unitVotes[unitKey] = idx;
   poll.opts[idx].votes++;
@@ -5280,7 +5319,7 @@ function submitPin(){
     var pin0=document.getElementById('pin0'); if(pin0) pin0.focus();
     return;
   }
-  ADMIN_ON = true;
+  _activateAdmin();
   if(err) err.style.display='none';
   showToast('✅ כניסת מנהל הצליחה');
   renderSettingsPage();
@@ -5289,7 +5328,7 @@ function submitPin(){
 }
 
 function lockAdmin(){
-  ADMIN_ON = false;
+  _deactivateAdmin();
   for(var i=0;i<4;i++){ var b=document.getElementById('pin'+i); if(b) b.value=''; }
   renderSettingsPage();
   renderCommunityPage();
