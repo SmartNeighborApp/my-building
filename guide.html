@@ -923,7 +923,7 @@ function showTab(name){
   document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  event.target.classList.add('active');
+  event.currentTarget.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
