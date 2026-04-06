@@ -1843,12 +1843,13 @@ async function submitAndPay(){
 
     var today        = new Date().toISOString().slice(0, 10);
     // תיקון: ניקוי תווים מיוחדים גם ב-buildingName (כמו ב-city)
-    var streetVal    = ((document.getElementById('f-street')  || {}).value || '').trim();
-    var addrNum      = ((document.getElementById('f-address') || {}).value || '').trim();
+    var streetVal    = ((document.getElementById('f-street')   || {}).value || '').trim();
+    var addrNum      = ((document.getElementById('f-address')  || {}).value || '').trim();
     var buildingName = streetVal;
-    var city         = ((document.getElementById('f-city')    || {}).value || '').trim();
+    var city         = ((document.getElementById('f-city')     || {}).value || '').trim();
+    var vaadUnit     = ((document.getElementById('f-vaad-unit')|| {}).value || '').trim() || null;
     // units נשאר null
-    var contactName  = ((document.getElementById('f-name')    || {}).value || '').trim();
+    var contactName  = ((document.getElementById('f-name')     || {}).value || '').trim();
     var phone        = ((document.getElementById('f-phone')   || {}).value || '').trim();
     var email        = ((document.getElementById('f-email')   || {}).value || '').trim();
     var units        = null;
