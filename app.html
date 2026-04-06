@@ -1441,7 +1441,7 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
       <div class="hdr-right">
-        <a class="hdr-refer-btn" href="/my-building/index.html?ref=app" target="_blank">⭐ ממליץ בחום</a>
+        <button class="hdr-refer-btn" onclick="shareAppWhatsApp()">💬 שתף לשכן</button>
         <div class="hdr-balance-pill">₪<span id="hdr-balance">0</span></div>
         <div class="hdr-avatar" onclick="switchTab('settings')">👤</div>
       </div>
@@ -2029,6 +2029,30 @@ a{text-decoration:none;color:inherit;}
             <div class="install-step"><div class="install-step-num">3</div><div>לחץ על <strong>"הוסף למסך הבית"</strong></div></div>
             <div class="install-step"><div class="install-step-num">4</div><div>לחץ <strong>"הוסף"</strong> לאישור</div></div>
           </div>
+        </div>
+      </div>
+
+      <!-- registration / invite card (admin-only) -->
+      <div class="sett-section admin-only" id="reg-invite-card">
+        <div class="admin-sec-title">🔗 קישור הצטרפות לדיירים</div>
+        <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;color:var(--slate);line-height:1.6;">
+            שתף את הקישור וקוד הכניסה עם הדיירים כדי שיוכלו להצטרף לאפליקציה.
+          </div>
+          <div style="background:#F8FAFC;border-radius:12px;padding:12px 14px;border:1.5px solid #E2E8F0;">
+            <div style="font-size:11px;font-weight:700;color:var(--slate);margin-bottom:4px;">קישור לאפליקציה</div>
+            <div id="reg-app-link" style="font-size:12px;font-weight:700;color:var(--blue);word-break:break-all;line-height:1.5;"></div>
+          </div>
+          <div style="background:#FEF3C7;border-radius:12px;padding:12px 14px;border:1.5px solid #FDE68A;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:2px;">קוד כניסה לבניין</div>
+              <div id="reg-access-code" style="font-size:26px;font-weight:900;color:#92400E;letter-spacing:4px;">—</div>
+            </div>
+            <button onclick="copyInviteCode()" style="padding:8px 14px;background:#F59E0B;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);white-space:nowrap;">📋 העתק קוד</button>
+          </div>
+          <button onclick="shareInviteWhatsApp()" style="width:100%;padding:11px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;">
+            💬 שלח הזמנה ב-WhatsApp
+          </button>
         </div>
       </div>
 
@@ -2682,6 +2706,8 @@ function _applyBuildingAndOpen(building){
     DB.building.name        = building.building_name || '';
     DB.building.city        = building.city || '';
     DB.building.total_units = parseInt(building.units_count) || 0;
+    DB.building.unique_slug = building.unique_slug || '';
+    DB.building.access_code = building.access_code  || '';
     // monthly_fee — מהגדרות הבניין בסופרבייס (admin מגדיר דמי ועד)
     if(building.monthly_fee !== undefined && building.monthly_fee !== null){
       var fee = parseFloat(building.monthly_fee);
@@ -3951,8 +3977,7 @@ function startApp(){
   document.getElementById('bottom-nav').classList.add('visible');
   switchTab('home'); // ← מעבר אוטומטי לדף הבית
   _cleanOldVaadNotices();
-  renderAll();
-  checkDebtAlert();
+  renderAll(); // checkDebtAlert נקרא בתוך renderAll אחרי טעינת תשלומים מסופרבייס
 }
 
 function renderAll(){
@@ -3970,6 +3995,8 @@ function renderAll(){
               try{ renderDocsPage(); }catch(e){}
               try{ renderSettingsPage(); }catch(e){}
               try{ renderProfessionalsPage(); }catch(e){}
+              // בדיקת חוב רק אחרי שהתשלומים נטענו מסופרבייס — מונע false positives
+              try{ checkDebtAlert(); }catch(e){}
             });
           });
         });
@@ -4145,6 +4172,15 @@ function renderCollDots(mk){
   var el = document.getElementById('coll-dots-public');
   if(!el) return;
   var tot = DB.building.total_units;
+  // פרטיות: דייר רגיל רואה רק סיכום — לא ניתן לזהות מי שילם ומי לא
+  if(!ADMIN_ON){
+    var paidCount = countPaid(mk);
+    el.innerHTML =
+      '<div style="width:100%;text-align:center;padding:10px 0;font-size:13px;font-weight:700;color:var(--slate);">'+
+        paidCount + ' מתוך ' + tot + ' דיירים שילמו החודש'+
+      '</div>';
+    return;
+  }
   var html = '';
   for(var i=1;i<=tot;i++){
     var unitKey = i+'-'+mk;
@@ -4850,7 +4886,54 @@ function renderSettingsPage(){
     renderCustomDocsAdmin();
     // drive link prefill
     val('admin-drive-link', DB.driveLink||'');
+    renderRegInviteCard();
   }
+}
+
+function renderRegInviteCard(){
+  var slug = DB.building.unique_slug || _getBuildingSlug() || '';
+  var code = DB.building.access_code || '';
+  var base = window.location.origin + window.location.pathname;
+  var link = slug ? (base + '?b=' + encodeURIComponent(slug)) : base;
+  var linkEl = document.getElementById('reg-app-link');
+  var codeEl = document.getElementById('reg-access-code');
+  if(linkEl) linkEl.textContent = link;
+  if(codeEl) codeEl.textContent = code || '—';
+}
+
+function copyInviteCode(){
+  var code = DB.building.access_code || '';
+  if(!code){ showToast('קוד כניסה לא זמין'); return; }
+  try{
+    navigator.clipboard.writeText(code).then(function(){ showToast('קוד הועתק ✅'); });
+  } catch(e){
+    showToast('קוד: ' + code);
+  }
+}
+
+function shareAppWhatsApp(){
+  // כפתור ה-"שתף לשכן" מהכותרת — שולח קישור כניסה מהיר לבניין
+  var slug = DB.building.unique_slug || _getBuildingSlug() || '';
+  var code = DB.building.access_code || '';
+  var base = window.location.origin + window.location.pathname;
+  var link = slug ? (base + '?b=' + encodeURIComponent(slug)) : base;
+  var bldg = DB.building.name || 'הבניין שלנו';
+  var msg  = 'היי! 👋 הצטרף/י לאפליקציית הבניין של ' + bldg + ':\n' + link;
+  if(code) msg += '\n🔑 קוד כניסה: ' + code;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function shareInviteWhatsApp(){
+  var slug = DB.building.unique_slug || _getBuildingSlug() || '';
+  var code = DB.building.access_code || '';
+  var base = window.location.origin + window.location.pathname;
+  var link = slug ? (base + '?b=' + encodeURIComponent(slug)) : base;
+  var bldg = DB.building.name || 'הבניין שלנו';
+  var msg  = 'היי! 👋\nאנחנו משתמשים באפליקציית ניהול הבניין של ' + bldg + '.\n\n';
+  msg += '📱 קישור לאפליקציה:\n' + link + '\n\n';
+  if(code) msg += '🔑 קוד כניסה: *' + code + '*\n\n';
+  msg += 'שכנות טובה · SmartNeighbor 🏢';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 function updateCfgLive(){
@@ -5362,7 +5445,19 @@ function saveBuildingConfig(){
   saveDB();
   updateCfgLive();
   renderHeader();
-  showToast('הגדרות בניין עודכנו ✅');
+  // סנכרון monthly_fee לסופרבייס
+  var slug = _getBuildingSlug();
+  if(slug){
+    sbClient.from('buildings')
+      .update({ monthly_fee: fe })
+      .eq('unique_slug', slug)
+      .then(function(res){
+        if(res.error){ showToast('נשמר מקומית · שגיאת ענן: '+res.error.message); }
+        else { showToast('הגדרות בניין עודכנו ✅ (כולל ענן)'); }
+      }).catch(function(){ showToast('נשמר מקומית · שגיאת חיבור'); });
+  } else {
+    showToast('הגדרות בניין עודכנו ✅');
+  }
 }
 
 function savePaySettings(){
@@ -5557,28 +5652,68 @@ function closeWATray(){
    RECEIPT MODAL
 ═══════════════════════════════════════════════════════════════ */
 function showMyReceipt(){
-  var unit   = DB.user.unit;
-  var mk     = monthKey(getTargetDate());
-  var unitKey= unit+'-'+mk;
-  var rec    = DB.approvedReceipts[unitKey];
-  if(!rec){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
+  var unit    = DB.user.unit;
+  var mk      = monthKey(getTargetDate());
+  var unitKey = unit+'-'+mk;
+  var slug    = _getBuildingSlug();
 
-  // מספר קבלה אוטומטי: YYYYMM-UNIT
-  var receiptNum = mk.replace('-','') + '-' + unit;
+  function _displayReceipt(rec){
+    var receiptNum = mk.replace('-','') + '-' + unit;
+    setText('receipt-cat-name',   DB.building.name||'הבניין');
+    setText('receipt-num-ph',     receiptNum);
+    setText('receipt-date-ph',    fmtDate(new Date()));
+    setText('receipt-supplier-ph',rec.name||('דירה '+unit));
+    setText('receipt-unit-ph',   'דירה '+rec.unit);
+    setText('receipt-month-ph',   rec.monthLabel||fmtMonth(getTargetDate()));
+    setText('receipt-method-ph',  rec.methodLabel||'—');
+    setText('receipt-amount-ph',  '₪'+num(rec.amount));
+    setText('receipt-bldg-ph',    DB.building.name||'—');
+    setText('receipt-addr-ph',    (DB.building.address||'')+' '+(DB.building.city||''));
+    var ov = document.getElementById('receipt-modal');
+    if(ov) ov.style.display='flex';
+  }
 
-  setText('receipt-cat-name',   DB.building.name||'הבניין');
-  setText('receipt-num-ph',     receiptNum);
-  setText('receipt-date-ph',    fmtDate(new Date()));
-  setText('receipt-supplier-ph',rec.name||('דירה '+unit));
-  setText('receipt-unit-ph',   'דירה '+rec.unit);
-  setText('receipt-month-ph',   rec.monthLabel||fmtMonth(getTargetDate()));
-  setText('receipt-method-ph',  rec.methodLabel||'—');
-  setText('receipt-amount-ph',  '₪'+num(rec.amount));
-  setText('receipt-bldg-ph',    DB.building.name||'—');
-  setText('receipt-addr-ph',    (DB.building.address||'')+' '+(DB.building.city||''));
-
-  var ov = document.getElementById('receipt-modal');
-  if(ov) ov.style.display='flex';
+  // רענון מסופרבייס לפני הצגה — מונע תצוגת נתונים ישנים מ-localStorage
+  if(slug){
+    showToast('טוען קבלה...');
+    sbClient.from('payments')
+      .select('*')
+      .eq('building_slug', slug)
+      .eq('unit', unit)
+      .eq('month_key', mk)
+      .eq('status', 'approved')
+      .limit(1)
+      .then(function(res){
+        if(!res.error && res.data && res.data.length){
+          var r = res.data[0];
+          var rec = {
+            id:          r.id,
+            name:        DB.unitNames[unit] || ('דירה '+unit),
+            unit:        unit,
+            amount:      r.amount       || '',
+            method:      r.method       || '',
+            methodLabel: r.method_label || '',
+            monthLabel:  r.month_label  || fmtMonth(getTargetDate()),
+            approvedDate:r.approved_date|| '',
+            approvedBy:  r.approved_by  || ''
+          };
+          // עדכן גם את ה-cache המקומי
+          DB.approvedReceipts[unitKey] = rec;
+          _displayReceipt(rec);
+        } else {
+          showToast('קבלה זמינה לאחר אישור הוועד');
+        }
+      }).catch(function(){
+        // fallback לנתונים מקומיים אם אין חיבור
+        var rec = DB.approvedReceipts[unitKey];
+        if(rec){ _displayReceipt(rec); }
+        else { showToast('קבלה זמינה לאחר אישור הוועד'); }
+      });
+  } else {
+    var rec = DB.approvedReceipts[unitKey];
+    if(rec){ _displayReceipt(rec); }
+    else { showToast('קבלה זמינה לאחר אישור הוועד'); }
+  }
 }
 
 function printReceipt(){
@@ -5592,40 +5727,44 @@ function printReceipt(){
   var bldg   = document.getElementById('receipt-bldg-ph')  ? document.getElementById('receipt-bldg-ph').textContent  : '';
   var addr   = document.getElementById('receipt-addr-ph')  ? document.getElementById('receipt-addr-ph').textContent  : '';
 
-  var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">'+
+  var html = '<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8">'+
     '<title>קבלה '+num+'</title>'+
     '<style>'+
-      'body{font-family:Arial,sans-serif;max-width:400px;margin:40px auto;padding:20px;direction:rtl;}'+
-      'h1{font-size:22px;text-align:center;color:#1A3A5C;margin-bottom:4px;}'+
-      '.sub{text-align:center;color:#64748B;font-size:13px;margin-bottom:20px;}'+
-      '.num{text-align:center;background:#F1F5F9;border-radius:8px;padding:8px;font-weight:900;color:#1A3A5C;margin-bottom:16px;font-size:14px;}'+
+      '*{box-sizing:border-box;margin:0;padding:0;}'+
+      'body{font-family:Arial,Helvetica,sans-serif;max-width:440px;margin:32px auto;padding:24px;direction:rtl;background:#fff;color:#1e293b;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      '.receipt-header{background:#1A3A5C;color:#fff;border-radius:12px 12px 0 0;padding:20px 24px;text-align:center;}'+
+      '.receipt-header h1{font-size:20px;font-weight:900;margin-bottom:4px;}'+
+      '.receipt-header .bldg{font-size:13px;opacity:.8;}'+
+      '.receipt-num{background:#F1F5F9;border:1.5px solid #E2E8F0;border-radius:0;padding:10px 24px;text-align:center;font-size:13px;font-weight:800;color:#1A3A5C;letter-spacing:1px;}'+
+      '.receipt-body{border:1.5px solid #E2E8F0;border-top:none;border-radius:0 0 12px 12px;padding:0;}'+
       'table{width:100%;border-collapse:collapse;}'+
-      'td{padding:10px 8px;border-bottom:1px solid #F1F5F9;font-size:14px;}'+
-      'td:first-child{color:#64748B;width:40%;}'+
-      'td:last-child{font-weight:700;color:#1A3A5C;}'+
-      '.total td{font-size:16px;font-weight:900;color:#1A3A5C;border-top:2px solid #E2E8F0;border-bottom:none;}'+
-      '.stamp{margin-top:20px;text-align:center;background:#F0FDF4;border-radius:10px;padding:12px;color:#16A34A;font-weight:700;font-size:13px;}'+
-      '.footer{margin-top:16px;text-align:center;color:#94A3B8;font-size:11px;}'+
-      '@media print{body{margin:0;}button{display:none;}}'+
+      'td{padding:11px 16px;border-bottom:1px solid #F1F5F9;font-size:13px;vertical-align:middle;}'+
+      'td:first-child{color:#64748B;width:38%;font-weight:600;}'+
+      'td:last-child{font-weight:700;color:#1e293b;}'+
+      'tr.total-row td{font-size:16px;font-weight:900;color:#1A3A5C;background:#EFF6FF;border-bottom:none;}'+
+      '.stamp{margin:16px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:12px 16px;color:#166534;font-weight:800;font-size:13px;text-align:center;}'+
+      '.footer{margin-top:16px;text-align:center;color:#94A3B8;font-size:11px;padding-bottom:8px;}'+
+      '.print-btn{display:block;width:100%;margin-top:20px;padding:13px;background:#1A3A5C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;}'+
+      '@media print{.print-btn{display:none;}body{margin:0;padding:16px;}'+
+        '.receipt-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+        'tr.total-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'+
     '</style></head><body>'+
-    '<h1>🧾 קבלה רשמית</h1>'+
-    '<div class="sub">ועד הבית — '+bldg+'</div>'+
-    '<div class="num">מספר קבלה: '+num+'</div>'+
+    '<div class="receipt-header"><h1>🧾 קבלה רשמית</h1><div class="bldg">ועד הבית — '+bldg+'</div></div>'+
+    '<div class="receipt-num">מספר קבלה: <strong>'+num+'</strong> &nbsp;·&nbsp; '+date+'</div>'+
+    '<div class="receipt-body">'+
     '<table>'+
-      '<tr><td>תאריך</td><td>'+date+'</td></tr>'+
       '<tr><td>שם משלם</td><td>'+name+'</td></tr>'+
       '<tr><td>דירה</td><td>'+unit+'</td></tr>'+
       '<tr><td>חודש תשלום</td><td>'+month+'</td></tr>'+
       '<tr><td>אמצעי תשלום</td><td>'+method+'</td></tr>'+
-      '<tr class="total"><td>סכום</td><td>'+amount+'</td></tr>'+
-    '</table>'+
-    '<table style="margin-top:12px;">'+
       '<tr><td>בניין</td><td>'+bldg+'</td></tr>'+
       '<tr><td>כתובת</td><td>'+addr+'</td></tr>'+
+      '<tr class="total-row"><td>סכום ששולם</td><td>'+amount+'</td></tr>'+
     '</table>'+
+    '</div>'+
     '<div class="stamp">✅ התשלום אושר על ידי ועד הבית</div>'+
     '<div class="footer">שכנות טובה · SmartNeighbor · מערכת ניהול בניינים</div>'+
-    '<br><button onclick="window.print()" style="width:100%;padding:12px;background:#1A3A5C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">🖨️ הדפס / שמור כ-PDF</button>'+
+    '<button class="print-btn" onclick="window.print()">🖨️ הדפס / שמור כ-PDF</button>'+
     '</body></html>';
 
   var blob    = new Blob([html], {type:'text/html;charset=utf-8'});
@@ -6739,24 +6878,32 @@ function exportAnnualPDF(){
   var html = '<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8">'+
   '<title>דוח שנתי '+year+' — '+escHtml(b.name||'')+'</title>'+
   '<style>'+
-    'body{font-family:Arial,sans-serif;font-size:13px;color:#1e293b;margin:0;padding:24px;direction:rtl;}'+
-    'h1{font-size:22px;color:#1E40AF;margin-bottom:4px;}'+
-    '.subtitle{color:#64748B;font-size:13px;margin-bottom:24px;}'+
-    '.summary{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;}'+
-    '.sum-box{flex:1;min-width:140px;border-radius:10px;padding:14px 18px;background:#EFF6FF;}'+
-    '.sum-box.green{background:#F0FDF4;}.sum-box.red{background:#FEF2F2;}.sum-box.orange{background:#FFFBEB;}'+
-    '.sum-label{font-size:11px;color:#64748B;margin-bottom:4px;}'+
-    '.sum-val{font-size:20px;font-weight:bold;color:#1E40AF;}'+
-    '.sum-box.green .sum-val{color:#16A34A;}.sum-box.red .sum-val{color:#DC2626;}.sum-box.orange .sum-val{color:#D97706;}'+
-    'h2{font-size:15px;color:#1E40AF;border-bottom:2px solid #DBEAFE;padding-bottom:6px;margin-top:28px;}'+
+    '*{box-sizing:border-box;}'+
+    'body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1e293b;margin:0;padding:28px;direction:rtl;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+    'h1{font-size:22px;color:#1A3A5C;margin-bottom:4px;font-weight:900;}'+
+    '.subtitle{color:#64748B;font-size:12px;margin-bottom:24px;}'+
+    '.summary{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;}'+
+    '.sum-box{flex:1;min-width:130px;border-radius:10px;padding:14px 16px;background:#EFF6FF;border:1.5px solid #BFDBFE;}'+
+    '.sum-box.green{background:#F0FDF4;border-color:#86EFAC;}'+
+    '.sum-box.red{background:#FEF2F2;border-color:#FECACA;}'+
+    '.sum-box.orange{background:#FFFBEB;border-color:#FDE68A;}'+
+    '.sum-label{font-size:11px;color:#64748B;margin-bottom:4px;font-weight:600;}'+
+    '.sum-val{font-size:20px;font-weight:900;color:#1A3A5C;}'+
+    '.sum-box.green .sum-val{color:#166534;}'+
+    '.sum-box.red .sum-val{color:#DC2626;}'+
+    '.sum-box.orange .sum-val{color:#92400E;}'+
+    'h2{font-size:14px;color:#1A3A5C;border-bottom:2px solid #1A3A5C;padding-bottom:5px;margin-top:28px;margin-bottom:10px;font-weight:900;}'+
     'table{width:100%;border-collapse:collapse;margin-bottom:16px;}'+
-    'th{background:#EFF6FF;color:#1E40AF;padding:8px 10px;text-align:right;font-size:12px;}'+
-    'td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:12px;}'+
-    'tr:hover td{background:#F8FAFC;}'+
-    'tr.subtotal td{background:#DBEAFE;font-weight:bold;}'+
+    'th{background:#1A3A5C;color:#fff;padding:8px 10px;text-align:right;font-size:11px;font-weight:700;}'+
+    'td{padding:7px 10px;border-bottom:1px solid #E2E8F0;font-size:12px;color:#1e293b;}'+
+    'tr:nth-child(even) td{background:#F8FAFC;}'+
+    'tr.subtotal td{background:#DBEAFE;font-weight:900;color:#1E40AF;border-top:1.5px solid #93C5FD;}'+
     '.footer{margin-top:32px;text-align:center;font-size:11px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:12px;}'+
-    '@media print{body{padding:8px;}button{display:none;}}'+
-    '.print-btn{background:#1E40AF;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;cursor:pointer;margin-bottom:20px;}'+
+    '.print-btn{background:#1A3A5C;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;cursor:pointer;margin-bottom:20px;font-family:Arial,sans-serif;}'+
+    '@media print{.print-btn{display:none;}body{padding:12px;}'+
+      'th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      'tr.subtotal td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      '.sum-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'+
   '</style></head><body>'+
   '<button class="print-btn" onclick="window.print()">🖨️ הדפס / שמור PDF</button>'+
   '<h1>📊 דוח שנתי '+year+'</h1>'+
@@ -7031,27 +7178,61 @@ function reportPaidFromBanner(){
 function renderResidentsList(){
   var el = document.getElementById('residents-list-admin');
   if(!el) return;
-  var mk = monthKey(getTargetDate());
-  var tot = DB.building.total_units;
-  var html = '';
-  for(var i=1;i<=tot;i++){
-    var name  = DB.unitNames[i]||('דייר '+i);
-    var phone = (DB.residentPhones && DB.residentPhones[i])||'';
-    var cleanPhone = phone.replace(/\D/g,'').replace(/^0/,'972');
-    var wa1 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
-    var reminderMsg = encodeURIComponent('שלום, נשמח להסדרת תשלום הוועד. תודה!');
-    var wa2 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'?text='+reminderMsg+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
-    html += '<div class="res-row">'+
-      '<div class="res-unit-badge">'+i+'</div>'+
-      '<div style="flex:1;min-width:0;">'+
-        '<div class="res-name">'+escHtml(name)+'</div>'+
-        (phone?'<div class="res-phone">📞 '+escHtml(phone)+'</div>':'<div class="res-phone" style="color:#CBD5E1;">אין טלפון</div>')+
-      '</div>'+
-      '<button class="res-wa-btn" onclick="'+wa1+'" title="פתח WhatsApp">💬</button>'+
-      '<button class="res-reminder-btn" onclick="'+wa2+'">📲 תזכורת</button>'+
-    '</div>';
-  }
-  el.innerHTML = html || '<div class="empty-state">אין דיירים</div>';
+  el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--slate);font-size:12px;">טוען...</div>';
+  var slug = _getBuildingSlug();
+  var tot  = DB.building.total_units;
+  // טעינת טלפונים ישירות מסופרבייס
+  sbClient.from('residents')
+    .select('unit,name,phone')
+    .eq('building_slug', slug)
+    .then(function(res){
+      // בנה מפת unit→{name,phone} מסופרבייס
+      var sbMap = {};
+      if(!res.error && res.data){
+        res.data.forEach(function(r){
+          var u = Number(r.unit);
+          if(!sbMap[u]){
+            sbMap[u] = { name: r.name||'', phone: r.phone||'' };
+          } else {
+            // אם יש כמה דיירים לאותה דירה — שמור את מי שיש לו טלפון
+            if(!sbMap[u].phone && r.phone) sbMap[u].phone = r.phone;
+          }
+        });
+      }
+      var html = '';
+      var reminderMsg = encodeURIComponent('שלום, נשמח להסדרת תשלום הוועד. תודה!');
+      for(var i=1;i<=tot;i++){
+        var sb    = sbMap[i] || {};
+        var name  = sb.name  || DB.unitNames[i] || ('דירה '+i);
+        var phone = sb.phone || (DB.residentPhones && DB.residentPhones[i]) || '';
+        var cleanPhone = phone.replace(/\D/g,'').replace(/^0/,'972');
+        var wa1 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
+        var wa2 = phone ? 'window.open(\'https://wa.me/'+cleanPhone+'?text='+reminderMsg+'\',\'_blank\')' : 'showToast(\'לא הוזן מספר לדירה '+i+'\')';
+        html += '<div class="res-row">'+
+          '<div class="res-unit-badge">'+i+'</div>'+
+          '<div style="flex:1;min-width:0;">'+
+            '<div class="res-name">'+escHtml(name)+'</div>'+
+            (phone?'<div class="res-phone">📞 '+escHtml(phone)+'</div>':'<div class="res-phone" style="color:#CBD5E1;">אין טלפון</div>')+
+          '</div>'+
+          '<button class="res-wa-btn" onclick="'+wa1+'" title="פתח WhatsApp">💬</button>'+
+          '<button class="res-reminder-btn" onclick="'+wa2+'">📲 תזכורת</button>'+
+        '</div>';
+      }
+      el.innerHTML = html || '<div class="empty-state">אין דיירים</div>';
+    }).catch(function(){
+      // fallback לנתונים מקומיים אם אין חיבור
+      var html = '';
+      for(var i=1;i<=tot;i++){
+        var name  = DB.unitNames[i]||('דירה '+i);
+        var phone = (DB.residentPhones && DB.residentPhones[i])||'';
+        html += '<div class="res-row">'+
+          '<div class="res-unit-badge">'+i+'</div>'+
+          '<div style="flex:1;min-width:0;"><div class="res-name">'+escHtml(name)+'</div>'+
+          (phone?'<div class="res-phone">📞 '+escHtml(phone)+'</div>':'<div class="res-phone" style="color:#CBD5E1;">אין טלפון</div>')+
+          '</div></div>';
+      }
+      el.innerHTML = html || '<div class="empty-state">אין דיירים</div>';
+    });
 }
 
 function saveResidentEntry(){
