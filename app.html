@@ -1194,7 +1194,11 @@ a{text-decoration:none;color:inherit;}
      SUPABASE ACCESS CODE MODAL
      מופיע ראשון בטעינת הדף — מסתיר את כל האפליקציה
 ═══════════════════════════════════════════════════════════ -->
-<div id="sb-access-modal" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0F2744 0%,#1A3A5C 60%,#1E4D8C 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;padding:20px;">
+<div id="sb-access-modal" style="
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(160deg,#0F2744 0%,#1A3A5C 60%,#1E4D8C 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Heebo',sans-serif;direction:rtl;padding:20px;">
   <!-- לוגו -->
   <div style="text-align:center;margin-bottom:32px;">
     <div style="font-size:56px;line-height:1;display:block;">🏢</div>
@@ -4088,7 +4092,17 @@ function updateMyPill(mk, unit){
 function renderCollDots(mk){
   var el = document.getElementById('coll-dots-public');
   if(!el) return;
-  el.innerHTML = '';
+  var tot = DB.building.total_units;
+  var html = '';
+  for(var i=1;i<=tot;i++){
+    var unitKey = i+'-'+mk;
+    var cls = 'unit-dot';
+    if(DB.approvedReceipts[unitKey]) cls+=' paid';
+    else if(DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; })) cls+=' pending';
+    else cls+=' unpaid';
+    html += '<div class="'+cls+'" title="דירה '+i+'">'+i+'</div>';
+  }
+  el.innerHTML = html;
 }
 
 function countPaid(mk){
@@ -5890,7 +5904,7 @@ function submitComplaint(profId, profName){
   bodyParts.push('');
   bodyParts.push('Complaint details:');
   var bod = encodeURIComponent(bodyParts.join('\r\n'));
-  window.location.href = 'mailto:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="483b25293a3c262d212f202a273a082f25292124662b2725">[email&#160;protected]</a>?subject=' + subj + '&body=' + bod;
+  window.location.href = 'mailto:smartneighbor@gmail.com?subject=' + subj + '&body=' + bod;
   showToast('\u05E0\u05E4\u05EA\u05D7 \u05D0\u05D9\u05DE\u05D9\u05D9\u05DC \u05DC\u05E9\u05DB\u05E0\u05D5\u05EA \u05D8\u05D5\u05D1\u05D4');
 }
 
@@ -6388,7 +6402,6 @@ function checkDebtAlert(){
   try{
     var shown = sessionStorage.getItem('sn19_debt_shown');
     if(shown) return;
-    if(!DB.approvedReceipts || Object.keys(DB.approvedReceipts).length===0) return;
     var unit = DB.user.unit;
     var now  = new Date();
     var debtMonths = [];
@@ -6714,7 +6727,7 @@ function exportAnnualPDF(){
   '<table><tr><th>שם</th><th>קטגוריה</th><th>טלפון</th><th>דירוג</th></tr>'+profRows+'</table>'+
 
   '<div class="footer">הדוח הופק על ידי מערכת שכנות טובה · SmartNeighbor · '+fmtDate(new Date())+'</div>'+
-  '<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>';
+  '</body></html>';
 
   var win = window.open('','_blank');
   if(win){ win.document.write(html); win.document.close(); }
@@ -7336,12 +7349,13 @@ window.addEventListener('load', function(){
 <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.onkeydown = function(e) {
-   if (e.keyCode == 123 || 
+        if (e.keyCode == 123 || 
             (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || 
             (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
             return false;
         }
     };
 </script>
+
 </body>
-</html>  
+</html>
