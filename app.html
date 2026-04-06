@@ -2560,6 +2560,14 @@ var SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk';
 var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* גלובל safety net — תופס כל Promise שנדחה ללא .catch()
+   Supabase JS בדרך כלל מחזיר {data,error} ולא דוחה, אבל
+   כשל רשת מוחלט (timeout/offline) עלול לגרום לדחייה שקטה */
+window.addEventListener('unhandledrejection', function(event){
+  console.warn('[SmartNeighbor] שגיאת רשת:', event.reason);
+  event.preventDefault(); // מונע הודעת שגיאה אדומה בקונסול
+});
+
 /* ═══════════════════════════════════════════════════════════════
    TRIAL EXPIRY CHECK — 14 יום ניסיון
    נקראת רק אחרי זיהוי בניין מוצלח, לא משפיעה על מסך הכניסה
@@ -3233,7 +3241,7 @@ var HE_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','י�
 function nowDate(){ return new Date(); }
 function getTargetDate(){
   var d = new Date();
-  d.setMonth(d.getMonth() + MONTH_OFFSET);
+  d.setMonth(d.getMonth() + Math.max(-24, Math.min(24, MONTH_OFFSET || 0)));
   return d;
 }
 function monthKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1); }
@@ -4925,8 +4933,8 @@ function quickApprove(unit){
           renderFundPage();
           renderHomePage();
         });
-      });
-    });
+      }).catch(function(){ showToast('שגיאת חיבור — נסה שוב'); });
+    }).catch(function(){ showToast('שגיאת חיבור — נסה שוב'); });
 }
 
 function rejectPayment(idx){
@@ -5581,8 +5589,11 @@ function printReceipt(){
     '<br><button onclick="window.print()" style="width:100%;padding:12px;background:#1A3A5C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">🖨️ הדפס / שמור כ-PDF</button>'+
     '</body></html>';
 
-  var w = window.open('','_blank');
-  if(w){ w.document.write(html); w.document.close(); }
+  var blob    = new Blob([html], {type:'text/html;charset=utf-8'});
+  var blobUrl = URL.createObjectURL(blob);
+  var w       = window.open(blobUrl, '_blank');
+  if(!w){ showToast('אפשר לפתוח חלונות קופצים בדפדפן'); }
+  setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 60000);
 }
 
 function closeReceipt(){
@@ -6400,7 +6411,7 @@ function loadPaymentsFromSupabase(cb){
    MONTH NAVIGATION
 ═══════════════════════════════════════════════════════════════ */
 function changeMonth(dir){
-  MONTH_OFFSET += dir;
+  MONTH_OFFSET = Math.max(-24, Math.min(24, MONTH_OFFSET + dir));
   renderFundPage();
 }
 
@@ -6738,9 +6749,11 @@ function exportAnnualPDF(){
   '<div class="footer">הדוח הופק על ידי מערכת שכנות טובה · SmartNeighbor · '+fmtDate(new Date())+'</div>'+
   '</body></html>';
 
-  var win = window.open('','_blank');
-  if(win){ win.document.write(html); win.document.close(); }
-  else { showToast('אפשר לפתוח חלונות קופצים בדפדפן'); }
+  var blob2    = new Blob([html], {type:'text/html;charset=utf-8'});
+  var blobUrl2 = URL.createObjectURL(blob2);
+  var win      = window.open(blobUrl2, '_blank');
+  if(!win){ showToast('אפשר לפתוח חלונות קופצים בדפדפן'); }
+  setTimeout(function(){ URL.revokeObjectURL(blobUrl2); }, 60000);
 }
 
 /* ═══════════════════════════════════════════════════════════════
