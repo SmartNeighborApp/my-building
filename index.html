@@ -1020,6 +1020,7 @@ footer {
     </div>
   </div>
 
+  </div>
 </section>
 
 <!-- ═══════════════════════════════════
@@ -1330,32 +1331,33 @@ footer {
             <input id="f-name" name="fullName" class="field-inp" type="text" placeholder="לדוגמה: דוד כהן">
             <div class="field-err" id="err-name">נא להזין שם מלא</div>
           </div>
-          <div class="field-row-2">
-            <div class="field-group">
-              <label class="field-label">רחוב</label>
-              <input id="f-street" name="street" class="field-inp" type="text" placeholder="לדוגמה: רוטשילד">
-              <div class="field-err" id="err-street">נא להזין שם רחוב</div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">מספר</label>
-              <input id="f-address" name="address" class="field-inp" type="number" placeholder="12" min="1" max="9999">
-              <div class="field-err" id="err-address">נא להזין מספר</div>
-            </div>
+          <div class="field-group">
+            <label class="field-label">כתובת הבניין (רחוב ומספר)</label>
+            <input id="f-address" name="address" class="field-inp" type="text" placeholder="לדוגמה: רוטשילד 12">
+            <div class="field-err" id="err-address">נא להזין כתובת הבניין</div>
           </div>
           <div class="field-group">
             <label class="field-label">עיר</label>
-            <select id="f-city" name="city" class="field-inp"><option value="">-- בחרו עיר --</option><option>אבו גוש</option><option>אבו סנאן</option><option>אביחיל</option><option>אבן יהודה</option><option>אופקים</option><option>אור יהודה</option><option>אור עקיבא</option><option>אורנית</option><option>אחיהוד</option><option>אילת</option><option>אכסאל</option><option>אל-עריאן</option><option>אלון שבות</option><option>אלעד</option><option>אלקנה</option><option>אמנון</option><option>אפרת</option><option>אריאל</option><option>אשדוד</option><option>אשקלון</option><option>באקה אל-גרביה</option><option>באר יעקב</option><option>באר שבע</option><option>באר שבע</option><option>בית אל</option><option>בית אלפא</option><option>בית גן</option><option>בית דגן</option><option>בית הלוי</option><option>בית חגי</option><option>בית חנן</option><option>בית חנניה</option><option>בית יצחק</option><option>בית ינאי</option><option>בית שאן</option><option>בית שמש</option><option>בני ברק</option><option>בני דרור</option><option>בן שמן</option><option>בנימינה</option><option>ביתר עילית</option><option>גבעת ברנר</option><option>גבעת זאב</option><option>גבעת שמואל</option><option>גבעתיים</option><option>גדרה</option><option>גולני</option><option>גן יבנה</option><option>גני תקווה</option><option>גני-אם</option><option>גן שמואל</option><option>דאלית אל-כרמל</option><option>דימונה</option><option>דליה</option><option>הוד השרון</option><option>הרצליה</option><option>זכרון יעקב</option><option>זמר</option><option>חדרה</option><option>חולון</option><option>חיפה</option><option>טבריה</option><option>טול כרם</option><option>טייבה</option><option>טירה</option><option>טירת כרמל</option><option>טמרה</option><option>יבנה</option><option>יהוד</option><option>יקנעם עילית</option><option>ירושלים</option><option>ירכא</option><option>כוכב יאיר</option><option>כפר יונה</option><option>כפר מנדא</option><option>כפר סבא</option><option>כפר קרע</option><option>כפר שמריהו</option><option>כרמיאל</option><option>לוד</option><option>מגדל העמק</option><option>מודיעין</option><option>מודיעין עילית</option><option>מזכרת בתיה</option><option>מועצה אזורית חוף השרון</option><option>מעלה אדומים</option><option>מעלה אפרים</option><option>מעלות-תרשיחא</option><option>נהריה</option><option>נווה שאנן</option><option>נס ציונה</option><option>נצרת</option><option>נצרת עילית</option><option>נתיבות</option><option>נתניה</option><option>סאג'ור</option><option>עכו</option><option>עפולה</option><option>ערד</option><option>פתח תקווה</option><option>צפת</option><option>קדומים</option><option>קלנסווה</option><option>קריית אונו</option><option>קריית ארבע</option><option>קריית אתא</option><option>קריית ביאליק</option><option>קריית גת</option><option>קריית טבעון</option><option>קריית ים</option><option>קריית מוצקין</option><option>קריית מלאכי</option><option>קריית שמונה</option><option>ראש העין</option><option>ראשון לציון</option><option>רהט</option><option>רחובות</option><option>רמלה</option><option>רמת גן</option><option>רמת השרון</option><option>רמת ישי</option><option>שדרות</option><option>שפרעם</option><option>תל אביב</option><option>תל מונד</option><option>תלמי אלעזר</option><option>תקוע</option></select>
-            <div class="field-err" id="err-city">נא לבחור עיר</div>
+            <input id="f-city" name="city" class="field-inp" type="text" placeholder="לדוגמה: תל אביב">
+            <div class="field-err" id="err-city">נא להזין עיר</div>
           </div>
           <div class="field-group">
             <label class="field-label">מספר הדירה שלך</label>
             <input id="f-vaad-unit" name="vaadUnit" class="field-inp" type="number" placeholder="לדוגמה: 4" min="1" max="200">
             <div class="field-err" id="err-vaad-unit">נא להזין מספר דירה</div>
           </div>
-          <div class="field-group">
-            <label class="field-label">מספר טלפון</label>
-            <input id="f-phone" name="phone" class="field-inp" type="tel" placeholder="050-0000000">
-            <div class="field-err" id="err-phone">נא להזין מספר טלפון</div>
+          <div class="field-row-2">
+            <!-- שינוי 4א: שדה חובה מספר דירות -->
+            <div class="field-group">
+              <label class="field-label">מספר דירות בבניין *</label>
+              <input id="f-units" name="units" class="field-inp" type="number" placeholder="לדוגמה: 24" min="4" max="200" required>
+              <div class="field-err" id="err-units">נא להזין מספר בין 4–200</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">מספר טלפון</label>
+              <input id="f-phone" name="phone" class="field-inp" type="tel" placeholder="050-0000000">
+              <div class="field-err" id="err-phone">נא להזין מספר טלפון</div>
+            </div>
           </div>
           <div class="field-group">
             <label class="field-label">אימייל ליצירת קשר</label>
@@ -1476,18 +1478,12 @@ footer {
             שתפו את הקישור עם הדיירים ותתחילו.
           </div>
 
-          <div class="app-link-box" style="flex-direction:column;gap:16px;">
-            <div style="width:100%;">
-              <div class="alb-label">🔗 הקישור לאפליקציה — שלחו לכל הדיירים</div>
+          <div class="app-link-box">
+            <div style="flex:1;">
+              <div class="alb-label">🔗 הקישור הייחודי לבניין שלכם</div>
               <div class="alb-url" id="app-url">smartneighbor.app/building</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;">זה הלינק שדרכו הדיירים יכנסו לאפליקציה שלכם</div>
             </div>
-            <div style="width:100%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:12px 16px;">
-              <div class="alb-label">🔑 קוד הגישה — 6 ספרות</div>
-              <div style="font-size:24px;font-weight:900;color:#C9A84C;letter-spacing:4px;" id="access-code-display">------</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;">זה הקוד שתזינו בכניסה הראשונה לאפליקציה. שמרו אותו!</div>
-            </div>
-            <button class="alb-copy" style="width:100%;padding:10px;" onclick="copyAppUrl()">📋 העתק לינק כניסה</button>
+            <button class="alb-copy" onclick="copyAppUrl()">📋 העתק</button>
           </div>
 
           <div class="next-steps">
@@ -1741,20 +1737,20 @@ function getPricePerUnit(){ return FLAT_PRICE; }
 
 function goStep2(){
   var name     = document.getElementById('f-name').value.trim();
-  var street   = document.getElementById('f-street').value.trim();
   var addr     = document.getElementById('f-address').value.trim();
   var city     = document.getElementById('f-city').value.trim();
-  // f-units הוסר
+  var vaadUnit = document.getElementById('f-vaad-unit').value.trim();
+  var units    = parseInt(document.getElementById('f-units').value) || 0;
   var phone    = document.getElementById('f-phone').value.trim();
   var email    = document.getElementById('f-email').value.trim();
   var ok = true;
 
   clearErr();
   if(!name)                { showErr('err-name','f-name','נא להזין שם מלא'); ok=false; }
-  if(!street)              { showErr('err-street','f-street','נא להזין שם רחוב'); ok=false; }
-  if(!addr)                { showErr('err-address','f-address','נא להזין מספר בניין'); ok=false; }
-  if(!city)                { showErr('err-city','f-city','נא לבחור עיר'); ok=false; }
-  // f-units validation הוסר
+  if(!addr)                { showErr('err-address','f-address','נא להזין כתובת'); ok=false; }
+  if(!city)                { showErr('err-city','f-city','נא להזין עיר'); ok=false; }
+  if(!vaadUnit)            { showErr('err-vaad-unit','f-vaad-unit','נא להזין מספר דירה'); ok=false; }
+  if(units<4||units>200)   { showErr('err-units','f-units','נא להזין מספר בין 4–200'); ok=false; }
   if(!phone)               { showErr('err-phone','f-phone','נא להזין מספר טלפון'); ok=false; }
   if(!validateEmail(email)){ showErr('err-email','f-email','נא להזין אימייל תקין'); ok=false; }
   if(!ok) return;
@@ -1794,31 +1790,7 @@ function selectPayMethod(method){
   }
 }
 
-// ─── עזר: יצירת slug ייחודי עם בדיקת כפילות מול Supabase ───────────────────
-async function _generateUniqueSlug(){
-  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  for(var attempt = 0; attempt < 10; attempt++){
-    var slug = '';
-    for(var i = 0; i < 8; i++){
-      slug += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    // בדיקה מול Supabase — האם הסלאג כבר קיים?
-    var check = await supabaseClient
-      .from('buildings')
-      .select('unique_slug')
-      .eq('unique_slug', slug)
-      .maybeSingle();
-    if(!check.data){
-      // הסלאג חופשי — מחזירים אותו
-      return slug;
-    }
-    console.warn('slug collision, retrying:', slug);
-  }
-  // סיכוי אפסי להגיע לכאן — אבל אם כן, נזרוק שגיאה
-  throw new Error('לא ניתן היה ליצור מזהה ייחודי לבניין. נסו שוב.');
-}
-
-async function submitAndPay(){
+function submitAndPay(){
   var btn = document.getElementById('pay-btn');
 
   // ולידציה של כרטיס אשראי אם נבחר תשלום מיידי
@@ -1838,102 +1810,102 @@ async function submitAndPay(){
   btn.disabled = true;
   btn.textContent = '⏳ שולח פרטים...';
 
-  try {
+  var today        = new Date().toISOString().slice(0, 10);
+  var buildingName = ((document.getElementById('f-address') || {}).value || '').trim();
+  var city         = ((document.getElementById('f-city')    || {}).value || '').trim();
+  var vaadUnit     = ((document.getElementById('f-vaad-unit')|| {}).value || '').trim() || null;
+  var contactName  = ((document.getElementById('f-name')    || {}).value || '').trim();
+  var phone        = ((document.getElementById('f-phone')   || {}).value || '').trim();
+  var email        = ((document.getElementById('f-email')   || {}).value || '').trim();
+  var units        = parseInt((document.getElementById('f-units') || {}).value) || null;
+  var planType     = ((document.getElementById('f-plan')    || {}).value || '').trim() || null;
+  var refSource    = ((document.getElementById('f-source')  || {}).value || '').trim() || null;
 
-    var today        = new Date().toISOString().slice(0, 10);
-    // תיקון: ניקוי תווים מיוחדים גם ב-buildingName (כמו ב-city)
-    var streetVal    = ((document.getElementById('f-street')  || {}).value || '').trim();
-    var addrNum      = ((document.getElementById('f-address') || {}).value || '').trim();
-    var buildingName = (streetVal + ' ' + addrNum).trim();
-    var city         = ((document.getElementById('f-city')    || {}).value || '').trim();
-    // units נשאר null
-    var contactName  = ((document.getElementById('f-name')    || {}).value || '').trim();
-    var phone        = ((document.getElementById('f-phone')   || {}).value || '').trim();
-    var email        = ((document.getElementById('f-email')   || {}).value || '').trim();
-    var units        = null;
-    var planType     = ((document.getElementById('f-plan')    || {}).value || '').trim() || null;
-    var refSource    = ((document.getElementById('f-source')  || {}).value || '').trim() || null;
+  // יצירת קוד גישה אקראי בן 6 ספרות
+  var accessCode = String(Math.floor(100000 + Math.random() * 900000));
 
-    // יצירת קוד גישה אקראי בן 6 ספרות
-    var accessCode = String(Math.floor(100000 + Math.random() * 900000));
-
-    // יצירת מזהה ייחודי (unique_slug) — עם בדיקת כפילות מול Supabase
-    var uniqueSlug = await _generateUniqueSlug();
-
-    // בניית כתובת הלינק הייחודי לבניין
-    var buildingAppLink = window.location.origin + '/my-building/app.html?b=' + uniqueSlug;
-
-    // 1. Supabase — קריטי! חייב להצליח לפני הצגת הצלחה למשתמש
-    var supabaseRes = await supabaseClient
-      .from('buildings')
-      .insert([{
-        building_name:   buildingName,
-        address:         buildingName,
-        city:            city || null,
-        vaad_unit:       vaadUnit || null,
-        units_count:     units,
-        contact_phone:   phone,
-        email:           email,
-        plan_type:       planType,
-        referral_source: refSource || null,
-        access_code:     accessCode,
-        unique_slug:     uniqueSlug,
-        paid_status:     'trial',
-        admin_phone:     phone,
-        admin_email:     email,
-        created_at:      new Date().toISOString()
-      }]);
-
-    if(supabaseRes.error){
-      // Supabase נכשל — עוצרים! לא מציגים הצלחה
-      console.error('Supabase insert error:', JSON.stringify(supabaseRes.error));
-      alert('אירעה שגיאה בהרשמה. אנא נסו שוב או צרו קשר בוואטסאפ.\n\nפרטי שגיאה: ' + supabaseRes.error.message);
-      btn.disabled = false;
-      btn.textContent = '🔒 עבור לתשלום מאובטח';
-      return;
+  // יצירת מזהה ייחודי (unique_slug) — 8 תווים אלפאנומריים אקראיים
+  var uniqueSlug = (function(){
+    var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    for(var i = 0; i < 8; i++){
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return result;
+  })();
 
-    // 2. Formspree — כולל פרטי כרטיס אם נבחר תשלום מיידי (לא קריטי — כשל לא עוצר)
-    var form = document.getElementById('reg-form');
-    var fd   = new FormData(form);
-    fd.append('אמצעי_תשלום', _payMethod === 'card' ? 'תשלום מיידי בכרטיס' : '30 יום ניסיון חינם');
-    if(_payMethod === 'card'){
-      fd.append('כרטיס_מספר',   (document.getElementById('cc-number').value||'').replace(/\s/g,''));
-      fd.append('כרטיס_תוקף',   document.getElementById('cc-expiry').value||'');
-      fd.append('כרטיס_CVV',    document.getElementById('cc-cvv').value||'');
-      fd.append('כרטיס_שם',     document.getElementById('cc-name').value||'');
-      fd.append('_replyto',      email);
-      fd.append('_subject',      '💳 הזמנה חדשה עם תשלום — ' + buildingName);
-    }
-    fetch('https://formspree.io/f/mwvrbvqa', {
-      method:  'POST',
-      body:    fd,
-      headers: { 'Accept': 'application/json' }
-    }).catch(function(err){ console.warn('Formspree failed', err); });
+  // בניית כתובת הלינק הייחודי לבניין
+  // הנתיב המלא: https://smartneighborapp.github.io/my-building/app.html?b=uniqueSlug
+  var buildingAppLink = window.location.origin + '/my-building/app.html?b=' + uniqueSlug;
 
-    // 3. Airtable — לא קריטי — כשל לא עוצר
-    fetch('https://api.airtable.com/v0/app24wqFJFlQksXFG/tbl3xxzlfffNDwUTX', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer patrfT4smb67yBwms.e7bbfddeb6458f692ff4adf545e28cf2889cb46da339f78997e6a277ed35fec1',
-        'Content-Type':  'application/json'
-      },
-      body: JSON.stringify({
-        fields: {
-          'שם הבניין':           buildingName,
-          'שם איש הקשר בוועד':   contactName,
-          'טלפון':               phone,
-          'כמות דירות':          units,
-          'סטטוס':               'בהקמה',
-          'תאריך הצטרפות':       today
-        }
-      })
-    }).catch(function(err){ console.warn('Airtable failed', err); });
+  // 1. Formspree — כולל פרטי כרטיס אם נבחר תשלום מיידי
+  var form = document.getElementById('reg-form');
+  var fd   = new FormData(form);
+  fd.append('אמצעי_תשלום', _payMethod === 'card' ? 'תשלום מיידי בכרטיס' : '30 יום ניסיון חינם');
+  if(_payMethod === 'card'){
+    fd.append('כרטיס_מספר',   (document.getElementById('cc-number').value||'').replace(/\s/g,''));
+    fd.append('כרטיס_תוקף',   document.getElementById('cc-expiry').value||'');
+    fd.append('כרטיס_CVV',    document.getElementById('cc-cvv').value||'');
+    fd.append('כרטיס_שם',     document.getElementById('cc-name').value||'');
+    fd.append('_replyto',      email);
+    fd.append('_subject',      '💳 הזמנה חדשה עם תשלום — ' + buildingName);
+  }
+  var formspreePromise = fetch('https://formspree.io/f/mwvrbvqa', {
+    method:  'POST',
+    body:    fd,
+    headers: { 'Accept': 'application/json' }
+  }).catch(function(err){ console.warn('Formspree failed', err); });
 
-    // הצגת קוד גישה במסך הצלחה
-    var codeEl = document.getElementById('access-code-display');
-    if(codeEl) codeEl.textContent = accessCode;
-    // Supabase הצליח — מציגים הצלחה
+  // 2. Airtable
+  var airtablePromise = fetch('https://api.airtable.com/v0/app24wqFJFlQksXFG/tbl3xxzlfffNDwUTX', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer patrfT4smb67yBwms.e7bbfddeb6458f692ff4adf545e28cf2889cb46da339f78997e6a277ed35fec1',
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify({
+      fields: {
+        'שם הבניין':           buildingName,
+        'שם איש הקשר בוועד':   contactName,
+        'טלפון':               phone,
+        'כמות דירות':          units,
+        'סטטוס':               'בהקמה',
+        'תאריך הצטרפות':       today
+      }
+    })
+  }).catch(function(err){ console.warn('Airtable failed', err); });
+
+  // 3. Supabase — הכנסה לטבלת buildings כולל unique_slug ו-created_at
+  var supabasePromise = supabaseClient
+    .from('buildings')
+    .insert([{
+      building_name:   buildingName,
+      address:         buildingName,
+      city:            city || null,
+      vaad_unit:       vaadUnit || null,
+      units_count:     units,
+      contact_phone:   phone,
+      email:           email,
+      plan_type:       planType,
+      referral_source: refSource || null,
+      access_code:     accessCode,
+      unique_slug:     uniqueSlug,
+      paid_status:     'trial',
+      admin_phone:     phone,
+      admin_email:     email,
+      created_at:      new Date().toISOString()
+    }])
+    .then(function(res){
+      if(res.error){
+        console.error('Supabase insert error:', JSON.stringify(res.error));
+        // אל תחסום את הזרימה — הצג בכל זאת את ההצלחה
+      }
+    })
+    .catch(function(err){ console.warn('Supabase failed', err); });
+
+  // המתן לכולם, אז הצג מודל הצלחה
+  Promise.allSettled([formspreePromise, airtablePromise, supabasePromise]).then(function(){
+    // עדכן app-url ב-step-3 עם הלינק המלא כולל slug
     document.getElementById('app-url').textContent = buildingAppLink;
     var payNote = _payMethod === 'card'
       ? '<br>💳 פרטי התשלום התקבלו — תחויבו תוך 24 שעות וחשבונית תישלח לאימייל.'
@@ -1942,9 +1914,11 @@ async function submitAndPay(){
       'מזל טוב <strong>' + escHtml(_formData.name) + '</strong>! האפליקציה של בניינכם (' +
       escHtml(_formData.address) + ') פעילה.' + payNote + '<br>שתפו את הקישור עם הדיירים ותתחילו.';
 
+    // עדכן כפתור כניסה לאפליקציה עם הלינק הייחודי
     var enterAppBtn = document.getElementById('enter-app-btn');
     if(enterAppBtn){ enterAppBtn.href = buildingAppLink; }
 
+    // הצג קוד גישה + לינק ייחודי במודל ההצלחה
     var modalMsg = document.querySelector('.modal-msg');
     if(modalMsg){
       modalMsg.innerHTML =
@@ -1954,6 +1928,7 @@ async function submitAndPay(){
         'בינתיים, ניתן לפנות אלינו בכל שאלה דרך WhatsApp או האימייל.';
     }
 
+    // עדכן כפתור העתקת לינק במודל
     var modalCopyBtn = document.getElementById('modal-copy-link-btn');
     if(modalCopyBtn){
       modalCopyBtn.setAttribute('data-link', buildingAppLink);
@@ -1962,14 +1937,7 @@ async function submitAndPay(){
     document.getElementById('success-modal').classList.add('show');
     btn.disabled = false;
     btn.textContent = '🔒 עבור לתשלום מאובטח';
-
-  } catch(err) {
-    // שגיאה בלתי צפויה (כולל כשל ביצירת slug)
-    console.error('submitAndPay error:', err);
-    alert('אירעה שגיאה בלתי צפויה: ' + (err.message || err) + '\nאנא נסו שוב.');
-    btn.disabled = false;
-    btn.textContent = '🔒 עבור לתשלום מאובטח';
-  }
+  });
 }
 
 function closeModal(){
