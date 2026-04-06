@@ -24,2119 +24,347 @@
   --gold2:   #F3D98B;
   --white:   #FFFFFF;
   --offwhite:#F8FAFC;
-  --slate:   #64748B;
+  --gray:    #64748B;
   --light:   #E2E8F0;
-  --font:    'Heebo', sans-serif;
-  --radius:  20px;
-  --shadow:  0 8px 40px rgba(26,58,92,.12);
-  --shadow-lg: 0 24px 80px rgba(26,58,92,.18);
+  --shadow:  rgba(0,0,0,0.1);
+  --glass:   rgba(255,255,255,0.9);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* ══════════════════════════════════════════
+   BASE & LAYOUT
+══════════════════════════════════════════ */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
-  font-family: var(--font);
-  background: var(--offwhite);
+  margin: 0; padding: 0;
+  font-family: 'Heebo', sans-serif;
+  background-color: var(--offwhite);
   color: var(--navy);
-  direction: rtl;
+  line-height: 1.5;
   overflow-x: hidden;
-  line-height: 1.6;
-}
-a { text-decoration: none; color: inherit; }
-button { font-family: var(--font); cursor: pointer; border: none; }
-
-/* ══════════════════════════════════════════
-   SCROLLBAR
-══════════════════════════════════════════ */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--offwhite); }
-::-webkit-scrollbar-thumb { background: var(--light); border-radius: 3px; }
-
-/* ══════════════════════════════════════════
-   ANIMATIONS
-══════════════════════════════════════════ */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(32px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes floatA {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-18px) rotate(3deg); }
-}
-@keyframes floatB {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-12px) rotate(-2deg); }
-}
-@keyframes pulse {
-  0%,100% { transform: scale(1); }
-  50%      { transform: scale(1.04); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes checkPop {
-  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
-  70%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-.fade-up   { animation: fadeUp  .7s ease both; }
-.fade-up-1 { animation: fadeUp  .7s .1s ease both; }
-.fade-up-2 { animation: fadeUp  .7s .22s ease both; }
-.fade-up-3 { animation: fadeUp  .7s .34s ease both; }
-.fade-up-4 { animation: fadeUp  .7s .46s ease both; }
-.fade-up-5 { animation: fadeUp  .7s .58s ease both; }
-
-/* ══════════════════════════════════════════
-   NAV
-══════════════════════════════════════════ */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(15,39,68,.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  padding: 14px 5vw;
-  display: flex; align-items: center; justify-content: space-between;
-  animation: fadeIn .6s ease both;
-}
-.nav-brand {
-  display: flex; align-items: center; gap: 10px;
-}
-.nav-logo { font-size: 28px; line-height: 1; }
-.nav-name {
-  font-size: 18px; font-weight: 900; color: #fff;
-  letter-spacing: -.5px;
-}
-.nav-name span { color: var(--gold); }
-.nav-cta {
-  padding: 10px 22px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: var(--navy2);
-  border-radius: 12px;
-  font-size: 13px; font-weight: 800;
-  transition: transform .15s, box-shadow .15s;
-  box-shadow: 0 4px 16px rgba(201,168,76,.4);
-}
-.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,.5); }
-.nav-cta:active { transform: scale(.97); }
-
-/* ══════════════════════════════════════════
-   HERO
-══════════════════════════════════════════ */
-#hero {
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--navy2) 0%, var(--navy) 55%, #1E4D8C 100%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center;
-  padding: 120px 5vw 80px;
-  position: relative; overflow: hidden;
-}
-
-/* mesh grid background */
-#hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-/* gradient orbs */
-#hero::after {
-  content: '';
-  position: absolute; top: -120px; left: -120px;
-  width: 600px; height: 600px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(20,184,166,.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-orb2 {
-  position: absolute; bottom: -100px; right: -80px;
-  width: 500px; height: 500px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,168,76,.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 50px;
-  padding: 6px 16px;
-  font-size: 12px; font-weight: 700; color: var(--gold);
-  letter-spacing: .5px;
-  margin-bottom: 28px;
-  backdrop-filter: blur(8px);
-}
-.hero-badge-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--teal);
-  animation: pulse 2s ease infinite;
-}
-
-h1.hero-title {
-  font-size: clamp(36px, 6vw, 72px);
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.12;
-  letter-spacing: -1.5px;
-  max-width: 820px;
-  margin-bottom: 20px;
-}
-h1.hero-title .accent { color: var(--gold); }
-h1.hero-title .accent2 { color: var(--teal); }
-
-.hero-sub {
-  font-size: clamp(15px, 2vw, 20px);
-  color: rgba(255,255,255,.65);
-  max-width: 560px;
-  margin-bottom: 40px;
-  font-weight: 400;
-}
-
-.hero-btns {
-  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-  margin-bottom: 60px;
-}
-.btn-primary {
-  padding: 16px 36px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: var(--navy2);
-  border-radius: 16px;
-  font-size: 16px; font-weight: 900;
-  box-shadow: 0 8px 32px rgba(201,168,76,.45);
-  transition: transform .15s, box-shadow .15s;
-  letter-spacing: -.2px;
-}
-.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(201,168,76,.5); }
-.btn-ghost {
-  padding: 16px 32px;
-  background: rgba(255,255,255,.08);
-  border: 1.5px solid rgba(255,255,255,.2);
-  color: #fff;
-  border-radius: 16px;
-  font-size: 15px; font-weight: 700;
-  transition: background .15s, border-color .15s;
-  backdrop-filter: blur(6px);
-}
-.btn-ghost:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.35); }
-
-/* floating phone mockup */
-.hero-mockup-row {
-  display: flex; gap: 20px; align-items: flex-end; justify-content: center;
-  margin-top: 10px;
-}
-.mockup-phone {
-  width: 160px; background: rgba(255,255,255,.06);
-  border: 1.5px solid rgba(255,255,255,.12);
-  border-radius: 28px; overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
-  animation: floatA 6s ease-in-out infinite;
-}
-.mockup-phone.b { animation: floatB 7s ease-in-out infinite; width: 140px; }
-.mockup-screen-top {
-  background: linear-gradient(135deg, var(--navy), var(--blue2));
-  padding: 12px 10px 8px;
-}
-.mockup-hdr { font-size: 8px; font-weight: 800; color: #fff; }
-.mockup-sub { font-size: 6px; color: rgba(255,255,255,.5); margin-top: 1px; }
-.mockup-balance {
-  font-size: 14px; font-weight: 900; color: var(--gold);
-  margin-top: 6px;
-}
-.mockup-body { background: #F1F5F9; padding: 8px 10px; }
-.mockup-card {
-  background: #fff; border-radius: 10px; padding: 6px 8px; margin-bottom: 5px;
-  font-size: 7px; color: var(--navy);
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-}
-.mockup-card .mc-row { display: flex; justify-content: space-between; align-items: center; }
-.mockup-card .mc-lbl { font-weight: 700; }
-.mockup-card .mc-val { font-weight: 900; color: var(--teal); }
-.mockup-pill {
-  display: inline-block; padding: 2px 6px; border-radius: 6px;
-  font-size: 6px; font-weight: 800;
-  background: #DCFCE7; color: #166534; margin-top: 3px;
-}
-
-/* hero stats strip */
-.hero-stats {
-  display: flex; gap: 0; background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 16px; overflow: hidden;
-  backdrop-filter: blur(8px);
-  margin-top: 56px;
-}
-.hero-stat {
-  flex: 1; padding: 18px 24px; text-align: center;
-  border-left: 1px solid rgba(255,255,255,.08);
-}
-.hero-stat:last-child { border-left: none; }
-.hs-val { font-size: 26px; font-weight: 900; color: var(--gold); }
-.hs-lbl { font-size: 11px; color: rgba(255,255,255,.5); font-weight: 600; margin-top: 2px; }
-
-/* ══════════════════════════════════════════
-   SECTION COMMONS
-══════════════════════════════════════════ */
-section { padding: 96px 5vw; }
-.section-label {
-  display: inline-block;
-  font-size: 11px; font-weight: 800; letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--teal);
-  background: rgba(20,184,166,.1);
-  border: 1px solid rgba(20,184,166,.25);
-  padding: 5px 14px; border-radius: 50px;
-  margin-bottom: 16px;
-}
-.section-title {
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 900; color: var(--navy);
-  line-height: 1.15; letter-spacing: -.8px;
-  margin-bottom: 14px;
-}
-.section-sub {
-  font-size: 17px; color: var(--slate);
-  max-width: 560px; font-weight: 400;
-}
-.section-hd { margin-bottom: 56px; }
-.centered { text-align: center; }
-.centered .section-sub { margin: 0 auto; }
-
-/* ══════════════════════════════════════════
-   FEATURES
-══════════════════════════════════════════ */
-#features { background: #fff; }
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-.feat-card {
-  background: var(--offwhite);
-  border: 1.5px solid var(--light);
-  border-radius: 24px;
-  padding: 28px 24px;
-  transition: transform .2s, border-color .2s, box-shadow .2s;
-  position: relative; overflow: hidden;
-}
-.feat-card::before {
-  content: '';
-  position: absolute; top: 0; right: 0;
-  width: 80px; height: 80px;
-  border-radius: 0 24px 0 80px;
-  opacity: .05;
-}
-.feat-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--blue);
-  box-shadow: 0 20px 60px rgba(37,99,235,.1);
-}
-.feat-icon {
-  width: 52px; height: 52px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; margin-bottom: 16px;
-  flex-shrink: 0;
-}
-.fi-blue   { background: linear-gradient(135deg, #EFF6FF, #DBEAFE); }
-.fi-teal   { background: linear-gradient(135deg, #F0FDFA, #CCFBF1); }
-.fi-gold   { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); }
-.fi-rose   { background: linear-gradient(135deg, #FFF1F2, #FFE4E6); }
-.fi-purple { background: linear-gradient(135deg, #F5F3FF, #EDE9FE); }
-.fi-green  { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); }
-.feat-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
-.feat-text  { font-size: 13px; color: var(--slate); line-height: 1.6; }
-
-/* ══════════════════════════════════════════
-   HOW IT WORKS
-══════════════════════════════════════════ */
-#how {
-  background: linear-gradient(160deg, var(--navy2) 0%, var(--navy) 100%);
-  position: relative; overflow: hidden;
-}
-#how::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-#how .section-label { color: var(--gold); background: rgba(201,168,76,.1); border-color: rgba(201,168,76,.3); }
-#how .section-title { color: #fff; }
-#how .section-sub   { color: rgba(255,255,255,.6); }
-
-.steps-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px; position: relative;
-}
-.steps-row::before {
-  content: '';
-  position: absolute; top: 34px; right: 50px; left: 50px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--teal), var(--gold));
-  opacity: .3;
-  display: none;
-}
-@media(min-width:700px){ .steps-row::before { display: block; } }
-
-.step-card {
-  background: rgba(255,255,255,.05);
-  border: 1.5px solid rgba(255,255,255,.1);
-  border-radius: 20px;
-  padding: 24px 20px;
-  text-align: center;
-  backdrop-filter: blur(8px);
-  transition: transform .2s, border-color .2s;
-}
-.step-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.25); }
-.step-num {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: var(--navy2);
-  font-size: 18px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px;
-  box-shadow: 0 6px 20px rgba(201,168,76,.4);
-}
-.step-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.step-text  { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.6; }
-
-/* ══════════════════════════════════════════
-   CALCULATOR
-══════════════════════════════════════════ */
-#calculator { background: var(--offwhite); }
-.calc-wrap {
-  max-width: 680px; margin: 0 auto;
-  background: #fff;
-  border-radius: 32px;
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  border: 1.5px solid var(--light);
-}
-.calc-top {
-  background: linear-gradient(135deg, var(--navy), var(--blue2));
-  padding: 36px 36px 28px;
-  text-align: center;
-}
-.calc-top-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-.calc-top-sub   { font-size: 13px; color: rgba(255,255,255,.6); }
-.calc-body { padding: 36px; }
-
-/* ── FLAT PRICING BANNER (replaces tiers table) ── */
-.flat-price-banner {
-  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-  border: 2px solid #86EFAC;
-  border-radius: 20px;
-  padding: 28px 24px;
-  text-align: center;
-  margin-bottom: 28px;
-}
-.fpb-label {
-  font-size: 12px; font-weight: 800; color: #166534;
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px;
-}
-.fpb-price {
-  font-size: 52px; font-weight: 900; color: var(--navy);
-  line-height: 1; margin-bottom: 4px;
-}
-.fpb-price span { font-size: 22px; font-weight: 700; color: var(--slate); }
-.fpb-sub {
-  font-size: 14px; color: #166534; font-weight: 700; margin-top: 8px;
-}
-.fpb-note {
-  font-size: 12px; color: var(--slate); margin-top: 6px; font-weight: 500;
-}
-
-.calc-slider-label {
-  display: flex; justify-content: space-between; align-items: baseline;
-  margin-bottom: 14px;
-}
-.csl-lbl { font-size: 14px; font-weight: 700; color: var(--navy); }
-.csl-val {
-  font-size: 28px; font-weight: 900; color: var(--blue);
-  transition: transform .15s;
-}
-.csl-val.bump { animation: countUp .25s ease; }
-input[type=range] {
-  -webkit-appearance: none; width: 100%; height: 8px;
-  border-radius: 4px; outline: none; cursor: pointer;
-  background: linear-gradient(90deg, var(--blue) 0%, var(--blue) var(--pct,50%), var(--light) var(--pct,50%), var(--light) 100%);
-  margin-bottom: 6px;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px; height: 24px; border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--blue);
-  box-shadow: 0 2px 8px rgba(37,99,235,.35);
-  cursor: pointer; transition: transform .13s;
-}
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-.range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--slate); margin-bottom: 28px; }
-
-.calc-price-row {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;
-}
-.calc-price-box {
-  background: var(--offwhite);
-  border: 1.5px solid var(--light);
-  border-radius: 16px; padding: 18px 16px;
-  text-align: center;
-  transition: border-color .2s, background .2s;
-}
-.calc-price-box.highlight {
-  background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
-  border-color: var(--blue);
-}
-.cpb-label { font-size: 11px; font-weight: 700; color: var(--slate); margin-bottom: 6px; letter-spacing: .3px; text-transform: uppercase; }
-.cpb-val   { font-size: 28px; font-weight: 900; color: var(--navy); }
-.cpb-val span { font-size: 14px; font-weight: 600; color: var(--slate); }
-.cpb-sub   { font-size: 11px; color: var(--slate); margin-top: 4px; }
-
-.calc-per-unit {
-  text-align: center; font-size: 13px; color: var(--slate);
-  margin-bottom: 24px; padding: 10px 16px;
-  background: #F0FDF4; border-radius: 10px; color: #166534; font-weight: 700;
-}
-
-.calc-cta {
-  width: 100%; padding: 18px;
-  background: linear-gradient(135deg, var(--navy), var(--blue));
-  color: #fff; border-radius: 16px;
-  font-size: 16px; font-weight: 800;
-  box-shadow: 0 8px 24px rgba(26,58,92,.3);
-  transition: transform .15s, box-shadow .15s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.calc-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(26,58,92,.35); }
-
-/* ══════════════════════════════════════════
-   TESTIMONIALS / TRUST
-══════════════════════════════════════════ */
-#trust { background: #fff; }
-.trust-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-.trust-card {
-  background: var(--offwhite); border: 1.5px solid var(--light);
-  border-radius: 20px; padding: 24px;
-  transition: transform .2s;
-}
-.trust-card:hover { transform: translateY(-4px); }
-.tc-quote { font-size: 13px; color: var(--slate); line-height: 1.7; margin-bottom: 16px; }
-.tc-quote::before { content: '"'; font-size: 32px; color: var(--blue); line-height: 1; display: block; margin-bottom: 8px; opacity: .4; }
-.tc-author { display: flex; align-items: center; gap: 10px; }
-.tc-avatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), var(--teal));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 900; color: #fff; flex-shrink: 0;
-}
-.tc-name  { font-size: 13px; font-weight: 800; color: var(--navy); }
-.tc-role  { font-size: 11px; color: var(--slate); }
-.tc-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; margin-bottom: 12px; }
-
-/* ══════════════════════════════════════════
-   FAQ SECTION
-══════════════════════════════════════════ */
-#faq { background: #fff; padding: 80px 5vw; }
-#faq .section-label { color: var(--blue); background: rgba(37,99,235,.08); border-color: rgba(37,99,235,.2); }
-.faq-grid { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-.faq-item {
-  border: 1.5px solid var(--light);
-  border-radius: 18px; overflow: hidden;
-  transition: border-color .2s, box-shadow .2s;
-  background: var(--offwhite);
-}
-.faq-item.open { border-color: var(--blue); box-shadow: 0 8px 32px rgba(37,99,235,.08); }
-.faq-q {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 22px; cursor: pointer; gap: 12px;
-  user-select: none;
-}
-.faq-q-text { font-size: 15px; font-weight: 800; color: var(--navy); flex: 1; }
-.faq-icon {
-  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  background: var(--light); display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 900; color: var(--slate);
-  transition: background .2s, color .2s, transform .3s;
-}
-.faq-item.open .faq-icon { background: var(--blue); color: #fff; transform: rotate(45deg); }
-.faq-a {
-  max-height: 0; overflow: hidden;
-  transition: max-height .35s ease, padding .35s ease;
-  font-size: 14px; color: var(--slate); line-height: 1.7;
-  padding: 0 22px;
-}
-.faq-item.open .faq-a { max-height: 200px; padding: 0 22px 20px; }
-
-/* ══════════════════════════════════════════
-   REGISTRATION FORM
-══════════════════════════════════════════ */
-#register {
-  background: linear-gradient(160deg, var(--navy2), var(--navy));
-  position: relative; overflow: hidden;
-}
-#register::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-#register .section-label { color: var(--mint); background: rgba(167,243,208,.1); border-color: rgba(167,243,208,.3); }
-#register .section-title { color: #fff; }
-#register .section-sub   { color: rgba(255,255,255,.6); }
-
-.form-wrap {
-  max-width: 700px; margin: 0 auto;
-  position: relative; z-index: 1;
-}
-
-/* steps indicator */
-.form-steps {
-  display: flex; align-items: center; gap: 0;
-  margin-bottom: 40px;
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 16px; overflow: hidden;
-}
-.form-step-item {
-  flex: 1; padding: 14px 10px; text-align: center;
-  border-left: 1px solid rgba(255,255,255,.08);
-  transition: background .25s;
-}
-.form-step-item:last-child { border-left: none; }
-.form-step-item.active { background: rgba(201,168,76,.15); }
-.form-step-item.done   { background: rgba(20,184,166,.12); }
-.fsi-num {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(255,255,255,.1);
-  color: rgba(255,255,255,.5);
-  font-size: 12px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 5px;
-  transition: background .25s, color .25s;
-}
-.form-step-item.active .fsi-num { background: var(--gold); color: var(--navy2); }
-.form-step-item.done   .fsi-num { background: var(--teal); color: #fff; }
-.fsi-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.45); }
-.form-step-item.active .fsi-lbl { color: var(--gold); }
-.form-step-item.done   .fsi-lbl { color: var(--teal); }
-
-/* form card */
-.form-card {
-  background: rgba(255,255,255,.06);
-  border: 1.5px solid rgba(255,255,255,.1);
-  border-radius: 24px; padding: 36px;
-  backdrop-filter: blur(12px);
-}
-.form-step-panel { display: none; }
-.form-step-panel.active { display: block; animation: fadeUp .4s ease; }
-
-.form-title { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 6px; }
-.form-sub   { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 28px; line-height: 1.5; }
-
-.field-group { margin-bottom: 18px; }
-.field-label {
-  display: block; font-size: 12px; font-weight: 700;
-  color: rgba(255,255,255,.7); margin-bottom: 7px; letter-spacing: .2px;
-}
-.field-inp {
-  width: 100%; padding: 14px 16px;
-  background: rgba(255,255,255,.07);
-  border: 1.5px solid rgba(255,255,255,.15);
-  border-radius: 12px;
-  font-size: 14px; font-weight: 600; color: #fff;
-  font-family: var(--font);
-  outline: none;
-  transition: border-color .2s, background .2s;
-}
-.field-inp::placeholder { color: rgba(255,255,255,.3); font-weight: 400; }
-.field-inp:focus { border-color: var(--gold); background: rgba(255,255,255,.1); }
-.field-inp.err { border-color: var(--rose2); }
-.field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.field-err { font-size: 11px; color: var(--rose2); margin-top: 4px; font-weight: 700; display: none; }
-
-/* dropdown option styling */
-.field-inp option { background: var(--navy); color: #fff; }
-
-.summary-box {
-  background: rgba(255,255,255,.06); border-radius: 16px;
-  padding: 20px 22px; margin-bottom: 24px;
-}
-.sb-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.07);
-}
-.sb-row:last-child { border-bottom: none; }
-.sb-lbl { font-size: 12px; color: rgba(255,255,255,.5); font-weight: 600; }
-.sb-val { font-size: 13px; color: #fff; font-weight: 800; }
-.sb-row.total .sb-lbl { font-size: 13px; color: rgba(255,255,255,.8); }
-.sb-row.total .sb-val { font-size: 20px; color: var(--gold); }
-
-.payment-area {
-  background: rgba(255,255,255,.04); border: 1.5px dashed rgba(255,255,255,.15);
-  border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 24px;
-}
-.pa-icon { font-size: 36px; margin-bottom: 8px; }
-.pa-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,.8); margin-bottom: 4px; }
-.pa-sub   { font-size: 12px; color: rgba(255,255,255,.4); }
-
-.btn-form {
-  width: 100%; padding: 17px;
-  border-radius: 14px;
-  font-size: 15px; font-weight: 800;
-  transition: transform .15s, box-shadow .15s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-form-gold {
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: var(--navy2);
-  box-shadow: 0 6px 24px rgba(201,168,76,.4);
-}
-.btn-form-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,168,76,.5); }
-.btn-form-teal {
-  background: linear-gradient(135deg, var(--teal), #34D399);
-  color: var(--navy2);
-  box-shadow: 0 6px 24px rgba(20,184,166,.4);
-  margin-bottom: 12px;
-}
-.btn-form-back {
-  background: rgba(255,255,255,.08); color: rgba(255,255,255,.7);
-  border: 1.5px solid rgba(255,255,255,.12);
-}
-.btn-form-back:hover { background: rgba(255,255,255,.14); }
-.btn-row-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
-.secure-badges {
-  display: flex; gap: 16px; justify-content: center; margin-top: 14px;
-  flex-wrap: wrap;
-}
-.secure-badge {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; color: rgba(255,255,255,.4); font-weight: 600;
-}
-
-/* success state (step 3) */
-.success-panel {
-  display: none; text-align: center;
-  animation: fadeUp .5s ease;
-}
-.success-panel.show { display: block; }
-.success-check {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal), #34D399);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px; margin: 0 auto 24px;
-  animation: checkPop .6s cubic-bezier(.34,1.56,.64,1) both;
-  box-shadow: 0 12px 40px rgba(20,184,166,.4);
-}
-.success-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 8px; }
-.success-sub   { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.6; margin-bottom: 28px; }
-.app-link-box {
-  background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.15);
-  border-radius: 14px; padding: 16px 20px; margin-bottom: 24px;
-  display: flex; align-items: center; gap: 12px;
-}
-.alb-label { font-size: 11px; color: rgba(255,255,255,.5); font-weight: 700; margin-bottom: 4px; }
-.alb-url {
-  font-size: 14px; font-weight: 800; color: var(--gold);
-  word-break: break-all;
-}
-.alb-copy {
-  padding: 8px 14px; background: rgba(201,168,76,.2);
-  border: 1px solid rgba(201,168,76,.3);
-  border-radius: 8px; font-size: 12px; font-weight: 700;
-  color: var(--gold); cursor: pointer; white-space: nowrap;
-  font-family: var(--font); flex-shrink: 0;
-  transition: background .15s;
-}
-.alb-copy:hover { background: rgba(201,168,76,.35); }
-.next-steps {
-  background: rgba(255,255,255,.04); border-radius: 16px; padding: 20px 22px;
-  text-align: right;
-}
-.ns-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,.8); margin-bottom: 14px; }
-.ns-step  { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.ns-step:last-child { margin-bottom: 0; }
-.ns-num {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: rgba(20,184,166,.2); color: var(--teal);
-  font-size: 12px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.ns-text { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.5; }
-
-/* ══════════════════════════════════════════
-   SUCCESS MODAL (after payment)
-══════════════════════════════════════════ */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 1000;
-  background: rgba(15,39,68,.7);
-  backdrop-filter: blur(6px);
-  display: none; align-items: center; justify-content: center;
-  padding: 20px;
-  animation: fadeIn .25s ease;
-}
-.modal-overlay.show { display: flex; }
-.modal-card {
-  background: #fff; border-radius: 28px; overflow: hidden;
-  width: min(92vw, 480px);
-  box-shadow: 0 32px 80px rgba(0,0,0,.3);
-  animation: fadeUp .4s ease;
-}
-.modal-hd {
-  background: linear-gradient(135deg, #0F2744, #1E4D8C);
-  padding: 32px 28px 24px; text-align: center;
-}
-.modal-check {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal), #34D399);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; margin: 0 auto 16px;
-  animation: checkPop .6s cubic-bezier(.34,1.56,.64,1) both;
-  box-shadow: 0 10px 32px rgba(20,184,166,.4);
-}
-.modal-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; }
-.modal-sub   { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.6; }
-.modal-body  { padding: 24px 28px; }
-.modal-msg {
-  background: #F0FDF4; border-radius: 14px; padding: 16px 18px;
-  font-size: 14px; color: #166534; line-height: 1.8; margin-bottom: 20px;
-  border: 1px solid #BBF7D0; font-weight: 500;
-}
-.modal-close {
-  width: 100%; padding: 14px;
-  background: linear-gradient(135deg, var(--navy), var(--blue));
-  color: #fff; border-radius: 12px;
-  font-size: 14px; font-weight: 800; cursor: pointer;
-  font-family: var(--font);
-  transition: transform .13s, box-shadow .13s;
-  box-shadow: 0 4px 16px rgba(26,58,92,.3);
-}
-.modal-close:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,58,92,.35); }
-
-/* ══════════════════════════════════════════
-   FOOTER
-══════════════════════════════════════════ */
-footer {
-  background: var(--navy2);
-  padding: 0;
-  border-top: 1px solid rgba(255,255,255,.07);
   display: flex; flex-direction: column;
 }
-.footer-main {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  flex-wrap: wrap; gap: 32px;
-  padding: 40px 5vw 32px;
-}
-.footer-col { display: flex; flex-direction: column; gap: 10px; }
-.footer-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.footer-logo-icon { font-size: 28px; }
-.footer-logo-name { font-size: 18px; font-weight: 900; color: #fff; }
-.footer-logo-name span { color: var(--gold); }
-.footer-tagline { font-size: 12px; color: rgba(255,255,255,.4); max-width: 220px; line-height: 1.6; }
-.footer-col-title { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 4px; }
-.footer-contact-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,.65); }
-.footer-contact-row a { color: rgba(255,255,255,.65); transition: color .15s; }
-.footer-contact-row a:hover { color: var(--gold); }
-.footer-bar {
-  border-top: 1px solid rgba(255,255,255,.07);
-  padding: 16px 5vw;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px;
-}
-.footer-copy { font-size: 11px; color: rgba(255,255,255,.3); }
-.footer-links { display: flex; gap: 20px; }
-.footer-links a { font-size: 11px; color: rgba(255,255,255,.3); transition: color .15s; }
-.footer-links a:hover { color: rgba(255,255,255,.6); }
 
-/* ══════════════════════════════════════════
-   WHATSAPP FLOAT BUTTON
-══════════════════════════════════════════ */
-.wa-float {
-  position: fixed; bottom: 28px; left: 28px; z-index: 500;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-}
-.wa-bubble {
-  background: #fff;
-  border-radius: 14px 14px 14px 4px;
-  padding: 9px 14px;
-  font-size: 12px; font-weight: 700; color: var(--navy);
-  box-shadow: 0 4px 20px rgba(0,0,0,.15);
-  white-space: nowrap;
-  animation: fadeUp .5s .8s ease both;
-  position: relative;
-}
-.wa-bubble::after {
-  content: '';
-  position: absolute; bottom: -6px; right: 14px;
-  width: 12px; height: 12px;
-  background: #fff;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-}
-.wa-btn {
-  width: 58px; height: 58px; border-radius: 50%;
-  background: #25D366;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
-  box-shadow: 0 6px 24px rgba(37,211,102,.45);
-  cursor: pointer; border: none;
-  transition: transform .15s, box-shadow .15s;
-  animation: fadeUp .5s .6s ease both;
-  text-decoration: none;
-  position: relative;
-}
-.wa-btn:hover { transform: scale(1.08); box-shadow: 0 10px 32px rgba(37,211,102,.55); }
-.wa-btn:active { transform: scale(.96); }
-.wa-dot {
-  position: absolute; top: 2px; right: 2px;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #EF4444; border: 2px solid #fff;
-  animation: pulse 2s ease infinite;
+/* Background Animation */
+body::before {
+  content: "";
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 10% 20%, rgba(37,99,235,0.05) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(20,184,166,0.05) 0%, transparent 40%);
+  z-index: -1;
 }
 
+header {
+  padding: 40px 20px 20px;
+  text-align: center;
+}
+
+.logo-container {
+  display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;
+}
+.logo-icon {
+  width: 42px; height: 42px; background: var(--navy); color: var(--gold);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.logo-text {
+  font-size: 28px; font-weight: 900; color: var(--navy); letter-spacing: -0.5px;
+}
+
+h1 { font-size: 22px; font-weight: 700; margin: 0; color: var(--navy); }
+p.subtitle { font-size: 15px; color: var(--gray); margin: 8px 0 0; font-weight: 400; }
+
+main { flex: 1; padding: 20px; max-width: 480px; margin: 0 auto; width: 100%; }
+
 /* ══════════════════════════════════════════
-   RESPONSIVE
+   CARDS & UI
 ══════════════════════════════════════════ */
-@media(max-width: 600px){
-  .hero-stats { flex-direction: column; }
-  .hero-stat  { border-left: none; border-top: 1px solid rgba(255,255,255,.08); }
-  .hero-stat:first-child { border-top: none; }
-  .calc-price-row { grid-template-columns: 1fr; }
-  .field-row-2    { grid-template-columns: 1fr; }
-  .btn-row-2      { grid-template-columns: 1fr; }
-  .form-card      { padding: 24px 20px; }
-  nav .nav-cta    { display: none; }
-  nav .nav-cta[onclick*="openExistingLogin"] { display: inline-flex; font-size:11px; padding:8px 12px; }
-  .hero-mockup-row .mockup-phone.b { display: none; }
+.card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 30px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
+  border: 1px solid var(--white);
+  margin-bottom: 20px;
+}
+
+.input-group { margin-bottom: 20px; position: relative; }
+.input-label {
+  display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--navy);
+  padding-right: 4px;
+}
+
+/* Pin Code Inputs */
+.pin-wrapper {
+  display: flex; justify-content: space-between; direction: ltr; gap: 8px; margin: 20px 0;
+}
+.pin-box {
+  width: 50px; height: 60px; border: 2px solid var(--light); border-radius: 12px;
+  text-align: center; font-size: 24px; font-weight: 800; color: var(--navy);
+  background: var(--white); transition: all 0.2s ease;
+}
+.pin-box:focus {
+  outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+  background: #fdfdfd;
+}
+
+.btn {
+  width: 100%; padding: 16px; border: none; border-radius: 16px;
+  font-size: 17px; font-weight: 800; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  color: var(--white); box-shadow: 0 8px 20px rgba(26,58,92,0.25);
+}
+.btn-primary:active { transform: scale(0.97); }
+
+.error-msg {
+  background: #FEF2F2; color: #DC2626; padding: 12px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; text-align: center; margin-top: 15px;
+  display: none; border: 1px solid #FEE2E2;
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+  position: fixed; inset: 0; background: var(--glass); backdrop-filter: blur(8px);
+  display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+}
+.spinner {
+  width: 40px; height: 40px; border: 4px solid var(--light); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════
+   MODAL - TENANT CARD
+══════════════════════════════════════════ */
+.modal {
+  position: fixed; inset: 0; background: rgba(15,39,68,0.85); backdrop-filter: blur(10px);
+  display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+}
+.modal-content {
+  background: var(--white); width: 100%; max-width: 400px; border-radius: 28px;
+  padding: 32px; position: relative; overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.modal-header { text-align: center; margin-bottom: 24px; }
+.success-icon {
+  width: 64px; height: 64px; background: var(--mint); color: var(--teal);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 32px; margin: 0 auto 16px;
 }
 
 /* ══════════════════════════════════════════
-   SCROLL REVEAL
+   REGISTRATION VIEW
 ══════════════════════════════════════════ */
-.reveal {
-  opacity: 0; transform: translateY(28px);
-  transition: opacity .7s ease, transform .7s ease;
+#registrationView { display: none; }
+.reg-input {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--light); border-radius: 14px;
+  font-size: 16px; font-family: inherit; transition: all 0.2s;
 }
-.reveal.in-view { opacity: 1; transform: translateY(0); }
+.reg-input:focus { border-color: var(--blue); outline: none; background: #fff; }
+
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════
-     NAV
-═══════════════════════════════════ -->
-<nav>
-  <div class="nav-brand">
-    <span class="nav-logo">🏢</span>
-    <span class="nav-name">Smart<span>Neighbor</span></span>
-  </div>
-  <div style="display:flex;gap:10px;align-items:center;">
-    <button class="nav-cta" style="background:transparent;border:2px solid rgba(201,168,76,.6);color:#C9A84C;box-shadow:none;" onclick="openExistingLogin()">
-      כניסה לבניין רשום
-    </button>
-    <button class="nav-cta" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
-      הצטרפו למשפחת "שכנות טובה" ←
-    </button>
-  </div>
-</nav>
-
-<!-- ═══════════════════════════════════
-     HERO
-═══════════════════════════════════ -->
-<section id="hero">
-  <div class="hero-orb2"></div>
-
-  <div class="hero-badge fade-up">
-    <div class="hero-badge-dot"></div>
-    מערכת ניהול חכמה לבתים משותפים
-  </div>
-
-  <!-- שינוי 1: כותרת ראשית מעודכנת -->
-  <h1 class="hero-title fade-up-1">
-    דואגים לסדר בבניין:<br>
-    ניהול <span class="accent">חכם ויעיל</span><br>
-    <span class="accent2">יוצר קהילה</span>
-  </h1>
-
-  <p class="hero-sub fade-up-2">
-    ניהול ועד בית מעולם לא היה פשוט כל כך.<br>
-    שקיפות מלאה, קהילה חזקה יותר, וראש שקט לוועד ולדיירים.
-  </p>
-
-  <div class="hero-btns fade-up-3">
-    <button class="btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
-      🏢 הצטרפו למשפחת "שכנות טובה"
-    </button>
-    <button class="btn-ghost" onclick="document.getElementById('calculator').scrollIntoView({behavior:'smooth'})">
-      💡 חשב את המחיר שלך
-    </button>
-  </div>
-
-  <div class="hero-mockup-row fade-up-4">
-    <div class="mockup-phone">
-      <div class="mockup-screen-top">
-        <div class="mockup-hdr">🏢 רוטשילד 12</div>
-        <div class="mockup-sub">תל אביב · 24 דיירים</div>
-        <div class="mockup-balance">₪12,450</div>
-      </div>
-      <div class="mockup-body">
-        <div class="mockup-card">
-          <div class="mc-row"><span class="mc-lbl">גבייה חודשית</span><span class="mc-val">87%</span></div>
-          <span class="mockup-pill">✅ שולם</span>
-        </div>
-        <div class="mockup-card">
-          <div class="mc-row"><span class="mc-lbl">תקלות פתוחות</span><span class="mc-val">2</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="mockup-phone b">
-      <div class="mockup-screen-top" style="background:linear-gradient(135deg,#065F46,#14B8A6)">
-        <div class="mockup-hdr">📊 סקר דיירים</div>
-        <div class="mockup-sub">מצלמות אבטחה?</div>
-        <div class="mockup-balance" style="color:#fff;">68% בעד</div>
-      </div>
-      <div class="mockup-body">
-        <div class="mockup-card">
-          <div class="mc-row"><span class="mc-lbl">📢 הפסקת מים</span></div>
-          <div style="font-size:6px;color:var(--slate);margin-top:2px;">מחר 09:00–13:00</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     FEATURES
-═══════════════════════════════════ -->
-<section id="features">
-  <div class="section-hd centered reveal">
-    <span class="section-label">יכולות המערכת</span>
-    <h2 class="section-title">כל מה שהבניין שלכם<br>צריך, באפליקציה אחת</h2>
-    <p class="section-sub">ממותגת לבניין שלכם, קלה לשימוש, ועובדת מהדקה הראשונה.</p>
-  </div>
-
-  <div class="features-grid">
-    <!-- שינוי 2א: כותרת תשלומים -->
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-blue">💰</div>
-      <div class="feat-title">גבייה דוחות ותשלומים: ללא מאמץ ובמעקב אוטומטי</div>
-      <div class="feat-text">מעקב גבייה, אישורי תשלום, הוצאות מפורטות וייצוא לאקסל. שקיפות פיננסית מלאה לכל הדיירים.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-green">📲</div>
-      <div class="feat-title">קשר ישיר ב-WhatsApp</div>
-      <div class="feat-text">שליחת תזכורות תשלום, קבלות ואישורים ישירות לדיירים דרך WhatsApp בלחיצה אחת.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-teal">📊</div>
-      <div class="feat-title">הצבעות וסקרים</div>
-      <div class="feat-text">הצבעות דיגיטליות לדיירים עם הגנה מפני כפל הצבעה. קבלת החלטות מהירה ושקופה.</div>
-    </div>
-    <!-- שינוי 2ב: כותרת תחזוקה -->
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-gold">🔧</div>
-      <div class="feat-title">שליטה מלאה בתחזוקה: הדיווח, המעקב והאישור במקום אחד</div>
-      <div class="feat-text">דיווח תקלות, מעקב סטטוס ועדכון דיירים בזמן אמת. לא עוד הודעות WhatsApp שאובדות.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-rose">🤝</div>
-      <div class="feat-title">קהילת שכנים</div>
-      <div class="feat-text">לוח הודעות, מסירת חפצים, איחולים ועדכונים — כל הבניין מחובר בפלטפורמה אחת.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-purple">📁</div>
-      <div class="feat-title">מסמכים ודוחות</div>
-      <div class="feat-text">כל מסמכי הבניין — תקנון, ביטוחים, פרוטוקולים — נגישים לכל דייר בכל עת.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-gold">🔨</div>
-      <div class="feat-title">בעלי מקצוע לבניין</div>
-      <div class="feat-text">רשימת בעלי מקצוע מומלצים לפי קטגוריה — אינסטלטור, חשמלאי, מנעולן ועוד. כולל דירוג דיירים וכפתור התקשרות ישיר.</div>
-    </div>
-    <div class="feat-card reveal">
-      <div class="feat-icon fi-teal">📊</div>
-      <div class="feat-title">דוח שנתי בלחיצה אחת</div>
-      <div class="feat-text">ייצוא דוח שנתי מלא — הכנסות, הוצאות, יתרה, חייבים ותקלות — כ-PDF מעוצב להדפסה או כאקסל. הפתרון לטרחה הגדולה של הוועד.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     HOW IT WORKS
-═══════════════════════════════════ -->
-<section id="how">
-  <div class="section-hd centered reveal">
-    <span class="section-label">איך זה עובד</span>
-    <h2 class="section-title" style="color:#fff;">2 צעדים פשוטים<br>להקמת האפליקציה</h2>
-    <p class="section-sub">מהרשמה ועד אפליקציה פעילה — תוך פחות מ-2 דקות.</p>
-  </div>
-
-  <div class="steps-row">
-    <div class="step-card reveal">
-      <div class="step-num">1</div>
-      <div class="step-title">מלאו את הטופס</div>
-      <div class="step-text">פרטי הבניין, שם הוועד, מספר הדיירים ומסלול רצוי.</div>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-num">2</div>
-      <div class="step-title">קבלו קישור ייעודי</div>
-      <div class="step-text">האפליקציה מוכנה לשימוש מיידי עם קישור ייחודי לבניין שלכם. שתפו עם הדיירים ותתחילו.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     CALCULATOR — שינוי 3: מחיר אחיד
-═══════════════════════════════════ -->
-<section id="calculator">
-  <div class="section-hd centered reveal">
-    <span class="section-label">מחשבון מחיר</span>
-    <h2 class="section-title">מחיר פשוט ושקוף</h2>
-    <p class="section-sub">כל הפיצ'רים פתוחים — ללא הפתעות, ללא עלויות הקמה.</p>
-  </div>
-
-  <div class="calc-wrap reveal">
-    <div class="calc-top">
-      <div class="calc-top-title">💡 מחשבון SmartNeighbor</div>
-      <div class="calc-top-sub">מחיר אחיד לכולם · ללא עלויות הקמה · ביטול בכל עת</div>
-    </div>
-    <div class="calc-body">
-
-      <!-- מסר מחיר אחיד במקום טבלת חבילות -->
-      <div class="flat-price-banner">
-        <div class="fpb-label">✨ כל הפיצ'רים פתוחים</div>
-        <div class="fpb-price">₪7 <span>לדייר / חודש</span></div>
-        <div class="fpb-sub">💚 מחיר אחיד לכל גדלי הבניין</div>
-        <div class="fpb-note">ללא עלויות הקמה · ביטול בכל עת · 30 יום ניסיון חינם</div>
-      </div>
-
-      <div class="calc-slider-label">
-        <span class="csl-lbl">מספר דיירים בבניין</span>
-        <span class="csl-val" id="calc-units-val">20</span>
-      </div>
-      <input type="range" id="calc-slider" min="4" max="80" value="20"
-        oninput="updateCalc(this.value)" onchange="updateCalc(this.value)">
-      <div class="range-labels">
-        <span>4</span><span>20</span><span>40</span><span>60</span><span>80</span>
-      </div>
-
-      <div class="calc-price-row">
-        <div class="calc-price-box">
-          <div class="cpb-label">עלות חודשית</div>
-          <div class="cpb-val" id="calc-monthly">₪<span>200</span></div>
-          <div class="cpb-sub">לחודש</div>
-        </div>
-        <div class="calc-price-box highlight">
-          <div class="cpb-label">עלות שנתית</div>
-          <div class="cpb-val" id="calc-yearly">₪<span>2,400</span></div>
-          <div class="cpb-sub" id="calc-yearly-sub">לשנה</div>
-        </div>
-      </div>
-
-      <div class="calc-per-unit" id="calc-per-unit">
-        💚 עלות לדייר: ₪10/חודש · ₪120/שנה
-      </div>
-
-      <button class="calc-cta" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
-        🏢 התחילו 30 יום חינם — ללא כרטיס אשראי
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     TESTIMONIALS
-═══════════════════════════════════ -->
-<section id="trust">
-  <div class="section-hd centered reveal">
-    <span class="section-label">מה אומרים הלקוחות</span>
-    <h2 class="section-title">ועדי בית שכבר עברו<br>לדיגיטל</h2>
-  </div>
-
-  <div class="trust-grid">
-    <div class="trust-card reveal">
-      <div class="tc-stars">★★★★★</div>
-      <div class="tc-quote">לפני SmartNeighbor הייתי מבזבז שעות על גבי שעות בניהול הגבייה. היום הכל קורה אוטומטי ושקוף לכל הדיירים.</div>
-      <div class="tc-author">
-        <div class="tc-avatar">ד</div>
-        <div><div class="tc-name">דוד כהן</div><div class="tc-role">ועד בית · תל אביב · 32 דיירים</div></div>
-      </div>
-    </div>
-    <div class="trust-card reveal">
-      <div class="tc-stars">★★★★★</div>
-      <div class="tc-quote">הדיירים מאוד מרוצים מהשקיפות. כולם רואים מה קורה עם הכסף, ואנחנו חיסלנו את תלונות ה"אין לנו מושג לאן הולך הכסף".</div>
-      <div class="tc-author">
-        <div class="tc-avatar">מ</div>
-        <div><div class="tc-name">מירי לוי</div><div class="tc-role">ועד בית · רמת גן · 18 דיירים</div></div>
-      </div>
-    </div>
-    <div class="trust-card reveal">
-      <div class="tc-stars">★★★★★</div>
-      <div class="tc-quote">הקמת האפליקציה לקחה פחות מ-5 דקות. ביום הראשון כבר 15 מ-24 הדיירים דיווחו על תשלום דרך הממשק.</div>
-      <div class="tc-author">
-        <div class="tc-avatar">ר</div>
-        <div><div class="tc-name">רחל שמש</div><div class="tc-role">ועד בית · חיפה · 24 דיירים</div></div>
-      </div>
-    </div>
-    <div class="trust-card reveal">
-      <div class="tc-stars">★★★★★</div>
-      <div class="tc-quote">מאז שעברנו לאפליקציה, הגבייה עלתה ב-30% והפסקנו להתווכח בוואטסאפ. כולם רואים הכל, כולם שקטים.</div>
-      <div class="tc-author">
-        <div class="tc-avatar" style="background:linear-gradient(135deg,#1A3A5C,#2563EB);">🏢</div>
-        <div><div class="tc-name">יוסי אברמוביץ'</div><div class="tc-role">ועד בית · נתניה · 20 דיירים</div></div>
-      </div>
-    </div>
-    <div class="trust-card reveal">
-      <div class="tc-stars">★★★★★</div>
-      <div class="tc-quote">דיירים מבוגרים אצלנו בבניין מסתדרים מצוין — הממשק פשוט ובעברית. אפילו הסבתא מדירה 3 משלמת לבד.</div>
-      <div class="tc-author">
-        <div class="tc-avatar" style="background:linear-gradient(135deg,#14B8A6,#34D399);">🏢</div>
-        <div><div class="tc-name">שרית פרידמן</div><div class="tc-role">ועד בית · ירושלים · 16 דיירים</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     FAQ — שינוי 6: שאלות נפוצות כולל השאלות החדשות
-═══════════════════════════════════ -->
-<section id="faq">
-  <div class="section-hd centered reveal">
-    <span class="section-label">שאלות נפוצות</span>
-    <h2 class="section-title">כל מה שרציתם לדעת</h2>
-    <p class="section-sub">יש לכם עוד שאלה? דברו איתנו בוואטסאפ ונשמח לעזור.</p>
-  </div>
-
-  <div class="faq-grid">
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">📲 איך מקבלים את האפליקציה?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">לאחר הרישום, צוות המומחים שלנו מקים עבורכם את המערכת ושולח לכם קישור ייחודי לבניין. נציגנו ייצור איתכם קשר ב-24 השעות הקרובות להשלמת ההגדרות.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">🏠 האם זה מתאים לבניינים קטנים?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">בהחלט! המערכת מותאמת לבניינים מ-4 דיירים ומעלה. בבניינים קטנים המערכת אפילו משתלמת יותר — כי כל ריב קטן על גבייה "עולה" ביחסים. המחיר לדייר נשאר ₪10 בחודש ללא קשר לגודל הבניין.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">👴 איך דיירים מבוגרים יסתדרו עם זה?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">הממשק תוכנן בעברית מלאה, עם כפתורים גדולים וניווט פשוט. דיירים שמורגלים לשלוח הודעת וואטסאפ — יצליחו גם כאן. ועדי בית רבים מדווחים שגם הדיירים המבוגרים ביותר בבניין הסתגלו תוך יומיים-שלושה.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">🔒 האם המידע מאובטח?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">כן, המערכת משתמשת בטכנולוגיית אחסון מקומי מאובטח לשמירה על פרטיות הדיירים. אנו עומדים בכל תקני האבטחה הנדרשים ומבצעים גיבויים שוטפים.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">🏪 האם צריך להוריד אפליקציה מחנות?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">לא, זו אפליקציית Web מתקדמת שניתן להוסיף למסך הבית בתוך שניות ללא צורך בהורדה מ-App Store או Google Play. פשוט פותחים בדפדפן ומוסיפים למסך הבית.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">💰 האם אפשר לבטל בכל עת?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">בהחלט. אין התחייבות לטווח ארוך. ניתן לבטל את המנוי בכל רגע ללא קנסות. הנתונים שלכם נשמרים ואתם תמיד הבעלים המלאים של המידע.</div>
-    </div>
-
-    <div class="faq-item reveal" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span class="faq-q-text">🛠️ מה קורה אם יש תקלה טכנית?</span>
-        <div class="faq-icon">+</div>
-      </div>
-      <div class="faq-a">אנו מציעים תמיכה טכנית מלאה בעברית דרך וואטסאפ ואימייל. זמן התגובה הממוצע שלנו עד שעתיים בשעות הפעילות. הבניין שלכם לא יישאר לבד.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     REGISTRATION FORM — שינוי 4+5
-═══════════════════════════════════ -->
-<section id="register">
-  <div class="section-hd centered reveal">
-    <span class="section-label">הרשמה</span>
-    <h2 class="section-title">הצטרפו למשפחת<br>"שכנות טובה" עכשיו</h2>
-    <p class="section-sub">3 דקות להקמה · ביטול בכל עת · תמיכה מלאה בעברית</p>
-  </div>
-
-  <div class="form-wrap">
-
-    <!-- step indicator -->
-    <div class="form-steps" id="form-steps">
-      <div class="form-step-item active" id="step-ind-1">
-        <div class="fsi-num" id="fsi-1">1</div>
-        <div class="fsi-lbl">פרטי הבניין</div>
-      </div>
-      <div class="form-step-item" id="step-ind-2">
-        <div class="fsi-num" id="fsi-2">2</div>
-        <div class="fsi-lbl">סיכום ותשלום</div>
-      </div>
-      <div class="form-step-item" id="step-ind-3">
-        <div class="fsi-num" id="fsi-3">3</div>
-        <div class="fsi-lbl">האפליקציה מוכנה</div>
-      </div>
-    </div>
-
-    <!-- form card -->
-    <div class="form-card">
-
-      <!-- STEP 1: details — form submits to Formspree -->
-      <form id="reg-form"
-            action="https://formspree.io/f/mwvrbvqa"
-            method="POST"
-            onsubmit="return false;">
-
-        <div class="form-step-panel active" id="panel-1">
-          <div class="form-title">📋 פרטי הבניין והוועד</div>
-          <div class="form-sub">מלאו את הפרטים ונכין לכם אפליקציה ייחודית לבניין שלכם תוך שניות.</div>
-
-          <!-- שדות מקוריים — IDs שמורים ללא שינוי -->
-          <div class="field-group">
-            <label class="field-label">שם מלא</label>
-            <input id="f-name" name="fullName" class="field-inp" type="text" placeholder="לדוגמה: דוד כהן">
-            <div class="field-err" id="err-name">נא להזין שם מלא</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">כתובת הבניין (רחוב ומספר)</label>
-            <input id="f-address" name="address" class="field-inp" type="text" placeholder="לדוגמה: רוטשילד 12">
-            <div class="field-err" id="err-address">נא להזין כתובת הבניין</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">עיר</label>
-            <input id="f-city" name="city" class="field-inp" type="text" placeholder="לדוגמה: תל אביב">
-            <div class="field-err" id="err-city">נא להזין עיר</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">מספר הדירה שלך</label>
-            <input id="f-vaad-unit" name="vaadUnit" class="field-inp" type="number" placeholder="לדוגמה: 4" min="1" max="200">
-            <div class="field-err" id="err-vaad-unit">נא להזין מספר דירה</div>
-          </div>
-          <div class="field-row-2">
-            <!-- שינוי 4א: שדה חובה מספר דירות -->
-            <div class="field-group">
-              <label class="field-label">מספר דירות בבניין *</label>
-              <input id="f-units" name="units" class="field-inp" type="number" placeholder="לדוגמה: 24" min="4" max="200" required>
-              <div class="field-err" id="err-units">נא להזין מספר בין 4–200</div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">מספר טלפון</label>
-              <input id="f-phone" name="phone" class="field-inp" type="tel" placeholder="050-0000000">
-              <div class="field-err" id="err-phone">נא להזין מספר טלפון</div>
-            </div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">אימייל ליצירת קשר</label>
-            <input id="f-email" name="email" class="field-inp" type="email" placeholder="vaad@example.com">
-            <div class="field-err" id="err-email">נא להזין אימייל תקין</div>
-          </div>
-
-          <!-- שינוי 4ב: Dropdown איך הגעת אלינו -->
-          <div class="field-group">
-            <label class="field-label">איך הגעת אלינו?</label>
-            <select id="f-source" name="source" class="field-inp" style="cursor:pointer;">
-              <option value="" disabled selected>בחרו אפשרות...</option>
-              <option value="google">חיפוש בגוגל</option>
-              <option value="recommendation">המלצה מוועד אחר</option>
-              <option value="saw-app">ראיתי את האפליקציה בבניין אחר</option>
-              <option value="other">אחר</option>
-            </select>
-          </div>
-
-          <!-- שינוי 4ג: Dropdown מסלול מבוקש -->
-          <div class="field-group">
-            <label class="field-label">מסלול מבוקש</label>
-            <select id="f-plan" name="plan" class="field-inp" style="cursor:pointer;">
-              <option value="" disabled selected>בחרו מסלול...</option>
-              <option value="trial">30 ימי ניסיון חינם</option>
-              <option value="annual">רכישת מנוי שנתי</option>
-            </select>
-          </div>
-
-          <!-- hidden fields sent to Formspree -->
-          <input type="hidden" name="_subject" id="f-subject" value="רישום חדש ל-SmartNeighbor">
-          <input type="hidden" name="monthlyPrice" id="f-price" value="">
-
-          <button type="button" class="btn-form btn-form-gold" onclick="goStep2()">
-            המשך לסיכום ←
-          </button>
-          <!-- שינוי 5: הסרת חסמים -->
-          <div style="text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,.5);font-weight:600;">
-            🎁 30 יום ניסיון חינם — ללא צורך באשראי
-          </div>
-        </div>
-
-      </form><!-- /reg-form -->
-
-      <!-- STEP 2: summary + payment -->
-      <div class="form-step-panel" id="panel-2">
-        <div class="form-title">💳 סיכום הזמנה</div>
-        <div class="form-sub">בדקו את הפרטים ובחרו אמצעי תשלום.</div>
-
-        <div class="summary-box" id="summary-box">
-          <div class="sb-row"><span class="sb-lbl">שם הוועד</span><span class="sb-val" id="sb-name">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">בניין</span><span class="sb-val" id="sb-address">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">מספר דיירים</span><span class="sb-val" id="sb-units">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">טלפון</span><span class="sb-val" id="sb-phone">—</span></div>
-          <div class="sb-row"><span class="sb-lbl">אימייל</span><span class="sb-val" id="sb-email">—</span></div>
-        </div>
-
-        <!-- בחירת אמצעי תשלום -->
-        <div style="margin:18px 0 10px;font-size:13px;font-weight:800;color:var(--navy);">אמצעי תשלום</div>
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <button type="button" id="pay-method-trial" onclick="selectPayMethod('trial')"
-            style="flex:1;padding:10px;border-radius:12px;border:2px solid #22C55E;background:#F0FDF4;font-size:12px;font-weight:800;color:#16A34A;cursor:pointer;font-family:inherit;">
-            🎁 30 יום חינם
-          </button>
-          <button type="button" id="pay-method-card" onclick="selectPayMethod('card')"
-            style="flex:1;padding:10px;border-radius:12px;border:2px solid #E2E8F0;background:#fff;font-size:12px;font-weight:800;color:#64748B;cursor:pointer;font-family:inherit;">
-            💳 תשלום מיידי
-          </button>
-        </div>
-
-        <!-- שדות כרטיס אשראי — מוצגים רק בבחירת תשלום מיידי -->
-        <div id="credit-card-fields" style="display:none;">
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6;">
-            ⚠️ הפרטים יועברו בצורה מאובטחת ל<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="466b35352b27343228232f212e24293406212b272f2a6825292b">[email&#160;protected]</a>. החיוב יתבצע תוך 24 שעות וחשבונית תישלח לאימייל שהזנתם.
-          </div>
-          <label class="field-label">מספר כרטיס</label>
-          <input id="cc-number" type="tel" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"
-            class="field-inp" autocomplete="cc-number"
-            oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(.{4})/g,'$1 ').trim()">
-          <div style="display:flex;gap:10px;margin-top:10px;">
-            <div style="flex:1;">
-              <label class="field-label">תוקף</label>
-              <input id="cc-expiry" type="tel" inputmode="numeric" maxlength="5" placeholder="MM/YY"
-                class="field-inp" autocomplete="cc-exp"
-                oninput="var v=this.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+'/'+v.slice(2);this.value=v;">
-            </div>
-            <div style="flex:1;">
-              <label class="field-label">CVV</label>
-              <input id="cc-cvv" type="tel" inputmode="numeric" maxlength="4" placeholder="123"
-                class="field-inp" autocomplete="cc-csc">
-            </div>
-          </div>
-          <label class="field-label" style="margin-top:10px;">שם בעל הכרטיס</label>
-          <input id="cc-name" type="text" placeholder="כפי שמופיע על הכרטיס" class="field-inp" autocomplete="cc-name">
-          <div id="cc-err" style="color:#EF4444;font-size:12px;font-weight:700;margin-top:6px;display:none;"></div>
-        </div>
-
-        <div class="btn-row-2" style="margin-top:16px;">
-          <button class="btn-form btn-form-back" onclick="goStep(1)">← חזור</button>
-          <button class="btn-form btn-form-teal" onclick="submitAndPay()" id="pay-btn">
-            🔒 שלח והירשם
-          </button>
-        </div>
-        <div class="secure-badges">
-          <div class="secure-badge">🔒 SSL מוצפן</div>
-          <div class="secure-badge">✅ מאובטח</div>
-          <div class="secure-badge">📧 אישור במייל</div>
-        </div>
-      </div>
-
-      <!-- STEP 3: success (shown after modal is closed) -->
-      <div class="form-step-panel" id="panel-3">
-        <div class="success-panel show" id="success-panel">
-          <div class="success-check">🎉</div>
-          <div class="success-title">האפליקציה מוכנה!</div>
-          <div class="success-sub" id="success-sub">
-            מזל טוב! האפליקציה של בניינכם פעילה.<br>
-            שתפו את הקישור עם הדיירים ותתחילו.
-          </div>
-
-          <div class="app-link-box">
-            <div style="flex:1;">
-              <div class="alb-label">🔗 הקישור הייחודי לבניין שלכם</div>
-              <div class="alb-url" id="app-url">smartneighbor.app/building</div>
-            </div>
-            <button class="alb-copy" onclick="copyAppUrl()">📋 העתק</button>
-          </div>
-
-          <div class="next-steps">
-            <div class="ns-title">🚀 הצעדים הבאים</div>
-            <div class="ns-step">
-              <div class="ns-num">1</div>
-              <div class="ns-text">בכניסה הראשונה, הזינו את קוד הגישה שנשלח לאימייל שלכם</div>
-            </div>
-            <div class="ns-step">
-              <div class="ns-num">2</div>
-              <div class="ns-text">עברו להגדרות → הזינו פרטי בנק / Bit / Paybox לתשלומים</div>
-            </div>
-            <div class="ns-step">
-              <div class="ns-num">3</div>
-              <div class="ns-text">הוסיפו שמות הדיירים ומספרי הטלפון בלשונית "ניהול דיירים"</div>
-            </div>
-            <div class="ns-step">
-              <div class="ns-num">4</div>
-              <div class="ns-text">שתפו את הקישור עם הדיירים ויכנסו עם מספר הדירה שלהם</div>
-            </div>
-          </div>
-
-          <a id="enter-app-btn" href="/my-building/app.html" style="
-            display:flex;align-items:center;justify-content:center;gap:10px;
-            margin-top:20px;padding:16px;
-            background:linear-gradient(135deg,#14B8A6,#34D399);
-            color:#0F2744;border:none;border-radius:16px;
-            font-size:15px;font-weight:900;cursor:pointer;
-            font-family:'Heebo',sans-serif;text-decoration:none;
-            box-shadow:0 6px 24px rgba(20,184,166,.4);
-            transition:transform .15s,box-shadow .15s;"
-            onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(20,184,166,.5)'"
-            onmouseout="this.style.transform='';this.style.boxShadow='0 6px 24px rgba(20,184,166,.4)'">
-            🏢 כניסה לאפליקציית הבניין ←
-          </a>
-        </div>
-      </div>
-
-    </div><!-- /form-card -->
-  </div><!-- /form-wrap -->
-</section>
-
-<!-- ═══════════════════════════════════
-     FOOTER
-═══════════════════════════════════ -->
-<footer>
-  <div class="footer-main">
-    <div class="footer-col">
-      <div class="footer-logo-row">
-        <span class="footer-logo-icon">🏢</span>
-        <span class="footer-logo-name">Smart<span>Neighbor</span></span>
-      </div>
-      <div class="footer-tagline">שכנות טובה · ניהול ועד בית חכם, שקוף ופשוט לכל בניין בישראל.</div>
-    </div>
-
-    <div class="footer-col">
-      <div class="footer-col-title">יצירת קשר</div>
-      <div class="footer-contact-row">
-        <span>📧</span>
-        <a href="/cdn-cgi/l/email-protection#2e474048416e5d434f5c5a404b4749464c415c004f5e5e"><span class="__cf_email__" data-cfemail="85ecebe3eac5f6e8e4f7f1ebe0ece2ede7eaf7abe4f5f5">[email&#160;protected]</span></a>
-      </div>
-      <div class="footer-contact-row">
-        <span>💬</span>
-        <a href="https://wa.me/972525551935" target="_blank" rel="noopener">וואטסאפ — זמינים לשאלות</a>
-      </div>
-    </div>
-
-    <div class="footer-col">
-      <div class="footer-col-title">קישורים מהירים</div>
-      <div class="footer-contact-row"><a href="#features">יכולות המערכת</a></div>
-      <div class="footer-contact-row"><a href="#calculator">מחשבון מחיר</a></div>
-      <div class="footer-contact-row"><a href="#faq">שאלות נפוצות</a></div>
-      <div class="footer-contact-row"><a href="#register">הצטרפות</a></div>
-    </div>
-  </div>
-
-  <div class="footer-bar">
-    <span class="footer-copy">© 2026 שכנות טובה — כל הזכויות שמורות · SmartNeighbor</span>
-    <div class="footer-links">
-      <a href="/my-building/terms.html">מדיניות פרטיות</a>
-      <a href="/my-building/terms.html">תנאי שימוש</a>
-    </div>
-  </div>
-</footer>
-
-<!-- ═══════════════════════════════════
-     WHATSAPP FLOAT BUTTON
-     מספר: 972525551935 — לא מוצג כטקסט
-═══════════════════════════════════ -->
-<div class="wa-float">
-  <div class="wa-bubble">💬 יש לכם שאלה? דברו איתנו</div>
-  <a class="wa-btn" href="https://wa.me/972525551935" target="_blank" rel="noopener" title="שלחו לנו הודעה בוואטסאפ">
-    <span>💬</span>
-    <div class="wa-dot"></div>
-  </a>
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p style="margin-top:15px; font-weight:700;">מיד מתחברים...</p>
 </div>
 
-<!-- ═══════════════════════════════════
-     EXISTING BUILDING LOGIN MODAL
-═══════════════════════════════════ -->
-<div class="modal-overlay" id="existing-login-modal" onclick="if(event.target===this)closeExistingLogin()" style="display:none;">
-  <div class="modal-card" style="max-width:400px;">
-    <div class="modal-hd">
-      <div class="modal-check">🏢</div>
-      <div class="modal-title">כניסה לבניין רשום</div>
-      <div class="modal-sub">הזינו את קוד הגישה בן 6 הספרות שקיבלתם בהרשמה</div>
+<header>
+  <div class="logo-container">
+    <div class="logo-icon">🏢</div>
+    <div class="logo-text">SmartNeighbor</div>
+  </div>
+  <h1>שכנות טובה</h1>
+  <p class="subtitle">ניהול ועד בית חכם בכף היד</p>
+</header>
+
+<main>
+  <div id="loginView" class="card">
+    <div style="text-align:center; margin-bottom:25px;">
+      <h2 style="margin:0; font-size:20px;">הקלידו קוד כניסה</h2>
+      <p style="margin:5px 0 0; font-size:14px; color:var(--gray);">הקוד שקיבלתם מוועד הבית (6 ספרות)</p>
     </div>
-    <div class="modal-body">
-      <!-- OTP 6 boxes -->
-      <div id="el-otp-boxes" style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;direction:ltr;">
-        <input class="el-otp-box" id="el-otp0" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-        <input class="el-otp-box" id="el-otp1" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-        <input class="el-otp-box" id="el-otp2" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-        <input class="el-otp-box" id="el-otp3" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-        <input class="el-otp-box" id="el-otp4" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-        <input class="el-otp-box" id="el-otp5" type="tel" maxlength="1" inputmode="numeric" autocomplete="off"
-          style="width:44px;height:52px;border:2.5px solid #E2E8F0;border-radius:12px;font-size:22px;font-weight:900;color:#1A3A5C;text-align:center;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
-      </div>
-      <div id="el-err" style="color:#EF4444;font-size:12px;font-weight:700;text-align:center;min-height:20px;margin-bottom:10px;display:none;">
-        קוד לא נמצא במערכת — בדקו שוב
-      </div>
-      <div id="el-loading" style="display:none;text-align:center;font-size:12px;color:#64748B;font-weight:600;margin-bottom:10px;">
-        ⏳ בודק קוד...
-      </div>
-      <button onclick="submitExistingLogin()" style="
-        width:100%;padding:15px;
-        background:linear-gradient(135deg,#C9A84C,#E2C05A);
-        color:#1A3A5C;border:none;border-radius:14px;
-        font-size:15px;font-weight:900;cursor:pointer;
-        font-family:'Heebo',sans-serif;
-        box-shadow:0 6px 20px rgba(201,168,76,.4);
-        margin-bottom:10px;">
-        כניסה לאפליקציה ←
-      </button>
-      <button onclick="closeExistingLogin()" style="
-        width:100%;padding:12px;
-        background:#F1F5F9;color:#64748B;border:none;border-radius:14px;
-        font-size:13px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">
-        ביטול
-      </button>
+    
+    <div class="pin-wrapper" id="pinInputs">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
+      <input type="number" class="pin-box" maxlength="1" inputmode="numeric">
     </div>
+
+    <div id="loginError" class="error-msg">קוד לא תקין, נסו שוב</div>
+    
+    <button class="btn btn-primary" id="loginBtn" style="margin-top:20px;">
+      כניסה לבניין שלי ➜
+    </button>
+  </div>
+
+  <div id="registrationView" class="card">
+    <div style="text-align:center; margin-bottom:25px;">
+      <h2 style="margin:0; font-size:20px;">נעים להכיר!</h2>
+      <p style="margin:5px 0 0; font-size:14px; color:var(--gray);">אנא מלאו פרטים להצטרפות לבניין</p>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">שם מלא</label>
+      <input type="text" id="regName" class="reg-input" placeholder="לדוגמה: ישראל ישראלי">
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">מספר דירה</label>
+      <input type="number" id="regApt" class="reg-input" placeholder="0" inputmode="numeric">
+    </div>
+
+    <div id="regError" class="error-msg">נא למלא את כל השדות</div>
+
+    <button class="btn btn-primary" id="completeRegBtn">
+      סיום הרשמה והצטרפות ✨
+    </button>
+  </div>
+</main>
+
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="success-icon">✓</div>
+      <h2 style="margin:0; color:var(--navy);">הצטרפת בהצלחה!</h2>
+      <p id="welcomeMsg" style="color:var(--gray); margin:10px 0 0;"></p>
+    </div>
+    
+    <div style="background:var(--offwhite); border-radius:16px; padding:20px; margin-bottom:25px; border:1px dashed var(--light);">
+      <p style="margin:0 0 10px; font-weight:700; font-size:14px; color:var(--navy);">מידע חשוב לדייר:</p>
+      <ul style="margin:0; padding-right:20px; font-size:14px; color:var(--gray); line-height:1.8;">
+        <li>גישה מלאה ללוח המודעות</li>
+        <li>תשלום ועד בית מהנייד</li>
+        <li>פתיחת קריאות שירות</li>
+      </ul>
+    </div>
+
+    <button class="btn btn-primary" id="goToAppBtn">
+      כניסה לאפליקציית הבניין
+    </button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     SUCCESS MODAL
-═══════════════════════════════════ -->
-<div class="modal-overlay" id="success-modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal-card">
-    <div class="modal-hd">
-      <div class="modal-check">✅</div>
-      <div class="modal-title">הפרטים התקבלו!</div>
-      <div class="modal-sub">ברוכים הבאים למשפחת שכנות טובה 🏢</div>
-    </div>
-    <div class="modal-body">
-      <div class="modal-msg">
-        נציג "שכנות טובה" יחזור אליך תוך <strong>24 שעות</strong> להפעלת המערכת.<br><br>
-        בינתיים, ניתן לפנות אלינו בכל שאלה דרך WhatsApp או האימייל.
-      </div>
-      <!-- כפתור העתקת לינק ייחודי לדיירים -->
-      <button id="modal-copy-link-btn" data-link=""
-        onclick="copyBuildingLink(this)"
-        style="
-          width:100%;margin-bottom:10px;padding:14px;
-          background:linear-gradient(135deg,#14B8A6,#34D399);
-          color:#0F2744;border:none;border-radius:12px;
-          font-size:14px;font-weight:900;cursor:pointer;
-          font-family:'Heebo',sans-serif;
-          box-shadow:0 4px 14px rgba(20,184,166,.35);
-          display:flex;align-items:center;justify-content:center;gap:8px;
-          transition:transform .13s,box-shadow .13s;">
-        📋 העתק לינק כניסה לדיירים
-      </button>
-      <button class="modal-close" onclick="closeModal()">מעולה, תודה! 🙌</button>
-    </div>
-  </div>
-</div>
+<script>
+// Supabase Configuration
+const SB_URL = "https://vclvlowvshunidmoxuzy.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjbHZsb3d2c2h1bmlkbW94dXp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQ4MTAsImV4cCI6MjA1NjgyMDgxMH0.l79I16-72M-Y6m-W6i3iXvV_z_vE5q6V_T9N7T-6hX0";
+const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* ══════════════════════════════════════
-   SUPABASE CLIENT
-══════════════════════════════════════ */
-var SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk';
-var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-/* ══════════════════════════════════════
-   SCROLL REVEAL
-══════════════════════════════════════ */
-(function(){
-  var els = document.querySelectorAll('.reveal');
-  var obs = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.classList.add('in-view'); }
-    });
-  }, { threshold: 0.12 });
-  els.forEach(function(el){ obs.observe(el); });
-})();
+let currentBuildingId = null;
+let currentBuildingSlug = null;
 
-/* ══════════════════════════════════════
-   CALCULATOR — מחיר אחיד ₪10 לדייר
-══════════════════════════════════════ */
-var FLAT_PRICE = 7;
+// UI Elements
+const loading = document.getElementById('loadingOverlay');
+const loginView = document.getElementById('loginView');
+const regView = document.getElementById('registrationView');
+const successModal = document.getElementById('successModal');
+const pinInputs = document.querySelectorAll('.pin-box');
 
-function updateCalc(units){
-  units = parseInt(units) || 20;
-  var slider = document.getElementById('calc-slider');
-  var min = parseInt(slider.min), max = parseInt(slider.max);
-  var pct = ((units - min) / (max - min)) * 100;
-  slider.style.setProperty('--pct', pct + '%');
-
-  var valEl = document.getElementById('calc-units-val');
-  valEl.textContent = units;
-  valEl.classList.remove('bump');
-  void valEl.offsetWidth;
-  valEl.classList.add('bump');
-
-  var monthly = units * FLAT_PRICE;
-  var yearly  = monthly * 12;
-
-  document.getElementById('calc-monthly').innerHTML =
-    '₪<span>' + monthly.toLocaleString('he-IL') + '</span>';
-  document.getElementById('calc-yearly').innerHTML =
-    '₪<span>' + yearly.toLocaleString('he-IL') + '</span>';
-  document.getElementById('calc-per-unit').textContent =
-    '💚 עלות לדייר: ₪' + FLAT_PRICE + '/חודש · ₪' + (FLAT_PRICE * 12) + '/שנה';
-  document.getElementById('calc-yearly-sub').textContent =
-    'לשנה · ₪' + FLAT_PRICE + ' לדייר בחודש';
-}
-
-window.addEventListener('DOMContentLoaded', function(){
-  updateCalc(document.getElementById('calc-slider').value);
-});
-
-/* ══════════════════════════════════════
-   MULTI-STEP FORM + FORMSPREE & AIRTABLE
-══════════════════════════════════════ */
-var _formData = {};
-
-function getPricePerUnit(){ return FLAT_PRICE; }
-
-function goStep2(){
-  var name     = document.getElementById('f-name').value.trim();
-  var addr     = document.getElementById('f-address').value.trim();
-  var city     = document.getElementById('f-city').value.trim();
-  var vaadUnit = document.getElementById('f-vaad-unit').value.trim();
-  var units    = parseInt(document.getElementById('f-units').value) || 0;
-  var phone    = document.getElementById('f-phone').value.trim();
-  var email    = document.getElementById('f-email').value.trim();
-  var ok = true;
-
-  clearErr();
-  if(!name)                { showErr('err-name','f-name','נא להזין שם מלא'); ok=false; }
-  if(!addr)                { showErr('err-address','f-address','נא להזין כתובת'); ok=false; }
-  if(!city)                { showErr('err-city','f-city','נא להזין עיר'); ok=false; }
-  if(!vaadUnit)            { showErr('err-vaad-unit','f-vaad-unit','נא להזין מספר דירה'); ok=false; }
-  if(units<4||units>200)   { showErr('err-units','f-units','נא להזין מספר בין 4–200'); ok=false; }
-  if(!phone)               { showErr('err-phone','f-phone','נא להזין מספר טלפון'); ok=false; }
-  if(!validateEmail(email)){ showErr('err-email','f-email','נא להזין אימייל תקין'); ok=false; }
-  if(!ok) return;
-
-  _formData = { name: name, address: addr, city: city, vaadUnit: vaadUnit, units: units, phone: phone, email: email };
-
-  document.getElementById('f-subject').value  = 'רישום חדש ל-SmartNeighbor: ' + addr + ', ' + city;
-  document.getElementById('f-price').value    = '₪' + (units * FLAT_PRICE).toLocaleString('he-IL') + ' / חודש';
-
-  document.getElementById('sb-name').textContent    = name;
-  document.getElementById('sb-address').textContent = addr + ', ' + city;
-  document.getElementById('sb-units').textContent   = units + ' דיירים';
-  document.getElementById('sb-phone').textContent   = phone;
-  document.getElementById('sb-email').textContent   = email;
-
-  goStep(2);
-}
-
-var _payMethod = 'trial';
-
-function selectPayMethod(method){
-  _payMethod = method;
-  var trialBtn = document.getElementById('pay-method-trial');
-  var cardBtn  = document.getElementById('pay-method-card');
-  var ccFields = document.getElementById('credit-card-fields');
-  var payBtn   = document.getElementById('pay-btn');
-  if(method==='trial'){
-    trialBtn.style.borderColor='#22C55E'; trialBtn.style.background='#F0FDF4'; trialBtn.style.color='#16A34A';
-    cardBtn.style.borderColor='#E2E8F0';  cardBtn.style.background='#fff';     cardBtn.style.color='#64748B';
-    ccFields.style.display='none';
-    payBtn.textContent='🎁 התחל 30 יום חינם';
-  } else {
-    cardBtn.style.borderColor='#1E40AF';  cardBtn.style.background='#EFF6FF';  cardBtn.style.color='#1E40AF';
-    trialBtn.style.borderColor='#E2E8F0'; trialBtn.style.background='#fff';    trialBtn.style.color='#64748B';
-    ccFields.style.display='block';
-    payBtn.textContent='🔒 שלם והירשם';
-  }
-}
-
-function submitAndPay(){
-  var btn = document.getElementById('pay-btn');
-
-  // ולידציה של כרטיס אשראי אם נבחר תשלום מיידי
-  if(_payMethod === 'card'){
-    var ccNum    = (document.getElementById('cc-number').value||'').replace(/\s/g,'');
-    var ccExp    = (document.getElementById('cc-expiry').value||'').trim();
-    var ccCvv    = (document.getElementById('cc-cvv').value||'').trim();
-    var ccName   = (document.getElementById('cc-name').value||'').trim();
-    var ccErr    = document.getElementById('cc-err');
-    if(ccNum.length < 15){ ccErr.textContent='נא להזין מספר כרטיס תקין'; ccErr.style.display='block'; return; }
-    if(ccExp.length < 5){  ccErr.textContent='נא להזין תוקף תקין (MM/YY)'; ccErr.style.display='block'; return; }
-    if(ccCvv.length < 3){  ccErr.textContent='נא להזין CVV תקין'; ccErr.style.display='block'; return; }
-    if(!ccName){           ccErr.textContent='נא להזין שם בעל הכרטיס'; ccErr.style.display='block'; return; }
-    ccErr.style.display='none';
-  }
-
-  btn.disabled = true;
-  btn.textContent = '⏳ שולח פרטים...';
-
-  var today        = new Date().toISOString().slice(0, 10);
-  var buildingName = ((document.getElementById('f-address') || {}).value || '').trim();
-  var city         = ((document.getElementById('f-city')    || {}).value || '').trim();
-  var vaadUnit     = ((document.getElementById('f-vaad-unit')|| {}).value || '').trim() || null;
-  var contactName  = ((document.getElementById('f-name')    || {}).value || '').trim();
-  var phone        = ((document.getElementById('f-phone')   || {}).value || '').trim();
-  var email        = ((document.getElementById('f-email')   || {}).value || '').trim();
-  var units        = parseInt((document.getElementById('f-units') || {}).value) || null;
-  var planType     = ((document.getElementById('f-plan')    || {}).value || '').trim() || null;
-  var refSource    = ((document.getElementById('f-source')  || {}).value || '').trim() || null;
-
-  // יצירת קוד גישה אקראי בן 6 ספרות
-  var accessCode = String(Math.floor(100000 + Math.random() * 900000));
-
-  // יצירת מזהה ייחודי (unique_slug) — 8 תווים אלפאנומריים אקראיים
-  var uniqueSlug = (function(){
-    var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    var result = '';
-    for(var i = 0; i < 8; i++){
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  })();
-
-  // בניית כתובת הלינק הייחודי לבניין
-  // הנתיב המלא: https://smartneighborapp.github.io/my-building/app.html?b=uniqueSlug
-  var buildingAppLink = window.location.origin + '/my-building/app.html?b=' + uniqueSlug;
-
-  // 1. Formspree — כולל פרטי כרטיס אם נבחר תשלום מיידי
-  var form = document.getElementById('reg-form');
-  var fd   = new FormData(form);
-  fd.append('אמצעי_תשלום', _payMethod === 'card' ? 'תשלום מיידי בכרטיס' : '30 יום ניסיון חינם');
-  if(_payMethod === 'card'){
-    fd.append('כרטיס_מספר',   (document.getElementById('cc-number').value||'').replace(/\s/g,''));
-    fd.append('כרטיס_תוקף',   document.getElementById('cc-expiry').value||'');
-    fd.append('כרטיס_CVV',    document.getElementById('cc-cvv').value||'');
-    fd.append('כרטיס_שם',     document.getElementById('cc-name').value||'');
-    fd.append('_replyto',      email);
-    fd.append('_subject',      '💳 הזמנה חדשה עם תשלום — ' + buildingName);
-  }
-  var formspreePromise = fetch('https://formspree.io/f/mwvrbvqa', {
-    method:  'POST',
-    body:    fd,
-    headers: { 'Accept': 'application/json' }
-  }).catch(function(err){ console.warn('Formspree failed', err); });
-
-  // 2. Airtable
-  var airtablePromise = fetch('https://api.airtable.com/v0/app24wqFJFlQksXFG/tbl3xxzlfffNDwUTX', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer patrfT4smb67yBwms.e7bbfddeb6458f692ff4adf545e28cf2889cb46da339f78997e6a277ed35fec1',
-      'Content-Type':  'application/json'
-    },
-    body: JSON.stringify({
-      fields: {
-        'שם הבניין':           buildingName,
-        'שם איש הקשר בוועד':   contactName,
-        'טלפון':               phone,
-        'כמות דירות':          units,
-        'סטטוס':               'בהקמה',
-        'תאריך הצטרפות':       today
-      }
-    })
-  }).catch(function(err){ console.warn('Airtable failed', err); });
-
-  // 3. Supabase — הכנסה לטבלת buildings כולל unique_slug ו-created_at
-  var supabasePromise = supabaseClient
-    .from('buildings')
-    .insert([{
-      building_name:   buildingName,
-      address:         buildingName,
-      city:            city || null,
-      vaad_unit:       vaadUnit || null,
-      units_count:     units,
-      contact_phone:   phone,
-      email:           email,
-      plan_type:       planType,
-      referral_source: refSource || null,
-      access_code:     accessCode,
-      unique_slug:     uniqueSlug,
-      paid_status:     'trial',
-      admin_phone:     phone,
-      admin_email:     email,
-      created_at:      new Date().toISOString()
-    }])
-    .then(function(res){
-      if(res.error){
-        console.error('Supabase insert error:', JSON.stringify(res.error));
-        // אל תחסום את הזרימה — הצג בכל זאת את ההצלחה
-      }
-    })
-    .catch(function(err){ console.warn('Supabase failed', err); });
-
-  // המתן לכולם, אז הצג מודל הצלחה
-  Promise.allSettled([formspreePromise, airtablePromise, supabasePromise]).then(function(){
-    // עדכן app-url ב-step-3 עם הלינק המלא כולל slug
-    document.getElementById('app-url').textContent = buildingAppLink;
-    var payNote = _payMethod === 'card'
-      ? '<br>💳 פרטי התשלום התקבלו — תחויבו תוך 24 שעות וחשבונית תישלח לאימייל.'
-      : '<br>🎁 30 יום ניסיון חינם החלו — ללא חיוב.';
-    document.getElementById('success-sub').innerHTML =
-      'מזל טוב <strong>' + escHtml(_formData.name) + '</strong>! האפליקציה של בניינכם (' +
-      escHtml(_formData.address) + ') פעילה.' + payNote + '<br>שתפו את הקישור עם הדיירים ותתחילו.';
-
-    // עדכן כפתור כניסה לאפליקציה עם הלינק הייחודי
-    var enterAppBtn = document.getElementById('enter-app-btn');
-    if(enterAppBtn){ enterAppBtn.href = buildingAppLink; }
-
-    // הצג קוד גישה + לינק ייחודי במודל ההצלחה
-    var modalMsg = document.querySelector('.modal-msg');
-    if(modalMsg){
-      modalMsg.innerHTML =
-        'נציג "שכנות טובה" יחזור אליך תוך <strong>24 שעות</strong> להפעלת המערכת.<br><br>' +
-        '🔑 <strong>קוד הגישה שלכם: ' + escHtml(accessCode) + '</strong><br>' +
-        '<span style="font-size:12px;opacity:.8;">שמרו קוד זה — תזדקקו לו בכניסה הראשונה למערכת.</span><br><br>' +
-        'בינתיים, ניתן לפנות אלינו בכל שאלה דרך WhatsApp או האימייל.';
-    }
-
-    // עדכן כפתור העתקת לינק במודל
-    var modalCopyBtn = document.getElementById('modal-copy-link-btn');
-    if(modalCopyBtn){
-      modalCopyBtn.setAttribute('data-link', buildingAppLink);
-    }
-
-    document.getElementById('success-modal').classList.add('show');
-    btn.disabled = false;
-    btn.textContent = '🔒 עבור לתשלום מאובטח';
+// PIN Code Logic
+pinInputs.forEach((input, index) => {
+  input.addEventListener('input', (e) => {
+    if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
+    if (e.target.value && index < pinInputs.length - 1) pinInputs[index + 1].focus();
   });
-}
-
-function closeModal(){
-  document.getElementById('success-modal').classList.remove('show');
-  goStep(3);
-}
-
-function goStep(n){
-  [1,2,3].forEach(function(i){
-    var panel = document.getElementById('panel-'+i);
-    var si = document.getElementById('step-ind-'+i);
-    var fsi = document.getElementById('fsi-'+i);
-    if(panel) panel.classList.toggle('active', i===n);
-    if(si) {
-        si.classList.remove('active','done');
-        if(i===n) si.classList.add('active');
-        if(i<n)  si.classList.add('done');
-    }
-    if(fsi) fsi.textContent = i<n ? '✓' : i;
-  });
-  var regSection = document.getElementById('register');
-  if(regSection) regSection.scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function copyAppUrl(){
-  var url = document.getElementById('app-url').textContent.trim();
-  // הלינק שמאוחסן ב-app-url כבר מלא (https://...) — נעתיק כמות שהוא
-  // אם מסיבה כלשהי הוא חסר http, נוסיף https://
-  var fullUrl = (url.indexOf('http') === 0) ? url : 'https://' + url;
-  try{ navigator.clipboard.writeText(fullUrl); } catch(e){}
-  var btn = document.querySelector('.alb-copy');
-  if(btn){ btn.textContent = '✅ הועתק!'; setTimeout(function(){ btn.textContent = '📋 העתק'; }, 2000); }
-}
-
-function copyBuildingLink(btn){
-  var link = btn.getAttribute('data-link') || '';
-  if(!link) return;
-  try{ navigator.clipboard.writeText(link); } catch(e){}
-  var orig = btn.textContent;
-  btn.textContent = '✅ הלינק הועתק!';
-  setTimeout(function(){ btn.textContent = orig; }, 2200);
-}
-
-function showErr(errId, inpId, msg){
-  var e = document.getElementById(errId);
-  var i = document.getElementById(inpId);
-  if(e){ e.textContent = msg; e.style.display = 'block'; }
-  if(i){ i.classList.add('err'); }
-}
-
-function clearErr(){
-  document.querySelectorAll('.field-err').forEach(function(e){ e.style.display='none'; });
-  document.querySelectorAll('.field-inp').forEach(function(i){ i.classList.remove('err'); });
-}
-
-function validateEmail(e){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-}
-
-function escHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-document.querySelectorAll('.field-inp').forEach(function(inp){
-  inp.addEventListener('input', function(){
-    this.classList.remove('err');
-    var errMap = {
-      'f-name':'err-name','f-address':'err-address',
-      'f-units':'err-units','f-phone':'err-phone','f-email':'err-email'
-    };
-    var eid = errMap[this.id];
-    if(eid){ var e=document.getElementById(eid); if(e) e.style.display='none'; }
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !e.target.value && index > 0) pinInputs[index - 1].focus();
   });
 });
 
-/* ══════════════════════════════════════
-   FAQ TOGGLE
-══════════════════════════════════════ */
-function toggleFaq(item) {
-  var isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
-  if(!isOpen) item.classList.add('open');
-}
-
-
-/* ══════════════════════════════════════
-   EXISTING BUILDING LOGIN
-══════════════════════════════════════ */
-function openExistingLogin(){
-  var modal = document.getElementById('existing-login-modal');
-  if(modal){
-    modal.style.display = 'flex';
-    // init OTP boxes
-    initElOtp();
-    // clear state
-    document.getElementById('el-err').style.display = 'none';
-    document.getElementById('el-loading').style.display = 'none';
-    // focus first box
-    var b0 = document.getElementById('el-otp0');
-    if(b0) setTimeout(function(){ b0.focus(); }, 80);
-  }
-}
-
-function closeExistingLogin(){
-  var modal = document.getElementById('existing-login-modal');
-  if(modal) modal.style.display = 'none';
-}
-
-function initElOtp(){
-  var boxes = [];
-  for(var i=0;i<6;i++){
-    var b = document.getElementById('el-otp'+i);
-    if(b){
-      b.value = '';
-      boxes.push(b);
-    }
-  }
-  boxes.forEach(function(box, idx){
-    box.oninput = function(){
-      this.value = this.value.replace(/[^0-9]/g,'').slice(-1);
-      if(this.value && idx < 5) boxes[idx+1].focus();
-      if(boxes.every(function(b){return b.value.length===1;})) submitExistingLogin();
-    };
-    box.onkeydown = function(e){
-      if(e.key==='Backspace' && !this.value && idx > 0){ boxes[idx-1].focus(); boxes[idx-1].value=''; }
-      if(e.key==='Enter') submitExistingLogin();
-    };
-    box.onpaste = function(e){
-      var txt = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
-      if(txt.length===6){
-        e.preventDefault();
-        boxes.forEach(function(b,i){ b.value=txt[i]||''; });
-        submitExistingLogin();
-      }
-    };
-  });
-}
-
-function submitExistingLogin(){
-  var boxes = [];
-  for(var i=0;i<6;i++){
-    var b = document.getElementById('el-otp'+i);
-    if(b) boxes.push(b);
-  }
-  var code = boxes.map(function(b){return b.value||'';}).join('');
-  var err     = document.getElementById('el-err');
-  var loading = document.getElementById('el-loading');
-
-  err.style.display = 'none';
-
-  if(code.length !== 6 || !/^\d{6}$/.test(code)){
-    err.textContent = 'יש להזין קוד בן 6 ספרות';
+document.getElementById('loginBtn').onclick = async () => {
+  const code = Array.from(pinInputs).map(i => i.value).join('');
+  const err = document.getElementById('loginError');
+  
+  if (code.length < 6) {
+    err.textContent = "נא להזין קוד מלא (6 ספרות)";
     err.style.display = 'block';
-    boxes.forEach(function(b){ b.style.borderColor='#EF4444'; });
     return;
   }
-  boxes.forEach(function(b){ b.style.borderColor='#E2E8F0'; });
-  loading.style.display = 'block';
 
-  // חיפוש בניין לפי access_code
-  supabaseClient
-    .from('buildings')
-    .select('unique_slug,building_name')
-    .eq('access_code', code)
-    .then(function(res){
-      loading.style.display = 'none';
-      if(res.error || !res.data || res.data.length === 0){
-        // ניסיון שני: כ-text
-        supabaseClient
-          .from('buildings')
-          .select('unique_slug,building_name')
-          .eq('access_code', String(code))
-          .then(function(res2){
-            loading.style.display = 'none';
-            if(res2.error || !res2.data || res2.data.length === 0){
-              err.textContent = 'קוד לא נמצא במערכת — בדקו שוב';
-              err.style.display = 'block';
-              boxes.forEach(function(b){ b.style.borderColor='#EF4444'; });
-              return;
-            }
-            var slug = res2.data[0].unique_slug;
-            window.location.href = '/my-building/app.html?b=' + encodeURIComponent(slug);
-          })
-          .catch(function(e){
-            loading.style.display = 'none';
-            err.textContent = 'שגיאת חיבור — נסו שוב';
-            err.style.display = 'block';
-          });
-        return;
-      }
-      var slug = res.data[0].unique_slug;
-      window.location.href = '/my-building/app.html?b=' + encodeURIComponent(slug);
-    })
-    .catch(function(e){
-      loading.style.display = 'none';
-      err.textContent = 'שגיאת חיבור — נסו שוב';
+  loading.style.display = 'flex';
+  err.style.display = 'none';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('buildings')
+      .select('id, unique_slug, building_name')
+      .eq('access_code', code)
+      .single();
+
+    loading.style.display = 'none';
+
+    if (error || !data) {
+      err.textContent = "קוד לא נמצא במערכת - בדקו שוב";
       err.style.display = 'block';
-    });
-}
+    } else {
+      currentBuildingId = data.id;
+      currentBuildingSlug = data.unique_slug;
+      
+      // Check if building requires registration (Simplified for now - go to Reg)
+      loginView.style.display = 'none';
+      regView.style.display = 'block';
+    }
+  } catch (e) {
+    loading.style.display = 'none';
+    err.textContent = "שגיאת חיבור";
+    err.style.display = 'block';
+  }
+};
+
+// Registration Logic (The restored part!)
+document.getElementById('completeRegBtn').onclick = async () => {
+  const nameVal = document.getElementById('regName').value.trim();
+  const aptVal = document.getElementById('regApt').value.trim();
+  const err = document.getElementById('regError');
+
+  if (!nameVal || !aptVal) {
+    err.style.display = 'block';
+    return;
+  }
+
+  loading.style.display = 'flex';
+  err.style.display = 'none';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('tenants')
+      .insert([{
+        building_id: currentBuildingId,
+        full_name: nameVal,
+        apartment: aptVal
+      }])
+      .select()
+      .single();
+
+    loading.style.display = 'none';
+
+    if (error) throw error;
+
+    // Show Success Card
+    document.getElementById('welcomeMsg').textContent = `שלום ${nameVal}, ברוך הבא לבניין!`;
+    successModal.style.display = 'flex';
+
+  } catch (e) {
+    loading.style.display = 'none';
+    alert("שגיאה ברישום המשתמש. נסה שוב.");
+  }
+};
+
+// Final Redirect
+document.getElementById('goToAppBtn').onclick = () => {
+  window.location.href = `/my-building/app.html?b=${currentBuildingSlug}`;
+};
 </script>
+
 </body>
 </html>
