@@ -3900,7 +3900,7 @@ function startApp(){
   switchTab('home'); // ← מעבר אוטומטי לדף הבית
   _cleanOldVaadNotices();
   renderAll();
-  checkDebtAlert();
+  // checkDebtAlert(); — מושבת זמנית עד שתמונת הגבייה תהיה מלאה (v55)
 }
 
 function renderAll(){
@@ -6402,7 +6402,6 @@ function checkDebtAlert(){
   try{
     var shown = sessionStorage.getItem('sn19_debt_shown');
     if(shown) return;
-    if(!DB.approvedReceipts || Object.keys(DB.approvedReceipts).length===0) return;
     var unit = DB.user.unit;
     var now  = new Date();
     var debtMonths = [];
@@ -7350,7 +7349,7 @@ window.addEventListener('load', function(){
 <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.onkeydown = function(e) {
-   if (e.keyCode == 123 || 
+     if (e.keyCode == 123 || 
             (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || 
             (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
             return false;
@@ -7358,4 +7357,4 @@ window.addEventListener('load', function(){
     };
 </script>
 </body>
-</html>  
+</html>
