@@ -10,12 +10,13 @@
 <title>שכנות טובה · SmartNeighbor v21</title>
 
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<!-- apple-touch-icon removed until favicon.png is optimized (currently 1.5 MB — target: <50 KB) -->
+<!-- TODO: compress favicon.png to ~32x32px PNG, then re-add: <link rel="apple-touch-icon" href="favicon.png"> -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2.39.3/dist/umd/supabase.js" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════
    ROOT & RESET
@@ -2543,6 +2544,16 @@ a{text-decoration:none;color:inherit;}
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
+   HTML ESCAPE HELPERS — defined first so all code below can use them
+═══════════════════════════════════════════════════════════════ */
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s){
+  return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SUPABASE CLIENT
 ═══════════════════════════════════════════════════════════════ */
 var SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
@@ -2636,7 +2647,7 @@ function _getBuildingSlug(){
   try{
     // נסיון 1 — מ-URL פרמטר ?b=slug
     var params = new URLSearchParams(window.location.search);
-    var slugUrl = (params.get('b')||'').trim();
+    var slugUrl = (params.get('b')||'').trim().toLowerCase().replace(/[^a-z0-9\-_]/g,'');
     if(slugUrl) return slugUrl;
     // נסיון 2 — מנתוני הבניין שנשמרו ב-localStorage
     var raw = localStorage.getItem('sn_building_data');
@@ -3185,7 +3196,7 @@ function migrateDB(){
   if(!DB.docCategories || !DB.docCategories.length)         DB.docCategories = d.docCategories;
   if(!DB.paySettings)       DB.paySettings = d.paySettings;
   if(DB.paySettings.vaadPhone===undefined) DB.paySettings.vaadPhone='';
-  if(!DB.adminPin)          DB.adminPin = '1234';
+  if(DB.adminPin === undefined || DB.adminPin === null) DB.adminPin = '1234';
   if(!DB.maintenance)       DB.maintenance = d.maintenance;
   if(!DB.maintenanceSeq)    DB.maintenanceSeq = d.maintenanceSeq;
   if(!DB.notices)           DB.notices = d.notices;
@@ -6926,13 +6937,6 @@ function num(n){
 function fmtDate(d){
   return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
 }
-function escHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s){
-  return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
-}
-
 /* ═══════════════════════════════════════════════════════════════
    V21: QUICK PAY CARD (home page)
 ═══════════════════════════════════════════════════════════════ */
