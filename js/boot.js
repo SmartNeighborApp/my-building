@@ -196,3 +196,14 @@ window.addEventListener('load', function(){
 /* ── DevTools Protection ───────────────────────────────────── */
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.onkeydown = function(e){ if(e.keyCode==123||(e.ctrlKey&&e.shiftKey&&e.keyCode=='I'.charCodeAt(0))||(e.ctrlKey&&e.keyCode=='U'.charCodeAt(0))){ return false; } };
+
+/* ── Share App ─────────────────────────────────────────────── */
+function _shareApp(){
+  var url = 'https://smartneighborapp.github.io/my-building/index.html';
+  var text = 'גיליתי אפליקציה מעולה לניהול ועד בית — שכנות טובה! ניהול גבייה, תקלות, קהילה — הכל במקום אחד 🏢';
+  if(navigator.share){
+    navigator.share({ title:'שכנות טובה', text:text, url:url }).catch(function(){});
+  } else {
+    try{ navigator.clipboard.writeText(url); showToast('הלינק הועתק — שלחי לחברים! ✅'); } catch(e){ window.open(url,'_blank'); }
+  }
+}
