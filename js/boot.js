@@ -112,6 +112,31 @@ function switchInstallTab(platform){
 /* ── Month Navigation ──────────────────────────────────────── */
 function changeMonth(dir){ MONTH_OFFSET += dir; renderFundPage(); }
 
+/* ── Debt Alert ────────────────────────────────────────────── */
+function checkDebtAlert(){
+  try{
+    var shown = sessionStorage.getItem('sn19_debt_shown');
+    if(shown) return;
+    if(!DB.approvedReceipts || Object.keys(DB.approvedReceipts).length===0) return;
+    var unit = DB.user.unit;
+    var now  = new Date();
+    var debtMonths = [];
+    for(var i=1;i<=6;i++){
+      var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      var mk = monthKey(d);
+      var unitKey = unit+'-'+mk;
+      var approved = !!DB.approvedReceipts[unitKey];
+      var pending  = DB.pendingPayments.some(function(p){ return p.unit===unit && p.monthKey===mk; });
+      if(!approved && !pending){ debtMonths.push(fmtMonth(d)); }
+    }
+    if(debtMonths.length===0) return;
+    sessionStorage.setItem('sn19_debt_shown','1');
+    var wrap = document.getElementById('debt-months-wrap');
+    if(wrap){ wrap.innerHTML = debtMonths.map(function(m){ return '<span class="debt-month-tag">'+m+'</span>'; }).join(''); }
+    setTimeout(function(){ var ov = document.getElementById('debt-overlay'); if(ov) ov.classList.add('open'); }, 1500);
+  } catch(e){}
+}
+
 /* ── Boot Sequence ─────────────────────────────────────────── */
 window.addEventListener('load', function(){
   loadDB();
