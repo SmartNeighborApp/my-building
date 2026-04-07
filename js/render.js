@@ -527,11 +527,15 @@ function renderMaintItem(m, showAdmin){
         remainStr = 'נעלם בעוד '+hLeft+'ש\' '+mLeft+'ד\'';
       }
     }
+    var photosHtml = '';
+    if(m.photo_url) photosHtml += '<img src="'+m.photo_url+'" style="width:100%;border-radius:10px;margin-top:8px;max-height:160px;object-fit:cover;" alt="תמונת לפני">';
+    if(m.photo_after_url) photosHtml += '<div style="font-size:11px;font-weight:700;color:#16A34A;margin-top:6px;">✅ תמונת אחרי:</div><img src="'+m.photo_after_url+'" style="width:100%;border-radius:10px;margin-top:4px;max-height:160px;object-fit:cover;" alt="תמונת אחרי">';
     return '<div class="maint-item done-item">'+
       '<div class="mi-icon">✅</div>'+
       '<div class="mi-body">'+
         '<div class="mi-title">'+escHtml(m.title)+'</div>'+
         '<div class="mi-sub">📍 '+escHtml(m.loc)+' · '+escHtml(m.desc)+'</div>'+
+        photosHtml+
         '<div class="mi-meta">'+
           '<span class="done-badge">✔ בוצע</span>'+
           '<span class="done-time-pill">🕒 '+doneDateStr+'</span>'+
@@ -549,11 +553,14 @@ function renderMaintItem(m, showAdmin){
     : '<option value="open"  '+(m.status==='open'  ?'selected':'')+'>פתוח</option>'+
       '<option value="inprog"'+(m.status==='inprog'?'selected':'')+'>בטיפול</option>';
 
+  var openPhotosHtml = '';
+  if(m.photo_url) openPhotosHtml += '<img src="'+m.photo_url+'" style="width:100%;border-radius:10px;margin-top:8px;max-height:160px;object-fit:cover;" alt="תמונת לפני">';
   return '<div class="maint-item">'+
     '<div class="mi-icon">🔧</div>'+
     '<div class="mi-body">'+
       '<div class="mi-title">'+escHtml(m.title)+'</div>'+
       '<div class="mi-sub">📍 '+escHtml(m.loc)+' · '+escHtml(m.desc)+'</div>'+
+      openPhotosHtml+
       '<div class="mi-meta">'+
         '<span class="'+priClass+'">'+priTxt+'</span>'+
         '<select class="st-sel" onchange="updateMaintStatus(\''+m.id+'\',this.value)">'+stOpts+'</select>'+
