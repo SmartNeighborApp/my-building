@@ -61,7 +61,7 @@ function switchTab(tab){
   });
   document.querySelector('.page-scroll').scrollTop=0;
   if(tab==='professionals') renderProfessionalsPage();
-  if(tab==='settings') loadPersonalSettings();
+  if(tab==='settings'){ loadPersonalSettings(); renderMyReceipts(); }
 }
 
 function updateNavDot(){
