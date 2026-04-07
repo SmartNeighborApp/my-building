@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   settings.js — שכנות טובה · SmartNeighbor
-   הגדרות מנהל + PIN + תקציב + מסמכים + ייצוא
-   תלוי ב: config.js, utils.js, db.js
-═══════════════════════════════════════════════════════════════ */
+/* settings.js — שכנות טובה */
 function pinNext(el, nextIdx){
   if(el.value.length===1){
     var next = document.getElementById('pin'+nextIdx);
@@ -601,6 +597,105 @@ function exportAnnualPDF(){
 /* ═══════════════════════════════════════════════════════════════
    SYNC: JSON EXPORT / IMPORT
 ═══════════════════════════════════════════════════════════════ */
+function exportSyncJSON(){
+  try{
+    // גרסה 2 — כולל DB מלא (הגדרות, הוצאות, adminPin, הגדרות תשלום)
+    // הערה: notices/faults/posts/professionals/payments נשמרים בסופרבייס ולא בקובץ זה
+    var syncPayload = {
+      _version: 2,
+      _exportedAt: new Date().toISOString(),
+      _building: DB.building.name,
+      db: DB,
+      residents: {}
+    };
+    // איסוף כל רישומי הדיירים מ-localStorage
+    for(var i=0; i<localStorage.length; i++){
+      var k = localStorage.key(i);
+      if(k && k.indexOf('sn21_residents_')===0){
+        try{ syncPayload.residents[k] = JSON.parse(localStorage.getItem(k)); } catch(e){}
+      }
+    }
+    var json = JSON.stringify(syncPayload, null, 2);
+    var bl   = new Blob([json],{type:'application/json;charset=utf-8;'});
+    var url  = URL.createObjectURL(bl);
+    var a    = document.createElement('a');
+    var dateStr = new Date().toISOString().slice(0,10);
+    a.href     = url;
+    a.download = 'smartneighbor-sync-'+dateStr+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    _showSyncStatus('✅ הקובץ יוצא בהצלחה! שלח אותו למכשיר השני.', 'success');
+  } catch(e){
+    _showSyncStatus('❌ שגיאה בייצוא: '+e.message, 'error');
+  }
+}
+
+function importSyncJSON(event){
+  var file = event.target.files && event.target.files[0];
+  if(!file){ return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var payload = JSON.parse(e.target.result);
+      // בדיקת מבנה — תומך גם בגרסה 1 (ישנה) וגם בגרסה 2 (עדכנית)
+      if(!payload._version || !payload.db || !payload.db.building){
+        _showSyncStatus('❌ קובץ לא תקין — ודא שזה קובץ סנכרון של SmartNeighbor', 'error');
+        return;
+      }
+      if(!confirm('ייבוא נתונים מ"'+payload._building+'" (יוצא ב-'+payload._exportedAt.slice(0,10)+').\nהנתונים הנוכחיים יוחלפו. להמשיך?')){
+        event.target.value='';
+        return;
+      }
+      // ייבוא DB — שמירה תחת מפתח sn22_db הנוכחי
+      localStorage.setItem(DB_KEY, JSON.stringify(payload.db));
+      // ייבוא רישומי דיירים
+      if(payload.residents){
+        Object.keys(payload.residents).forEach(function(k){
+          try{ localStorage.setItem(k, JSON.stringify(payload.residents[k])); } catch(ex){}
+        });
+      }
+      // ניקוי session — המשתמש יתחבר מחדש
+      try{ localStorage.removeItem(SESS_KEY); } catch(ex){}
+      _showSyncStatus('✅ ייבוא הצליח! הדף יטען מחדש...', 'success');
+      setTimeout(function(){ location.reload(); }, 1800);
+    } catch(ex){
+      _showSyncStatus('❌ שגיאה בקריאת הקובץ: '+ex.message, 'error');
+    }
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function _showSyncStatus(msg, type){
+  var el = document.getElementById('sync-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type==='success' ? '#DCFCE7' : '#FEE2E2';
+  el.style.color      = type==='success' ? '#166534' : '#DC2626';
+  el.style.border     = type==='success' ? '1px solid #86EFAC' : '1px solid #FECACA';
+  setTimeout(function(){ el.style.display='none'; }, 5000);
+}
+
+function copyField(id){
+function copyField(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  try{ navigator.clipboard.writeText(el.textContent||el.value); } catch(e){}
+  showToast('הועתק ✅');
+}
+
+function copyAllBank(){
+  var ps = DB.paySettings;
+  var txt = 'בנק: '+ps.bankName+'\nסניף: '+ps.bankBranch+'\nחשבון: '+ps.bankAccount+'\nשם: '+ps.bankOwner;
+  try{ navigator.clipboard.writeText(txt); } catch(e){}
+  showToast('פרטי בנק הועתקו ✅');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHEETS
+═══════════════════════════════════════════════════════════════ */
+function openNoticeSheet(type){
 function renderResidentsList(){
   var el = document.getElementById('residents-list-admin');
   if(!el) return;
@@ -643,37 +738,3 @@ function saveResidentEntry(){
   renderResidentsList();
   renderAdminCollBoard();
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   V21: INSTALL TAB SWITCH
-═══════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════
-   בעלי מקצוע — PROFESSIONALS MODULE
-═══════════════════════════════════════════════════════════════ */
-var PROF_CATS = ['הכל','אינסטלטור','חשמלאי','מנעולן','מעליות','גינון','ניקיון','צבע','מזגנים','שיפוצניק','עו"ד','רו"ח','מאפרת','מעצב/ת פנים','צלם/ת','מטפל/ת','מדריך/ה','אחר'];
-var PROF_ICONS = {
-  'אינסטלטור':'🚿','חשמלאי':'⚡','מנעולן':'🔑','מעליות':'🛗',
-  'גינון':'🌿','ניקיון':'🧹','צבע':'🖌️','מזגנים':'❄️','שיפוצניק':'🏗️',
-  'עו"ד':'⚖️','רו"ח':'📊','מאפרת':'💄','מעצב/ת פנים':'🎨','צלם/ת':'📷','מטפל/ת':'🌿','מדריך/ה':'🏋️','אחר':'📋'
-};
-var _profEditId = null;
-var _profFilterCat = 'הכל';
-var _profSearchTerm = '';
-function copyField(id){
-  var el = document.getElementById(id);
-  if(!el) return;
-  try{ navigator.clipboard.writeText(el.textContent||el.value); } catch(e){}
-  showToast('הועתק ✅');
-}
-
-function copyAllBank(){
-  var ps = DB.paySettings;
-  var txt = 'בנק: '+ps.bankName+'\nסניף: '+ps.bankBranch+'\nחשבון: '+ps.bankAccount+'\nשם: '+ps.bankOwner;
-  try{ navigator.clipboard.writeText(txt); } catch(e){}
-  showToast('פרטי בנק הועתקו ✅');
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SHEETS
-═══════════════════════════════════════════════════════════════ */
-function openNoticeSheet(type){
