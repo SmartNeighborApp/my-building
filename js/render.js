@@ -22,7 +22,7 @@ function renderHeader(){
   setText('hdr-bldg-sub',  cityDisplay + (cityDisplay ? ' · ' : '') + b.total_units+' דיירים');
   setText('hdr-name',      u.name.split(' ')[0]);
   setText('hdr-greeting',  'דירה '+u.unit);
-  setText('hdr-balance',   num(DB.finance.balance));
+  setText('hdr-balance',   num(_calcBalance()));
   setText('bldg-sett-sub', supabaseName || b.name);
   setText('sl-user',       '👤 '+u.name);
   setText('user-sett-sub', 'דירה '+u.unit);
@@ -31,6 +31,45 @@ function renderHeader(){
 /* ═══════════════════════════════════════════════════════════════
    HOME PAGE
 ═══════════════════════════════════════════════════════════════ */
+
+function _calcBalance(){
+  // הכנסות — כל התשלומים המאושרים
+  var totalIncome = 0;
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){
+    var r = DB.approvedReceipts[k];
+    if(r) totalIncome += parseFloat(r.amount)||0;
+  });
+  // הוצאות — יחסיות לזמן
+  // מוצאים את החודש הראשון שיש בו תשלום מאושר
+  var now = new Date();
+  var earliestMk = null;
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){
+    var mk = k.slice(k.indexOf('-')+1);
+    if(!earliestMk || mk < earliestMk) earliestMk = mk;
+  });
+  var monthsActive = 1;
+  if(earliestMk){
+    var parts = earliestMk.split('-');
+    var startYear = parseInt(parts[0])||now.getFullYear();
+    var startMonth = parseInt(parts[1])||1;
+    monthsActive = (now.getFullYear()-startYear)*12 + (now.getMonth()+1-startMonth) + 1;
+    if(monthsActive < 1) monthsActive = 1;
+  }
+  var MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  var totalExpenses = 0;
+  (DB.finance.expenses||[]).forEach(function(e){
+    var amt = parseFloat(e.amount)||0;
+    if(e.expType==='קבועה'){
+      totalExpenses += amt * monthsActive;
+    } else {
+      // חד פעמית — רק אם החודש שלה כבר עבר או החודש הנוכחי
+      var eMonth = MONTHS_HE.indexOf(e.month);
+      if(eMonth !== -1 && eMonth <= now.getMonth()) totalExpenses += amt;
+      else if(!e.month) totalExpenses += amt;
+    }
+  });
+  return totalIncome - totalExpenses;
+}
 
 function _calcMonthIncome(mk){
   var total = 0;
@@ -46,7 +85,8 @@ function renderHomePage(){
   var tgt = getTargetDate();
   var mk  = monthKey(tgt);
   var monthIncome = _calcMonthIncome(mk);
-  setText('donut-home-num', '₪'+num(DB.finance.balance));
+  var balance = _calcBalance();
+  setText('donut-home-num', '₪'+num(balance));
   setText('income-lbl',     '₪'+num(monthIncome));
   var unit= DB.user.unit;
   var tot = DB.building.total_units;
@@ -92,7 +132,7 @@ function renderFundPage(){
   setText('fund-month-lbl',   lbl);
   setText('fund-month-badge', fmtMonth(tgt));
   var fundIncome = _calcMonthIncome(mk);
-  setText('fund-bal-val',     '₪'+num(DB.finance.balance));
+  setText('fund-bal-val',     '₪'+num(_calcBalance()));
   setText('fund-income-val',  '₪'+num(fundIncome));
 
   // resident summary
