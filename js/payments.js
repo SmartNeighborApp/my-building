@@ -549,7 +549,7 @@ function renderMyReceipts(){
   var html = '';
   receipts.forEach(function(r){
     var rid = escAttr(r.id||r.monthLabel||'');
-    html += '<div onclick="openReceiptById('' + rid + '')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F1F5F9;cursor:pointer;">'+
+    html += '<div onclick="openReceiptById(\'' + rid + '\')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F1F5F9;cursor:pointer;">'+
       '<div>'+
         '<div style="font-size:14px;font-weight:800;color:var(--navy);">'+escHtml(r.monthLabel||'')+'</div>'+
         '<div style="font-size:12px;color:var(--slate);">'+escHtml(r.methodLabel||'')+(r.approvedDate?' · '+escHtml(r.approvedDate):'')+'</div>'+
