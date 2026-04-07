@@ -79,8 +79,13 @@ function renderFundPage(){
   var lbl = isCur ? 'חודש נוכחי' : (MONTH_OFFSET<0?'חודש קודם':'חודש עתידי');
   setText('fund-month-lbl',   lbl);
   setText('fund-month-badge', fmtMonth(tgt));
-  setText('fund-bal-val',     '₪'+num(DB.finance.balance));
-  setText('fund-income-val',  '₪'+num(DB.finance.income));
+  // חישוב הכנסות מתשלומים מאושרים לחודש הנוכחי
+  var monthIncome = 0;
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r && r.monthKey===mk) monthIncome += parseFloat(r.amount)||0; });
+  var totalExpenses = (DB.finance.expenses||[]).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0);
+  var balance = monthIncome - totalExpenses;
+  setText('fund-bal-val',     '₪'+num(balance));
+  setText('fund-income-val',  '₪'+num(monthIncome));
 
   // resident summary
   var unit = DB.user.unit;
@@ -166,7 +171,17 @@ function updateMyPill(mk, unit){
 function renderCollDots(mk){
   var el = document.getElementById('coll-dots-public');
   if(!el) return;
-  el.innerHTML = '';
+  var tot = DB.building.total_units;
+  var html = '';
+  for(var i=1;i<=tot;i++){
+    var unitKey = i+'-'+mk;
+    var cls = 'unit-dot';
+    if(DB.approvedReceipts[unitKey]) cls+=' paid';
+    else if(DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; })) cls+=' pending';
+    else cls+=' unpaid';
+    html += '<div class="'+cls+'" title="דירה '+i+'">'+i+'</div>';
+  }
+  el.innerHTML = html;
 }
 
 function countPaid(mk){
@@ -183,16 +198,21 @@ function renderPayHistory(unit){
   if(!el) return;
   var now = new Date();
   var html = '';
+  var fee = DB.building.monthly_fee || 0;
   for(var i=-5;i<=6;i++){
     var d = new Date(now.getFullYear(), now.getMonth()+i, 1);
     var mk = monthKey(d);
     var unitKey = unit+'-'+mk;
-    var paid = !!DB.approvedReceipts[unitKey];
+    var rec = DB.approvedReceipts[unitKey];
+    var paid = !!rec;
     var pending = DB.pendingPayments.some(function(p){ return p.unit===unit && p.monthKey===mk; });
-    var cls = paid ? 'pay-cell paid' : (pending ? 'pay-cell' : 'pay-cell unpaid');
-    var icon = paid ? '✅' : (pending ? '⏳' : '');
+    var paidAmt = paid ? (parseFloat(rec.amount)||0) : 0;
+    var isPartial = paid && fee>0 && paidAmt < fee;
     var shortMo = HE_MONTHS[d.getMonth()].slice(0,3);
-    html += '<div class="'+cls+'"><span class="pay-mo">'+shortMo+'</span><span class="pay-icon">'+icon+'</span></div>';
+    var icon = paid ? (isPartial?'':'✅') : (pending?'⏳':'');
+    var cls = paid ? (isPartial?'pay-cell partial':'pay-cell paid') : (pending?'pay-cell':'pay-cell unpaid');
+    var partialStyle = isPartial ? ' style="background:linear-gradient(to right,#bbf7d0 '+Math.round(paidAmt/fee*100)+'%,#fecaca '+Math.round(paidAmt/fee*100)+'%)"' : '';
+    html += '<div class="'+cls+'"'+partialStyle+'><span class="pay-mo">'+shortMo+'</span><span class="pay-icon">'+icon+'</span>'+(isPartial?'<span style="font-size:9px;color:#dc2626;">'+paidAmt+'/'+fee+'</span>':'')+'</div>';
   }
   el.innerHTML = html;
 }
