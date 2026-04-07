@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   professionals.js — שכנות טובה · SmartNeighbor
-   ספקים + דירוגים + הסכמים
-   תלוי ב: config.js, utils.js, db.js
-═══════════════════════════════════════════════════════════════ */
+/* professionals.js — שכנות טובה · SmartNeighbor */
 function setProfSearch(q){ _profSearchTerm=(q||'').trim().toLowerCase(); renderProfessionalsPage(); }
 
 function renderProfessionalsPage(){
@@ -229,4 +225,3 @@ function rateProfessional(id, stars){
   });
 }
 
-function switchInstallTab(platform){
