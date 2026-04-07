@@ -65,12 +65,7 @@ function saveBuildingConfig(){
   saveDB();
   // שמירת monthly_fee ב-Supabase
   var slug = _getBuildingSlug();
-  if(slug && fe > 0){
-    sbClient.from('buildings').update({monthly_fee:fe}).eq('unique_slug',slug).then(function(res){
-      if(res.error) showToast('⚠️ שגיאה בשמירת דמי ועד: '+res.error.message);
-      else showToast('✅ דמי ועד נשמרו: ₪'+fe);
-    });
-  } else { showToast('⚠️ slug='+slug+' fee='+fe); }
+  if(slug && fe > 0){ sbClient.from('buildings').update({monthly_fee:fe,units_count:un}).eq('unique_slug',slug).then(function(res){ if(res.error) showToast('⚠️ שגיאת Supabase: '+res.error.message); else showToast('✅ נשמר: ₪'+fe+' | '+un+' דירות'); }); } else { showToast('⚠️ slug='+slug+' fee='+fe); }
   updateCfgLive();
   renderHeader();
   showToast('הגדרות בניין עודכנו ✅');
