@@ -63,6 +63,9 @@ function saveBuildingConfig(){
   DB.building.total_units = un;
   DB.building.monthly_fee = fe;
   saveDB();
+  // שמירת monthly_fee ב-Supabase
+  var slug = _getBuildingSlug();
+  if(slug && fe > 0) sbClient.from('buildings').update({monthly_fee:fe}).eq('unique_slug',slug).then(function(){});
   updateCfgLive();
   renderHeader();
   showToast('הגדרות בניין עודכנו ✅');
@@ -777,7 +780,8 @@ function renderCollectionCenter(){
   var sel = document.getElementById('cc-month-sel');
   if(!sel) return;
   var mk  = sel.value || monthKey(new Date());
-  var fee = DB.building.monthly_fee || 0;
+  var feeEl = document.getElementById('admin-fee');
+  var fee = DB.building.monthly_fee || (feeEl ? parseInt(feeEl.value)||0 : 0);
   var tot = DB.building.total_units || 0;
   var slug = _getBuildingSlug();
 
