@@ -2244,6 +2244,12 @@ a{text-decoration:none;color:inherit;}
         </select>
       </div>
     </div>
+      <div>
+        <label class="field-label">📸 צילום התקלה <span style="font-weight:400;color:#94A3B8;font-size:11px;">(רשות)</span></label>
+        <input type="file" id="fault-photo" accept="image/*" capture="environment" style="display:none;" onchange="previewFaultPhoto(this)">
+        <button type="button" onclick="document.getElementById('fault-photo').click()" style="width:100%;padding:10px;background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:12px;font-size:13px;font-weight:700;color:#475569;cursor:pointer;font-family:var(--font);">📷 צלם / בחר תמונה</button>
+        <img id="fault-photo-preview" src="" alt="" style="display:none;width:100%;border-radius:12px;margin-top:8px;max-height:180px;object-fit:cover;">
+      </div>
     <div id="fault-err" class="err-msg"></div>
     <div class="sheet-2col">
       <button class="btn-cancel" id="fault-cancel-btn" onclick="closeSheet('fault')">ביטול</button>
