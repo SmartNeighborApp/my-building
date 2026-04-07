@@ -321,6 +321,16 @@ function closePinLoginModal(){ document.getElementById('pin-login-modal').classL
 function selectPinResident(idx){ _pinSelectedIdx=idx; document.querySelectorAll('.pmrs-btn').forEach(function(b,i){ b.className='pmrs-btn'+(i===idx?' active':''); }); for(var i=0;i<4;i++){ var b=document.getElementById('pml'+i); if(b) b.value=''; } var errEl=document.getElementById('pin-login-err'); if(errEl) errEl.style.display='none'; setTimeout(function(){ var b=document.getElementById('pml0'); if(b) b.focus(); },50); }
 function pinModalNext(idx){ var cur=document.getElementById('pml'+idx); if(cur&&cur.value.length===1){ if(idx<3){ var next=document.getElementById('pml'+(idx+1)); if(next) next.focus(); } else { submitPinLogin(); } } }
 
+function _loginAs(unit, resident){
+  var name = resident.name || DB.unitNames[unit] || 'דייר '+unit;
+  DB.user = { name: name, unit: unit };
+  saveDB();
+  try{ localStorage.setItem(SESS_KEY, JSON.stringify({unit:unit, name:name, ts:Date.now()})); } catch(e){}
+  document.getElementById('auth-screen').style.display='none';
+  startApp();
+  if(!resident.pin){ setTimeout(function(){ openSetPinModal(); }, 600); }
+}
+
 function submitPinLogin(){
   var pin='';
   for(var i=0;i<4;i++){ var b=document.getElementById('pml'+i); if(b) pin+=b.value; }
