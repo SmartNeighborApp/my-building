@@ -823,16 +823,28 @@ function renderCollectionCenter(){
   var tEl = document.getElementById('cc-table');
   if(tEl) tEl.innerHTML = thtml;
 
-  // רשימת חייבים לתזכורת
-  var debtors = rows.filter(function(r){ return r.status!=='paid' && r.phone!=='—'; });
+  // רשימת חייבים לתזכורת — כולל מי שאין לו טלפון
+  var allDebtors = rows.filter(function(r){ return r.status!=='paid'; });
+  var debtorsWithPhone = allDebtors.filter(function(r){ return r.phone!=='—'; });
   var rEl = document.getElementById('cc-reminders-list');
   if(rEl){
-    if(!debtors.length){ rEl.innerHTML='<div style="color:var(--green);font-weight:700;">✅ כל הדיירים שילמו!</div>'; }
-    else { rEl.innerHTML = debtors.map(function(r){ return '<div style="padding:4px 0;border-bottom:1px solid #F1F5F9;">'+escHtml(r.name)+' (דירה '+r.unit+') — חוב: ₪'+num(r.debt)+'</div>'; }).join(''); }
+    if(!allDebtors.length){ rEl.innerHTML='<div style="color:var(--green);font-weight:700;">✅ כל הדיירים שילמו!</div>'; }
+    else {
+      rEl.innerHTML = allDebtors.map(function(r){
+        var hasPhone = r.phone!=='—';
+        var phoneWarn = hasPhone ? '' : ' <span style="color:var(--orange);font-size:10px;font-weight:700;">⚠️ חסר טלפון</span>';
+        return '<div style="padding:6px 0;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center;">'+
+          '<span>'+escHtml(r.name)+' (דירה '+r.unit+')'+phoneWarn+'</span>'+
+          '<span style="color:var(--rose);font-weight:800;">₪'+num(r.debt)+'</span></div>';
+      }).join('');
+      if(debtorsWithPhone.length < allDebtors.length){
+        rEl.innerHTML += '<div style="font-size:11px;color:var(--orange);margin-top:6px;font-weight:700;">⚠️ '+(allDebtors.length-debtorsWithPhone.length)+' דיירים ללא טלפון — לא יקבלו תזכורת</div>';
+      }
+    }
   }
   var btn = document.getElementById('cc-send-all-btn');
-  if(btn) btn.style.display = debtors.length ? 'block' : 'none';
-  window._ccDebtors = debtors;
+  if(btn) btn.style.display = debtorsWithPhone.length ? 'block' : 'none';
+  window._ccDebtors = debtorsWithPhone;
   window._ccMonthKey = mk;
 }
 
