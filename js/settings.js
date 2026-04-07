@@ -698,6 +698,24 @@ function copyAllBank(){
 function renderResidentsList(){
   var el = document.getElementById('residents-list-admin');
   if(!el) return;
+  var slug = _getBuildingSlug();
+  // שליפת נתוני דיירים מסופרבייס כולל טלפון
+  if(slug){
+    sbClient.from('residents').select('unit,name,phone').eq('building_slug',slug).then(function(res){
+      if(!res.error && res.data){
+        res.data.forEach(function(r){
+          if(r.name) DB.unitNames[r.unit] = r.name;
+          if(r.phone){ if(!DB.residentPhones) DB.residentPhones={}; DB.residentPhones[r.unit] = r.phone; }
+        });
+      }
+      _doRenderResidentsList();
+    }).catch(function(){ _doRenderResidentsList(); });
+  } else { _doRenderResidentsList(); }
+}
+
+function _doRenderResidentsList(){
+  var el = document.getElementById('residents-list-admin');
+  if(!el) return;
   var mk = monthKey(getTargetDate());
   var tot = DB.building.total_units;
   var html = '';
