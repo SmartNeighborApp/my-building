@@ -70,17 +70,71 @@ function approvePayment(idx){
   var p = DB.pendingPayments[idx];
   if(!p || !p.id) return;
   var approvedDate = fmtDate(new Date());
-  var approvedBy   = DB.unitNames[DB.user.unit] || ('ועד בית');
+  var approvedBy   = DB.unitNames[DB.user.unit] || 'ועד בית';
+  var slug         = _getBuildingSlug();
+  var fee          = DB.building.monthly_fee || 0;
+  var totalAmount  = parseFloat(p.amount) || fee;
+
+  // חישוב חודשים מכוסים אוטומטית מהישן לחדש
+  var months = _calcCoveredMonths(p.unit, totalAmount, fee);
+  var monthLabels = months.map(function(m){ return m.label; }).join(' + ');
+
+  // עדכון הרשומה הקיימת ל-approved + פירוט חודשים
   sbClient.from('payments').update({
     status:        'approved',
     approved_date: approvedDate,
-    approved_by:   approvedBy
+    approved_by:   approvedBy,
+    month_label:   monthLabels,
+    note:          (p.note||'')+(months.length>1?' | חודשים: '+monthLabels:'')
   }).eq('id', p.id).then(function(res){
     if(res.error){ showToast('שגיאה באישור: '+res.error.message); return; }
-    showToast('תשלום אושר ✅');
-    triggerWATray(p.unit, p.monthKey);
-    loadPaymentsFromSupabase(function(){ renderAll(); });
+
+    // אם יש יותר מחודש אחד — צור רשומות נוספות לכל חודש
+    if(months.length > 1){
+      var extraInserts = months.slice(1).map(function(m){
+        return sbClient.from('payments').insert([{
+          building_slug: slug, unit:p.unit, month_key:m.key,
+          status:'approved', amount:String(m.amount),
+          method:p.method||'', method_label:p.methodLabel||'',
+          month_label:m.label, approved_date:approvedDate, approved_by:approvedBy
+        }]);
+      });
+      Promise.all(extraInserts).then(function(){
+        showToast('תשלום אושר ✅ ('+months.length+' חודשים)');
+        triggerWATray(p.unit, p.monthKey);
+        loadPaymentsFromSupabase(function(){ renderAll(); });
+      });
+    } else {
+      showToast('תשלום אושר ✅');
+      triggerWATray(p.unit, p.monthKey);
+      loadPaymentsFromSupabase(function(){ renderAll(); });
+    }
   });
+}
+
+function _calcCoveredMonths(unit, totalAmount, fee){
+  // מוצא חודשים שלא שולמו מהישן לחדש (עד 12 חודשים אחורה)
+  var months = [];
+  var remaining = totalAmount;
+  var now = new Date();
+  for(var i=12; i>=0 && remaining>0; i--){
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var mk = monthKey(d);
+    var unitKey = unit+'-'+mk;
+    var alreadyPaid = !!DB.approvedReceipts[unitKey];
+    var isPending = DB.pendingPayments.some(function(pp){ return pp.unit===unit && pp.monthKey===mk; });
+    if(!alreadyPaid && !isPending){
+      var covered = Math.min(remaining, fee);
+      months.push({ key:mk, label:fmtMonth(d), amount:covered });
+      remaining -= covered;
+    }
+  }
+  if(!months.length){
+    // אם כל החודשים שולמו — הוסף לחודש הנוכחי
+    var d0 = new Date(now.getFullYear(), now.getMonth(), 1);
+    months.push({ key:monthKey(d0), label:fmtMonth(d0), amount:totalAmount });
+  }
+  return months;
 }
 
 function quickApprove(unit){
@@ -207,18 +261,13 @@ function resetPay(){
 
 function confirmPay(){
   if(!_payMethod){ showToast('בחר שיטת תשלום'); return; }
-  var mk   = monthKey(getTargetDate());
   var unit = DB.user.unit;
-  var amount = DB.building.monthly_fee;
-
+  var fee  = DB.building.monthly_fee || 0;
   var methodLabels={bit:'ביט',paybox:'פייבוקס',bank:'העברה בנקאית',cash:'מזומן',check:'שיק'};
   var mLbl = methodLabels[_payMethod]||_payMethod;
-
-  if(_payMethod==='cash'||_payMethod==='check'){
-    var amtEl = document.getElementById('opf-amount');
-    var parsed = amtEl ? parseFloat(amtEl.value) : NaN;
-    if(!isNaN(parsed) && parsed>0) amount = parsed;
-  }
+  var amtEl = document.getElementById('opf-amount');
+  var amount = amtEl ? parseFloat(amtEl.value)||fee : fee;
+  var mk = monthKey(getTargetDate());
 
   // check if already pending
     // בדיקה אם כבר קיים pending — מהנתונים שנטענו מסופרבייס
@@ -317,25 +366,32 @@ function closeWATray(){
    RECEIPT MODAL
 ═══════════════════════════════════════════════════════════════ */
 function showMyReceipt(){
-  var unit   = DB.user.unit;
-  var mk     = monthKey(getTargetDate());
-  var unitKey= unit+'-'+mk;
-  var rec    = DB.approvedReceipts[unitKey];
-  if(!rec){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
+  var unit = DB.user.unit;
+  // מוצא את כל הקבלות של הדייר
+  var allRecs = [];
+  Object.keys(DB.approvedReceipts).forEach(function(k){
+    var r = DB.approvedReceipts[k];
+    if(Number(r.unit)===Number(unit)) allRecs.push(r);
+  });
+  if(!allRecs.length){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
+  // מיון לפי חודש — חדש ראשון
+  allRecs.sort(function(a,b){ return (b.monthLabel||'').localeCompare(a.monthLabel||''); });
+  var rec = allRecs[0]; // הקבלה האחרונה
+  var mk  = rec.monthLabel||fmtMonth(getTargetDate());
+  var receiptNum = (new Date().getFullYear())+''+String(new Date().getMonth()+1).padStart(2,'0')+'-'+unit;
+  var totalAmount = allRecs.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); }, 0);
+  var monthsList  = allRecs.map(function(r){ return r.monthLabel||''; }).filter(Boolean).join(' + ');
 
-  // מספר קבלה אוטומטי: YYYYMM-UNIT
-  var receiptNum = mk.replace('-','') + '-' + unit;
-
-  setText('receipt-cat-name',   DB.building.name||'הבניין');
-  setText('receipt-num-ph',     receiptNum);
-  setText('receipt-date-ph',    fmtDate(new Date()));
-  setText('receipt-supplier-ph',rec.name||('דירה '+unit));
-  setText('receipt-unit-ph',   'דירה '+rec.unit);
-  setText('receipt-month-ph',   rec.monthLabel||fmtMonth(getTargetDate()));
-  setText('receipt-method-ph',  rec.methodLabel||'—');
-  setText('receipt-amount-ph',  '₪'+num(rec.amount));
-  setText('receipt-bldg-ph',    DB.building.name||'—');
-  setText('receipt-addr-ph',    (DB.building.address||'')+' '+(DB.building.city||''));
+  setText('receipt-cat-name',    DB.building.name||'הבניין');
+  setText('receipt-num-ph',      receiptNum);
+  setText('receipt-date-ph',     fmtDate(new Date()));
+  setText('receipt-supplier-ph', DB.unitNames[unit]||('דירה '+unit));
+  setText('receipt-unit-ph',    'דירה '+unit);
+  setText('receipt-month-ph',    monthsList||mk);
+  setText('receipt-method-ph',   rec.methodLabel||'—');
+  setText('receipt-amount-ph',   '₪'+num(totalAmount));
+  setText('receipt-bldg-ph',     DB.building.name||'—');
+  setText('receipt-addr-ph',     (DB.building.address||'')+' '+(DB.building.city||''));
 
   var ov = document.getElementById('receipt-modal');
   if(ov) ov.style.display='flex';
