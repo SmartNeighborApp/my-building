@@ -580,3 +580,83 @@ function _openReceipt(i){
   w.document.write('</body></html>');
   w.document.close();
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RECEIPTS MODALS — קבלות דייר ומנהל
+═══════════════════════════════════════════════════════════════ */
+function openReceiptsModal(){
+  var el = document.getElementById('receipts-modal-list');
+  if(!el) return;
+  var unit = DB.user ? DB.user.unit : 0;
+  var receipts = [];
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===Number(unit)) receipts.push(r); });
+  receipts.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
+  if(!receipts.length){ el.innerHTML='<div style="text-align:center;color:var(--slate);padding:40px 0;">אין קבלות עדיין</div>'; }
+  else {
+    el.innerHTML = receipts.map(function(r,i){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F1F5F9;">'+
+        '<div><div style="font-size:14px;font-weight:800;color:var(--navy);">'+escHtml(r.monthLabel||'')+'</div>'+
+        '<div style="font-size:11px;color:var(--slate);">'+(r.approvedDate||'')+(r.methodLabel?' · '+escHtml(r.methodLabel):'')+'</div></div>'+
+        '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<span style="font-size:15px;font-weight:900;color:var(--green);">₪'+num(r.amount)+'</span>'+
+        '<button onclick="_openReceipt('+i+')" style="padding:5px 10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;">הדפס</button>'+
+        '</div></div>';
+    }).join('');
+    window._myReceipts = receipts;
+  }
+  var modal = document.getElementById('receipts-modal');
+  if(modal) modal.style.display='block';
+}
+
+function closeReceiptsModal(){
+  var modal = document.getElementById('receipts-modal');
+  if(modal) modal.style.display='none';
+}
+
+function openAdminReceiptsModal(){
+  var el = document.getElementById('admin-receipts-list');
+  if(!el) return;
+  var all = [];
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r) all.push(r); });
+  all.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
+  if(!all.length){ el.innerHTML='<div style="text-align:center;color:var(--slate);padding:40px 0;">אין קבלות</div>'; }
+  else {
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="background:#F8FAFC;"><th style="padding:8px 6px;text-align:right;font-weight:800;">תאריך</th><th style="padding:8px 6px;text-align:right;font-weight:800;">דירה</th><th style="padding:8px 6px;text-align:right;font-weight:800;">חודש</th><th style="padding:8px 6px;text-align:right;font-weight:800;">סכום</th><th style="padding:8px 6px;text-align:right;font-weight:800;">אמצעי</th><th style="padding:8px 6px;"></th></tr>'+
+    all.map(function(r,i){
+      return '<tr style="border-bottom:1px solid #F1F5F9;">'+
+        '<td style="padding:8px 6px;">'+escHtml(r.approvedDate||'')+'</td>'+
+        '<td style="padding:8px 6px;font-weight:700;">'+escHtml(String(r.unit))+'</td>'+
+        '<td style="padding:8px 6px;">'+escHtml(r.monthLabel||'')+'</td>'+
+        '<td style="padding:8px 6px;color:var(--green);font-weight:800;">₪'+num(r.amount)+'</td>'+
+        '<td style="padding:8px 6px;">'+escHtml(r.methodLabel||'')+'</td>'+
+        '<td style="padding:8px 6px;"><button onclick="window._adminReceipts='+JSON.stringify(all)+';_openAdminReceipt('+i+')" style="padding:4px 8px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:10px;cursor:pointer;">הדפס</button></td></tr>';
+    }).join('')+'</table>';
+    window._adminReceipts = all;
+  }
+  var modal = document.getElementById('admin-receipts-modal');
+  if(modal) modal.style.display='block';
+}
+
+function _openAdminReceipt(i){
+  var all = window._adminReceipts || [];
+  var r = all[i];
+  if(!r) return;
+  var w = window.open('','_blank');
+  if(!w){ showToast('אפשר חלונות קופצים'); return; }
+  var rNum = String(r.approvedDate||'').replace(/[^0-9]/g,'')+'-'+r.unit;
+  w.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>קבלה</title>');
+  w.document.write('<style>body{font-family:Arial,sans-serif;padding:24px;direction:rtl;max-width:400px;margin:0 auto;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F1F5F9;}.lbl{font-size:12px;color:#64748B;}.val{font-size:12px;font-weight:700;color:#1A3A5C;}.total{font-size:20px;font-weight:900;color:#16A34A;}.print-btn{background:#1A3A5C;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer;width:100%;margin-bottom:16px;}@media print{.print-btn{display:none;}}</style></head><body>');
+  w.document.write('<button class="print-btn" onclick="window.print()">🖨️ הדפס / שמור PDF</button>');
+  w.document.write('<h2 style="color:#1A3A5C;">🧾 קבלה #'+rNum+'</h2>');
+  w.document.write('<div class="row"><span class="lbl">בניין</span><span class="val">'+(DB.building.name||'')+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">דירה</span><span class="val">'+r.unit+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">דייר</span><span class="val">'+(DB.unitNames[r.unit]||'דירה '+r.unit)+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">חודש תשלום</span><span class="val">'+(r.monthLabel||'')+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">אמצעי תשלום</span><span class="val">'+(r.methodLabel||'')+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">תאריך אישור</span><span class="val">'+(r.approvedDate||'')+'</span></div>');
+  w.document.write('<div class="row"><span class="lbl">אושר על ידי</span><span class="val">'+(r.approvedBy||'ועד הבית')+'</span></div>');
+  w.document.write('<div class="row" style="margin-top:16px;"><span class="lbl" style="font-size:14px;font-weight:800;">סכום ששולם</span><span class="total">₪'+num(r.amount)+'</span></div>');
+  w.document.write('<p style="font-size:11px;color:#94A3B8;text-align:center;margin-top:24px;">שכנות טובה · SmartNeighbor</p>');
+  w.document.write('</body></html>');
+  w.document.close();
+}
