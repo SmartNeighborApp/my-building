@@ -1,4 +1,9 @@
 /* professionals.js — שכנות טובה · SmartNeighbor */
+var _profEditId = null;
+var _profFilterCat = 'הכל';
+var _profSearchTerm = '';
+var _vaadOrderProfId = null;
+
 function setProfSearch(q){ _profSearchTerm=(q||'').trim().toLowerCase(); renderProfessionalsPage(); }
 
 function renderProfessionalsPage(){
