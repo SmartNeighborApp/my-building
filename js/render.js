@@ -36,7 +36,8 @@ function _calcMonthIncome(mk){
   var total = 0;
   Object.keys(DB.approvedReceipts||{}).forEach(function(k){
     var r = DB.approvedReceipts[k];
-    if(r && r.monthKey === mk) total += parseFloat(r.amount)||0;
+    var keyMk = k.indexOf('-') > -1 ? k.slice(k.indexOf('-')+1) : '';
+    if(r && keyMk === mk) total += parseFloat(r.amount)||0;
   });
   return total;
 }
