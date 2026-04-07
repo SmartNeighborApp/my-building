@@ -541,22 +541,22 @@ function exportAnnualPDF(){
   var html = '<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8">'+
   '<title>דוח שנתי '+year+' — '+escHtml(b.name||'')+'</title>'+
   '<style>'+
-    'body{font-family:Arial,sans-serif;font-size:13px;color:#1e293b;margin:0;padding:24px;direction:rtl;}'+
+    'body{font-family:Arial,sans-serif;font-size:15px;color:#0f172a;margin:0;padding:24px;direction:rtl;}'+
     'h1{font-size:22px;color:#1E40AF;margin-bottom:4px;}'+
-    '.subtitle{color:#64748B;font-size:13px;margin-bottom:24px;}'+
+    '.subtitle{color:#1e293b;font-size:14px;margin-bottom:24px;}'+
     '.summary{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;}'+
     '.sum-box{flex:1;min-width:140px;border-radius:10px;padding:14px 18px;background:#EFF6FF;}'+
     '.sum-box.green{background:#F0FDF4;}.sum-box.red{background:#FEF2F2;}.sum-box.orange{background:#FFFBEB;}'+
-    '.sum-label{font-size:11px;color:#64748B;margin-bottom:4px;}'+
+    '.sum-label{font-size:13px;color:#1e293b;margin-bottom:4px;}'+
     '.sum-val{font-size:20px;font-weight:bold;color:#1E40AF;}'+
     '.sum-box.green .sum-val{color:#16A34A;}.sum-box.red .sum-val{color:#DC2626;}.sum-box.orange .sum-val{color:#D97706;}'+
     'h2{font-size:15px;color:#1E40AF;border-bottom:2px solid #DBEAFE;padding-bottom:6px;margin-top:28px;}'+
     'table{width:100%;border-collapse:collapse;margin-bottom:16px;}'+
-    'th{background:#EFF6FF;color:#1E40AF;padding:8px 10px;text-align:right;font-size:12px;}'+
-    'td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:12px;}'+
+    'th{background:#DBEAFE;color:#1e3a8a;padding:8px 10px;text-align:right;font-size:13px;font-weight:bold;}'+
+    'td{padding:7px 10px;border-bottom:1px solid #E2E8F0;font-size:13px;color:#0f172a;}'+
     'tr:hover td{background:#F8FAFC;}'+
     'tr.subtotal td{background:#DBEAFE;font-weight:bold;}'+
-    '.footer{margin-top:32px;text-align:center;font-size:11px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:12px;}'+
+    '.footer{margin-top:32px;text-align:center;font-size:12px;color:#475569;border-top:1px solid #E2E8F0;padding-top:12px;}'+
     '@media print{body{padding:8px;}button{display:none;}}'+
     '.print-btn{background:#1E40AF;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;cursor:pointer;margin-bottom:20px;}'+
   '</style></head><body>'+
