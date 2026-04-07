@@ -186,7 +186,19 @@ window.addEventListener('load', function(){
           }
         }).catch(function(){});
       }
-      startApp();
+      // טעינת monthly_fee מ-Supabase
+      var bSlug = _getBuildingSlug();
+      if(bSlug){
+        sbClient.from('buildings').select('monthly_fee,units_count').eq('unique_slug',bSlug).single().then(function(res){
+          if(!res.error && res.data){
+            if(res.data.monthly_fee) DB.building.monthly_fee = parseInt(res.data.monthly_fee)||0;
+            if(res.data.units_count && !DB.building.total_units) DB.building.total_units = parseInt(res.data.units_count)||0;
+          }
+          startApp();
+        }).catch(function(){ startApp(); });
+      } else {
+        startApp();
+      }
     } else {
       showAuthScreen();
     }
