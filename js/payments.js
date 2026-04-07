@@ -265,22 +265,15 @@ function confirmPay(){
   var fee  = DB.building.monthly_fee || 0;
   var methodLabels={bit:'ביט',paybox:'פייבוקס',bank:'העברה בנקאית',cash:'מזומן',check:'שיק'};
   var mLbl = methodLabels[_payMethod]||_payMethod;
-  var amtEl = document.getElementById('opf-amount');
-  var amount = amtEl ? parseFloat(amtEl.value)||fee : fee;
+  // קריאת סכום לפי שיטה
+  var amount = fee;
+  if(_payMethod==='bit'||_payMethod==='paybox'){ var ae=document.getElementById('opf-amount-digital'); if(ae&&ae.value) amount=parseFloat(ae.value)||fee; }
+  else if(_payMethod==='bank'){ var ab=document.getElementById('opf-amount-bank'); if(ab&&ab.value) amount=parseFloat(ab.value)||fee; }
+  else { var ao=document.getElementById('opf-amount'); if(ao&&ao.value) amount=parseFloat(ao.value)||fee; }
   var mk = monthKey(getTargetDate());
-
-  // check if already pending
-    // בדיקה אם כבר קיים pending — מהנתונים שנטענו מסופרבייס
-  var alreadyPending = DB.pendingPayments.some(function(p){ return p.unit===unit && p.monthKey===mk; });
-  if(alreadyPending){
-    showToast('כבר דווחת תשלום לחודש זה');
-    return;
-  }
-
   var slug = _getBuildingSlug();
   if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
-
-  var ref  = document.getElementById('opf-ref')  ? document.getElementById('opf-ref').value  : '';
+  var ref  = (_payMethod==='bank') ? (document.getElementById('opf-ref-bank')?document.getElementById('opf-ref-bank').value:'') : (document.getElementById('opf-ref')?document.getElementById('opf-ref').value:'');
   var note = document.getElementById('opf-note') ? document.getElementById('opf-note').value : '';
 
   sbClient.from('payments').insert([{
