@@ -784,7 +784,18 @@ function renderCollectionCenter(){
   var fee = DB.building.monthly_fee || (feeEl ? parseInt(feeEl.value)||0 : 0);
   var tot = DB.building.total_units || 0;
   var slug = _getBuildingSlug();
+  // טעינת שמות מסופרבייס אם חסרים
+  if(slug){
+    sbClient.from('residents').select('unit,name,phone').eq('building_slug',slug).then(function(res){
+      if(!res.error && res.data){ res.data.forEach(function(r){ if(r.name) DB.unitNames[r.unit]=r.name; if(r.phone){ if(!DB.residentPhones) DB.residentPhones={}; DB.residentPhones[r.unit]=r.phone; } }); }
+      _doRenderCollectionCenter(mk, fee, tot);
+    }).catch(function(){ _doRenderCollectionCenter(mk, fee, tot); });
+    return;
+  }
+  _doRenderCollectionCenter(mk, fee, tot);
+}
 
+function _doRenderCollectionCenter(mk, fee, tot){
   // בניית טבלה
   var rows = [];
   for(var i=1;i<=tot;i++){
@@ -830,16 +841,8 @@ function renderCollectionCenter(){
   if(rEl){
     if(!allDebtors.length){ rEl.innerHTML='<div style="color:var(--green);font-weight:700;">✅ כל הדיירים שילמו!</div>'; }
     else {
-      rEl.innerHTML = allDebtors.map(function(r){
-        var hasPhone = r.phone!=='—';
-        var phoneWarn = hasPhone ? '' : ' <span style="color:var(--orange);font-size:10px;font-weight:700;">⚠️ חסר טלפון</span>';
-        return '<div style="padding:6px 0;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center;">'+
-          '<span>'+escHtml(r.name)+' (דירה '+r.unit+')'+phoneWarn+'</span>'+
-          '<span style="color:var(--rose);font-weight:800;">₪'+num(r.debt)+'</span></div>';
-      }).join('');
-      if(debtorsWithPhone.length < allDebtors.length){
-        rEl.innerHTML += '<div style="font-size:11px;color:var(--orange);margin-top:6px;font-weight:700;">⚠️ '+(allDebtors.length-debtorsWithPhone.length)+' דיירים ללא טלפון — לא יקבלו תזכורת</div>';
-      }
+      var noPhone = allDebtors.length - debtorsWithPhone.length;
+      rEl.innerHTML = '<div style="font-size:13px;color:var(--slate);font-weight:600;">'+allDebtors.length+' דיירים חייבים · '+debtorsWithPhone.length+' עם טלפון'+(noPhone>0?' · <span style="color:var(--orange);">'+noPhone+' ללא טלפון</span>':'')+'</div>';
     }
   }
   var btn = document.getElementById('cc-send-all-btn');
