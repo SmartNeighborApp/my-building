@@ -52,8 +52,8 @@ function submitVaadOrder(){
 
   var slug     = _getBuildingSlug();
   var bldgName = (DB.building && DB.building.name) ? DB.building.name : 'הבניין';
-  var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+encodeURIComponent(slug)+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName);
-  var msg      = encodeURIComponent('שלום ' + p.name + ', אני וועד הבית מבניין ' + bldgName + '. נשמח לתיאום עבודה בתחום ' + p.cat + '. לאחר סיום העבודה — נא לדווח דרך הקישור: ' + reportUrl);
+  var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat);
+  var msg      = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך לטיפול בתחום ' + p.cat + '.\nלאחר סיום — דווח דרך הקישור:\n' + reportUrl);
   var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
 
   // פתח וואטסאפ
