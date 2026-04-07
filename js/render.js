@@ -15,8 +15,6 @@ function renderHeader(){
       var sbData = JSON.parse(sbRaw);
       supabaseName = sbData.building_name || '';
       supabaseCity = sbData.city || '';
-      if(sbData.monthly_fee && !DB.building.monthly_fee) DB.building.monthly_fee = parseInt(sbData.monthly_fee)||0;
-      if(sbData.units_count  && !DB.building.total_units) DB.building.total_units = parseInt(sbData.units_count)||0;
     }
   } catch(e){}
   var cityDisplay = supabaseCity || b.city || '';
@@ -33,11 +31,22 @@ function renderHeader(){
 /* ═══════════════════════════════════════════════════════════════
    HOME PAGE
 ═══════════════════════════════════════════════════════════════ */
+
+function _calcMonthIncome(mk){
+  var total = 0;
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){
+    var r = DB.approvedReceipts[k];
+    if(r && r.monthKey === mk) total += parseFloat(r.amount)||0;
+  });
+  return total;
+}
+
 function renderHomePage(){
-  setText('donut-home-num', '₪'+num(DB.finance.balance));
-  setText('income-lbl',     '₪'+num(DB.finance.income));
   var tgt = getTargetDate();
   var mk  = monthKey(tgt);
+  var monthIncome = _calcMonthIncome(mk);
+  setText('donut-home-num', '₪'+num(DB.finance.balance));
+  setText('income-lbl',     '₪'+num(monthIncome));
   var unit= DB.user.unit;
   var tot = DB.building.total_units;
   var paidCount = countPaid(mk);
@@ -81,8 +90,9 @@ function renderFundPage(){
   var lbl = isCur ? 'חודש נוכחי' : (MONTH_OFFSET<0?'חודש קודם':'חודש עתידי');
   setText('fund-month-lbl',   lbl);
   setText('fund-month-badge', fmtMonth(tgt));
+  var fundIncome = _calcMonthIncome(mk);
   setText('fund-bal-val',     '₪'+num(DB.finance.balance));
-  setText('fund-income-val',  '₪'+num(DB.finance.income));
+  setText('fund-income-val',  '₪'+num(fundIncome));
 
   // resident summary
   var unit = DB.user.unit;
@@ -868,7 +878,6 @@ function renderSettingsPage(){
     renderCustomDocsAdmin();
     // drive link prefill
     val('admin-drive-link', DB.driveLink||'');
-    initCollectionCenter();
   }
 }
 
