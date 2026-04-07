@@ -878,6 +878,7 @@ function renderSettingsPage(){
     renderCustomDocsAdmin();
     // drive link prefill
     val('admin-drive-link', DB.driveLink||'');
+    initCollectionCenter();
   }
 }
 
