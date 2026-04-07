@@ -114,6 +114,7 @@ function approvePayment(idx){
 
 function _calcCoveredMonths(unit, totalAmount, fee){
   // מוצא חודשים שלא שולמו מהישן לחדש (עד 12 חודשים אחורה)
+  // תומך בתשלום חלקי — ממלא חודש אחד לגמרי לפני שעובר לבא אחריו
   var months = [];
   var remaining = totalAmount;
   var now = new Date();
@@ -121,18 +122,20 @@ function _calcCoveredMonths(unit, totalAmount, fee){
     var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
     var mk = monthKey(d);
     var unitKey = unit+'-'+mk;
-    var alreadyPaid = !!DB.approvedReceipts[unitKey];
+    // כמה כבר שולם לחודש זה (כולל תשלומים חלקיים)
+    var alreadyPaidAmt = 0;
+    Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r && r.unit==unit && r.monthKey===mk) alreadyPaidAmt += parseFloat(r.amount)||0; });
+    var stillNeeded = fee - alreadyPaidAmt;
+    if(stillNeeded <= 0) continue; // חודש זה כבר שולם במלואו
     var isPending = DB.pendingPayments.some(function(pp){ return pp.unit===unit && pp.monthKey===mk; });
-    if(!alreadyPaid && !isPending){
-      var covered = Math.min(remaining, fee);
-      months.push({ key:mk, label:fmtMonth(d), amount:covered });
-      remaining -= covered;
-    }
+    if(isPending) continue; // ממתין לאישור — לא נוגעים
+    var covered = Math.min(remaining, stillNeeded);
+    months.push({ key:mk, label:fmtMonth(d), amount:covered, alreadyPaid:alreadyPaidAmt });
+    remaining -= covered;
   }
   if(!months.length){
-    // אם כל החודשים שולמו — הוסף לחודש הנוכחי
     var d0 = new Date(now.getFullYear(), now.getMonth(), 1);
-    months.push({ key:monthKey(d0), label:fmtMonth(d0), amount:totalAmount });
+    months.push({ key:monthKey(d0), label:fmtMonth(d0), amount:totalAmount, alreadyPaid:0 });
   }
   return months;
 }
