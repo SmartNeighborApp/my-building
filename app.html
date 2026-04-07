@@ -1493,10 +1493,11 @@ a{text-decoration:none;color:inherit;}
 
       <!-- quick actions -->
       <div class="sec-title">פעולות מהירות</div>
-      <div class="qa-grid">
+      <div class="qa-grid" style="grid-template-columns:repeat(4,1fr);">
         <button class="qa-btn" onclick="openSheet('pay')"><span class="qa-icon">💳</span><span class="qa-lbl">תשלום</span></button>
         <button class="qa-btn" onclick="openSheet('fault')"><span class="qa-icon">🔧</span><span class="qa-lbl">תקלה</span></button>
         <button class="qa-btn" onclick="openSheet('notice')"><span class="qa-icon">📢</span><span class="qa-lbl">הודעה</span></button>
+        <button class="qa-btn" onclick="openReceiptsModal()"><span class="qa-icon">🧾</span><span class="qa-lbl">קבלות</span></button>
       </div>
 
       <!-- finances summary -->
@@ -1762,11 +1763,11 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
-      <!-- קבלות דייר — כפתור בלבד -->
+      <!-- קבלות דייר -->
       <div class="sett-section">
-        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
           <div style="font-size:14px;font-weight:900;color:var(--navy);">🧾 הקבלות שלי</div>
-          <button onclick="openReceiptsModal()" style="padding:8px 16px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">צפה בקבלות</button>
+          <button onclick="openReceiptsModal()" style="padding:8px 16px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">צפה בקבלות</button>
         </div>
         <div id="my-receipts-list" style="display:none;"></div>
       </div>
