@@ -755,3 +755,121 @@ function saveResidentEntry(){
   renderResidentsList();
   renderAdminCollBoard();
 }
+/* ═══════════════════════════════════════════════════════════════
+   COLLECTION CENTER — מרכז גבייה חכם
+═══════════════════════════════════════════════════════════════ */
+function initCollectionCenter(){
+  var sel = document.getElementById('cc-month-sel');
+  if(!sel) return;
+  var now = new Date();
+  var html = '';
+  for(var i=-2;i<=1;i++){
+    var d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    var mk = monthKey(d);
+    var lbl = fmtMonth(d);
+    html += '<option value="'+mk+'"'+(i===0?' selected':'')+'>'+lbl+'</option>';
+  }
+  sel.innerHTML = html;
+  renderCollectionCenter();
+}
+
+function renderCollectionCenter(){
+  var sel = document.getElementById('cc-month-sel');
+  if(!sel) return;
+  var mk  = sel.value || monthKey(new Date());
+  var fee = DB.building.monthly_fee || 0;
+  var tot = DB.building.total_units || 0;
+  var slug = _getBuildingSlug();
+
+  // בניית טבלה
+  var rows = [];
+  for(var i=1;i<=tot;i++){
+    var name  = DB.unitNames[i]||('דירה '+i);
+    var phone = (DB.residentPhones&&DB.residentPhones[i])||'—';
+    // סכום ששולם לחודש זה
+    var paidAmt = 0;
+    Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===i&&r.monthKey===mk) paidAmt+=parseFloat(r.amount)||0; });
+    var isPending = DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; });
+    var debt = Math.max(0, fee - paidAmt);
+    var status = paidAmt>=fee ? 'paid' : (isPending ? 'pending' : (paidAmt>0 ? 'partial' : 'unpaid'));
+    rows.push({unit:i, name:name, phone:phone, paidAmt:paidAmt, debt:debt, status:status});
+  }
+
+  // סיכום
+  var totalPaid   = rows.filter(function(r){ return r.status==='paid'; }).length;
+  var totalDebt   = rows.reduce(function(s,r){ return s+r.debt; },0);
+  var totalIncome = rows.reduce(function(s,r){ return s+r.paidAmt; },0);
+  var sumEl = document.getElementById('cc-summary');
+  if(sumEl) sumEl.innerHTML = '<div style="flex:1;background:#F0FDF4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--green);">'+totalPaid+'/'+tot+'</div><div style="font-size:11px;color:var(--slate);">שילמו</div></div><div style="flex:1;background:#FFF7ED;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--orange);">₪'+num(totalIncome)+'</div><div style="font-size:11px;color:var(--slate);">גבוי</div></div><div style="flex:1;background:#FFF1F2;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--rose);">₪'+num(totalDebt)+'</div><div style="font-size:11px;color:var(--slate);">חסר</div></div>';
+
+  // טבלה
+  var stLbls = {paid:'✅ שולם',pending:'⏳ ממתין',partial:'🔶 חלקי',unpaid:'❌ חסר'};
+  var stCols = {paid:'#16A34A',pending:'#F59E0B',partial:'#EA580C',unpaid:'#E11D48'};
+  var thtml = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  thtml += '<tr style="background:#F8FAFC;"><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">דירה</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שולם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">חוב</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">סטטוס</th></tr>';
+  rows.forEach(function(r){
+    thtml += '<tr style="border-bottom:1px solid #F1F5F9;">'+
+      '<td style="padding:8px 6px;font-weight:700;">'+r.unit+'</td>'+
+      '<td style="padding:8px 6px;">'+escHtml(r.name)+'</td>'+
+      '<td style="padding:8px 6px;color:var(--green);font-weight:700;">₪'+num(r.paidAmt)+'</td>'+
+      '<td style="padding:8px 6px;color:var(--rose);font-weight:700;">'+(r.debt>0?'₪'+num(r.debt):'—')+'</td>'+
+      '<td style="padding:8px 6px;color:'+stCols[r.status]+';font-weight:800;">'+stLbls[r.status]+'</td></tr>';
+  });
+  thtml += '</table>';
+  var tEl = document.getElementById('cc-table');
+  if(tEl) tEl.innerHTML = thtml;
+
+  // רשימת חייבים לתזכורת
+  var debtors = rows.filter(function(r){ return r.status!=='paid' && r.phone!=='—'; });
+  var rEl = document.getElementById('cc-reminders-list');
+  if(rEl){
+    if(!debtors.length){ rEl.innerHTML='<div style="color:var(--green);font-weight:700;">✅ כל הדיירים שילמו!</div>'; }
+    else { rEl.innerHTML = debtors.map(function(r){ return '<div style="padding:4px 0;border-bottom:1px solid #F1F5F9;">'+escHtml(r.name)+' (דירה '+r.unit+') — חוב: ₪'+num(r.debt)+'</div>'; }).join(''); }
+  }
+  var btn = document.getElementById('cc-send-all-btn');
+  if(btn) btn.style.display = debtors.length ? 'block' : 'none';
+  window._ccDebtors = debtors;
+  window._ccMonthKey = mk;
+}
+
+function sendAllReminders(){
+  var debtors = window._ccDebtors || [];
+  var mk = window._ccMonthKey || monthKey(new Date());
+  var bldg = DB.building.name||'הבניין';
+  var monthLbl = (function(){ var p=mk.split('-'); return (HE_MONTHS[parseInt(p[1])-1]||'')+' '+p[0]; })();
+  if(!debtors.length){ showToast('אין חייבים לשליחה'); return; }
+  // שולח אחד אחד — פותח וואטסאפ לכל חייב בהפרש של שניה
+  debtors.forEach(function(r,i){
+    setTimeout(function(){
+      var phone = r.phone.replace(/\D/g,'').replace(/^0/,'');
+      var msg = 'שלום '+r.name+', ועד הבית של '+bldg+' מזכיר לך שתשלום דמי הועד לחודש '+monthLbl+' עדיין לא התקבל. סכום לתשלום: ₪'+num(r.debt)+'. נא לשלם בהקדם דרך האפליקציה. תודה 🏢';
+      window.open('https://wa.me/972'+phone+'?text='+encodeURIComponent(msg),'_blank');
+    }, i*800);
+  });
+  showToast('שולח תזכורות ל-'+debtors.length+' דיירים...');
+}
+
+function exportCollectionCSV(){
+  var sel = document.getElementById('cc-month-sel');
+  var mk  = sel ? sel.value : monthKey(new Date());
+  var fee = DB.building.monthly_fee||0;
+  var tot = DB.building.total_units||0;
+  var rows = [['דירה','שם','טלפון','שולם','חוב','סטטוס']];
+  var stLbls = {paid:'שולם',pending:'ממתין',partial:'חלקי',unpaid:'חסר'};
+  for(var i=1;i<=tot;i++){
+    var name  = DB.unitNames[i]||('דירה '+i);
+    var phone = (DB.residentPhones&&DB.residentPhones[i])||'';
+    var paidAmt = 0;
+    Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===i&&r.monthKey===mk) paidAmt+=parseFloat(r.amount)||0; });
+    var isPending = DB.pendingPayments.some(function(p){ return p.unit===i&&p.monthKey===mk; });
+    var debt = Math.max(0,fee-paidAmt);
+    var status = paidAmt>=fee?'paid':(isPending?'pending':(paidAmt>0?'partial':'unpaid'));
+    rows.push([i,name,phone,paidAmt,debt,stLbls[status]]);
+  }
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download='גבייה_'+mk+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
