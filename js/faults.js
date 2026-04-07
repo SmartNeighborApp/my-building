@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   faults.js — שכנות טובה · SmartNeighbor
-   תקלות + חשבוניות + ספקים
-   תלוי ב: config.js, utils.js, db.js
-═══════════════════════════════════════════════════════════════ */
+/* faults.js — שכנות טובה */
 function openVaadOrderSheet(profId){
   _vaadOrderProfId = profId;
   var p = (DB.professionals||[]).find(function(x){ return String(x.id)===String(profId); });
@@ -556,7 +552,3 @@ function updateMaintStatusFromAdmin(id, status){
     renderHomePage();
   });
 }
-
-var COLORS=['#3B82F6','#F59E0B','#22C55E','#8B5CF6','#EF4444','#14B8A6','#F97316','#EC4899','#06B6D4','#84CC16'];
-
-function renderBudgetManager(){
