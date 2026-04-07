@@ -75,10 +75,8 @@ function approvePayment(idx){
   var fee          = DB.building.monthly_fee || 0;
   var totalAmount  = parseFloat(p.amount) || fee;
 
-  // חישוב חודשים מכוסים אוטומטית מהישן לחדש + יתרה
-  var calc = _calcCoveredMonths(p.unit, totalAmount, fee);
-  var months = calc.months;
-  var newBalance = calc.newBalance;
+  // חישוב חודשים מכוסים אוטומטית מהישן לחדש
+  var months = _calcCoveredMonths(p.unit, totalAmount, fee);
   var monthLabels = months.map(function(m){ return m.label; }).join(' + ');
 
   // עדכון הרשומה הקיימת ל-approved + פירוט חודשים
@@ -91,22 +89,23 @@ function approvePayment(idx){
   }).eq('id', p.id).then(function(res){
     if(res.error){ showToast('שגיאה באישור: '+res.error.message); return; }
 
-    // שמירת יתרה ב-Supabase
-    var balSlug = _getBuildingSlug();
-    sbClient.from('resident_balance').upsert([{building_slug:balSlug, unit:p.unit, balance:newBalance, updated_at:new Date().toISOString()}], {onConflict:'building_slug,unit'}).then(function(){});
-
     // אם יש יותר מחודש אחד — צור רשומות נוספות לכל חודש
     if(months.length > 1){
       var extraInserts = months.slice(1).map(function(m){
-        return sbClient.from('payments').insert([{building_slug:slug, unit:p.unit, month_key:m.key, status:'approved', amount:String(m.amount), method:p.method||'', method_label:p.methodLabel||'', month_label:m.label, approved_date:approvedDate, approved_by:approvedBy}]);
+        return sbClient.from('payments').insert([{
+          building_slug: slug, unit:p.unit, month_key:m.key,
+          status:'approved', amount:String(m.amount),
+          method:p.method||'', method_label:p.methodLabel||'',
+          month_label:m.label, approved_date:approvedDate, approved_by:approvedBy
+        }]);
       });
       Promise.all(extraInserts).then(function(){
-        showToast('תשלום אושר ✅ ('+months.length+' חודשים)'+(newBalance>0?' | יתרה: ₪'+newBalance:''));
+        showToast('תשלום אושר ✅ ('+months.length+' חודשים)');
         triggerWATray(p.unit, p.monthKey);
         loadPaymentsFromSupabase(function(){ renderAll(); });
       });
     } else {
-      showToast('תשלום אושר ✅'+(newBalance>0?' | יתרה: ₪'+newBalance:''));
+      showToast('תשלום אושר ✅');
       triggerWATray(p.unit, p.monthKey);
       loadPaymentsFromSupabase(function(){ renderAll(); });
     }
@@ -114,9 +113,9 @@ function approvePayment(idx){
 }
 
 function _calcCoveredMonths(unit, totalAmount, fee){
+  // מוצא חודשים שלא שולמו מהישן לחדש (עד 12 חודשים אחורה)
   var months = [];
-  var existingBalance = (DB.residentBalances&&DB.residentBalances[unit]) ? parseFloat(DB.residentBalances[unit]) : 0;
-  var remaining = totalAmount + existingBalance;
+  var remaining = totalAmount;
   var now = new Date();
   for(var i=12; i>=0 && remaining>0; i--){
     var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
@@ -131,10 +130,11 @@ function _calcCoveredMonths(unit, totalAmount, fee){
     }
   }
   if(!months.length){
+    // אם כל החודשים שולמו — הוסף לחודש הנוכחי
     var d0 = new Date(now.getFullYear(), now.getMonth(), 1);
     months.push({ key:monthKey(d0), label:fmtMonth(d0), amount:totalAmount });
   }
-  return { months:months, newBalance:remaining };
+  return months;
 }
 
 function quickApprove(unit){
@@ -368,13 +368,12 @@ function showMyReceipt(){
     if(Number(r.unit)===Number(unit)) allRecs.push(r);
   });
   if(!allRecs.length){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
-  // מיון לפי חודש — חדש ראשון
-  allRecs.sort(function(a,b){ return (b.monthLabel||'').localeCompare(a.monthLabel||''); });
-  var rec = allRecs[0]; // הקבלה האחרונה
-  var mk  = rec.monthLabel||fmtMonth(getTargetDate());
+  // מיון לפי תאריך אישור — חדש ראשון
+  allRecs.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
+  var rec = allRecs[0]; // הקבלה האחרונה בלבד
   var receiptNum = (new Date().getFullYear())+''+String(new Date().getMonth()+1).padStart(2,'0')+'-'+unit;
-  var totalAmount = allRecs.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); }, 0);
-  var monthsList  = allRecs.map(function(r){ return r.monthLabel||''; }).filter(Boolean).join(' + ');
+  var totalAmount = parseFloat(rec.amount)||0; // סכום הקבלה הספציפית
+  var monthsList  = rec.monthLabel||fmtMonth(getTargetDate());
 
   setText('receipt-cat-name',    DB.building.name||'הבניין');
   setText('receipt-num-ph',      receiptNum);
@@ -528,7 +527,7 @@ function renderMyReceipts(){
     if(Number(r.unit) === Number(unit)) receipts.push(r);
   });
   if(!receipts.length){ el.innerHTML='<div class="empty-state">אין קבלות עדיין</div>'; return; }
-  receipts.sort(function(a,b){ return (b.monthLabel||'').localeCompare(a.monthLabel||''); });
+  receipts.sort(function(a,b){ return (b.approvedDate||b.monthLabel||'').localeCompare(a.approvedDate||a.monthLabel||''); });
   var html = '';
   receipts.forEach(function(r,i){
     html += '<div onclick="_openReceipt('+i+')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F1F5F9;cursor:pointer;">'+
