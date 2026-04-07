@@ -49,7 +49,7 @@ function _applyBuildingAndOpen(building){
     DB.building.total_units = parseInt(building.units_count) || 0;
     if(building.monthly_fee !== undefined && building.monthly_fee !== null){
       var fee = parseFloat(building.monthly_fee);
-      if(!isNaN(fee) && fee > 0) DB.building.monthly_fee = fee;
+      if(!isNaN(fee)) DB.building.monthly_fee = fee;
     }
   }
   if(building.vaad_unit && DB && DB.user){ DB.user.unit = parseInt(building.vaad_unit) || DB.user.unit; }
