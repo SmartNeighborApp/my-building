@@ -1885,6 +1885,23 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
+      <!-- admin: מרכז גבייה חכם -->
+      <div class="sett-section admin-only" id="collection-center-card">
+        <div class="admin-sec-title">📋 מרכז גבייה — מעקב דיירים</div>
+        <div style="padding:12px 16px 4px;">
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <select id="cc-month-sel" class="admin-inp" style="flex:1;min-width:120px;" onchange="renderCollectionCenter()"></select>
+            <button onclick="exportCollectionCSV()" style="padding:8px 14px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;">📥 CSV</button>
+          </div>
+          <div id="cc-summary" style="display:flex;gap:8px;margin-bottom:12px;"></div>
+          <div id="cc-table" style="overflow-x:auto;"></div>
+        </div>
+        <div style="padding:0 16px 16px;">
+          <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">📲 תזכורות לחייבים</div>
+          <div id="cc-reminders-list" style="margin-bottom:10px;font-size:12px;color:var(--slate);"></div>
+          <button id="cc-send-all-btn" onclick="sendAllReminders()" style="width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;">📲 שלח תזכורת לכל החייבים</button>
+        </div>
+      </div>
       <!-- admin: budget manager -->
       <!-- admin: faults management -->
       <div class="sett-section admin-only" id="admin-faults-card">
