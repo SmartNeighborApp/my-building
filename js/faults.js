@@ -1,3 +1,13 @@
+function previewFaultPhoto(input){
+  var prev = document.getElementById('fault-photo-preview');
+  if(!prev) return;
+  if(input.files && input.files[0]){
+    var reader = new FileReader();
+    reader.onload = function(e){ prev.src=e.target.result; prev.style.display='block'; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 /* faults.js — שכנות טובה */
 function openVaadOrderSheet(profId){
   _vaadOrderProfId = profId;
@@ -42,7 +52,8 @@ function submitVaadOrder(){
 
   var slug     = _getBuildingSlug();
   var bldgName = (DB.building && DB.building.name) ? DB.building.name : 'הבניין';
-  var msg      = encodeURIComponent('שלום ' + p.name + ', אני וועד הבית מבניין ' + bldgName + '. נשמח לתיאום עבודה בתחום ' + p.cat + '. מתי תוכל להגיע?');
+  var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+encodeURIComponent(slug)+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName);
+  var msg      = encodeURIComponent('שלום ' + p.name + ', אני וועד הבית מבניין ' + bldgName + '. נשמח לתיאום עבודה בתחום ' + p.cat + '. לאחר סיום העבודה — נא לדווח דרך הקישור: ' + reportUrl);
   var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
 
   // פתח וואטסאפ
@@ -438,22 +449,40 @@ function submitFault(){
     unit:        DB.user ? DB.user.unit : null
   };
 
-  sbClient.from('faults').insert([record]).then(function(res){
-    if(res.error){ showToast('שגיאה בשמירת תקלה: '+res.error.message); return; }
-    document.getElementById('fault-loc').value='';
-    document.getElementById('fault-desc').value='';
-    document.getElementById('fault-pri').value='med';
-    var otherInp2 = document.getElementById('fault-loc-other');
-    if(otherInp2){ otherInp2.value=''; otherInp2.style.display='none'; }
-    var suggestBox = document.getElementById('fault-prof-suggest');
-    if(suggestBox) suggestBox.style.display='none';
-    closeSheet('fault');
-    loadFaultsFromSupabase(function(){
-      renderFaultsPage();
-      renderHomePage();
+  function _doInsertFault(photoUrl){
+    if(photoUrl) record.photo_url = photoUrl;
+    sbClient.from('faults').insert([record]).then(function(res){
+      if(res.error){ showToast('שגיאה בשמירת תקלה: '+res.error.message); return; }
+      document.getElementById('fault-loc').value='';
+      document.getElementById('fault-desc').value='';
+      document.getElementById('fault-pri').value='med';
+      var otherInp2 = document.getElementById('fault-loc-other');
+      if(otherInp2){ otherInp2.value=''; otherInp2.style.display='none'; }
+      var suggestBox = document.getElementById('fault-prof-suggest');
+      if(suggestBox) suggestBox.style.display='none';
+      var prev = document.getElementById('fault-photo-preview');
+      if(prev){ prev.src=''; prev.style.display='none'; }
+      var photoInp = document.getElementById('fault-photo');
+      if(photoInp) photoInp.value='';
+      closeSheet('fault');
+      loadFaultsFromSupabase(function(){ renderFaultsPage(); renderHomePage(); });
+      showToast('תקלה דווחה ✅');
     });
-    showToast('תקלה דווחה ✅');
-  });
+  }
+  var photoInput = document.getElementById('fault-photo');
+  var photoFile = photoInput && photoInput.files && photoInput.files[0] ? photoInput.files[0] : null;
+  if(photoFile){
+    var ext = photoFile.name.split('.').pop() || 'jpg';
+    var fileName = slug+'-'+Date.now()+'.'+ext;
+    sbClient.storage.from('fault-images').upload(fileName, photoFile, {contentType: photoFile.type, upsert:true}).then(function(res){
+      if(res.error){ _doInsertFault(null); return; }
+      var urlRes = sbClient.storage.from('fault-images').getPublicUrl(fileName);
+      var publicUrl = urlRes.data && urlRes.data.publicUrl ? urlRes.data.publicUrl : null;
+      _doInsertFault(publicUrl);
+    }).catch(function(){ _doInsertFault(null); });
+  } else {
+    _doInsertFault(null);
+  }
 }
 
 
