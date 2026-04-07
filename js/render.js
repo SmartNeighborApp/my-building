@@ -15,6 +15,8 @@ function renderHeader(){
       var sbData = JSON.parse(sbRaw);
       supabaseName = sbData.building_name || '';
       supabaseCity = sbData.city || '';
+      if(sbData.monthly_fee && !DB.building.monthly_fee) DB.building.monthly_fee = parseInt(sbData.monthly_fee)||0;
+      if(sbData.units_count  && !DB.building.total_units) DB.building.total_units = parseInt(sbData.units_count)||0;
     }
   } catch(e){}
   var cityDisplay = supabaseCity || b.city || '';
