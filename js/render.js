@@ -79,13 +79,8 @@ function renderFundPage(){
   var lbl = isCur ? 'חודש נוכחי' : (MONTH_OFFSET<0?'חודש קודם':'חודש עתידי');
   setText('fund-month-lbl',   lbl);
   setText('fund-month-badge', fmtMonth(tgt));
-  // חישוב הכנסות מתשלומים מאושרים לחודש הנוכחי
-  var monthIncome = 0;
-  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r && r.monthKey===mk) monthIncome += parseFloat(r.amount)||0; });
-  var totalExpenses = (DB.finance.expenses||[]).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0);
-  var balance = monthIncome - totalExpenses;
-  setText('fund-bal-val',     '₪'+num(balance));
-  setText('fund-income-val',  '₪'+num(monthIncome));
+  setText('fund-bal-val',     '₪'+num(DB.finance.balance));
+  setText('fund-income-val',  '₪'+num(DB.finance.income));
 
   // resident summary
   var unit = DB.user.unit;
@@ -198,21 +193,16 @@ function renderPayHistory(unit){
   if(!el) return;
   var now = new Date();
   var html = '';
-  var fee = DB.building.monthly_fee || 0;
   for(var i=-5;i<=6;i++){
     var d = new Date(now.getFullYear(), now.getMonth()+i, 1);
     var mk = monthKey(d);
     var unitKey = unit+'-'+mk;
-    var rec = DB.approvedReceipts[unitKey];
-    var paid = !!rec;
+    var paid = !!DB.approvedReceipts[unitKey];
     var pending = DB.pendingPayments.some(function(p){ return p.unit===unit && p.monthKey===mk; });
-    var paidAmt = paid ? (parseFloat(rec.amount)||0) : 0;
-    var isPartial = paid && fee>0 && paidAmt < fee;
+    var cls = paid ? 'pay-cell paid' : (pending ? 'pay-cell' : 'pay-cell unpaid');
+    var icon = paid ? '✅' : (pending ? '⏳' : '');
     var shortMo = HE_MONTHS[d.getMonth()].slice(0,3);
-    var icon = paid ? (isPartial?'':'✅') : (pending?'⏳':'');
-    var cls = paid ? (isPartial?'pay-cell partial':'pay-cell paid') : (pending?'pay-cell':'pay-cell unpaid');
-    var partialStyle = isPartial ? ' style="background:linear-gradient(to right,#bbf7d0 '+Math.round(paidAmt/fee*100)+'%,#fecaca '+Math.round(paidAmt/fee*100)+'%)"' : '';
-    html += '<div class="'+cls+'"'+partialStyle+'><span class="pay-mo">'+shortMo+'</span><span class="pay-icon">'+icon+'</span>'+(isPartial?'<span style="font-size:9px;color:#dc2626;">'+paidAmt+'/'+fee+'</span>':'')+'</div>';
+    html += '<div class="'+cls+'"><span class="pay-mo">'+shortMo+'</span><span class="pay-icon">'+icon+'</span></div>';
   }
   el.innerHTML = html;
 }
@@ -876,6 +866,7 @@ function renderSettingsPage(){
     renderCustomDocsAdmin();
     // drive link prefill
     val('admin-drive-link', DB.driveLink||'');
+    initCollectionCenter();
   }
 }
 
