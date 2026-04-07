@@ -465,3 +465,41 @@ function reportPaidFromBanner(){
 /* ═══════════════════════════════════════════════════════════════
    V21: RESIDENTS MANAGER
 ═══════════════════════════════════════════════════════════════ */
+
+/* ── My Receipts ───────────────────────────────────────────── */
+function renderMyReceipts(){
+  var el = document.getElementById('my-receipts-list');
+  if(!el) return;
+  var unit = DB.user ? DB.user.unit : 0;
+  if(!unit){ el.innerHTML='<div class="empty-state">יש להיכנס עם מספר דירה</div>'; return; }
+
+  // סינון כל הקבלות של הדייר מ-DB.approvedReceipts
+  var receipts = [];
+  Object.keys(DB.approvedReceipts).forEach(function(k){
+    var r = DB.approvedReceipts[k];
+    if(Number(r.unit) === Number(unit)){
+      receipts.push(r);
+    }
+  });
+
+  if(!receipts.length){
+    el.innerHTML='<div class="empty-state">אין קבלות עדיין</div>';
+    return;
+  }
+
+  // מיון לפי חודש — חדש ראשון
+  receipts.sort(function(a,b){ return (b.monthLabel||'').localeCompare(a.monthLabel||''); });
+
+  var html = '';
+  receipts.forEach(function(r){
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F1F5F9;">'+
+      '<div>'+
+        '<div style="font-size:14px;font-weight:800;color:var(--navy);">'+escHtml(r.monthLabel||'')+'</div>'+
+        '<div style="font-size:12px;color:var(--slate);">'+escHtml(r.methodLabel||'')+(r.approvedDate?' · '+escHtml(r.approvedDate):'')+'</div>'+
+      '</div>'+
+      '<div style="font-size:16px;font-weight:900;color:var(--green);">₪'+num(r.amount)+'</div>'+
+    '</div>';
+  });
+
+  el.innerHTML = html;
+}
