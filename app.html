@@ -2154,6 +2154,7 @@ a{text-decoration:none;color:inherit;}
         <div id="ps2-digital-hint" style="font-size:13px;color:var(--slate);margin-bottom:14px;"></div>
         <button class="launch-pay-btn" id="ps2-launch-btn" onclick="launchPay()">פתח לתשלום ←</button>
         <div class="pay-step-lbl">לאחר התשלום, חזור לכאן ולחץ "דיווחתי"</div>
+        <div style="margin-top:12px;"><label class="field-label">סכום ששולם (₪)</label><input id="opf-amount-digital" class="field-input" type="number" placeholder="350"></div>
       </div>
       <!-- bank box -->
       <div id="ps2-bank-box" style="display:none;">
@@ -2164,6 +2165,8 @@ a{text-decoration:none;color:inherit;}
           <div class="bank-row"><span class="bank-lbl" id="bd-lbl-owner">שם</span><span class="bank-val" id="bd-owner">—</span></div>
         </div>
         <button class="copy-all-btn" id="bank-copy-all-btn" onclick="copyAllBank()">📋 העתק הכל</button>
+        <div style="margin-top:12px;"><label class="field-label">סכום שהועבר (₪)</label><input id="opf-amount-bank" class="field-input" type="number" placeholder="350"></div>
+        <div style="margin-top:8px;"><label class="field-label">מספר אסמכתא</label><input id="opf-ref-bank" class="field-input" type="text" placeholder="123456"></div>
       </div>
       <!-- offline form (cash/check) -->
       <div id="ps2-offline-form" style="display:none;">
