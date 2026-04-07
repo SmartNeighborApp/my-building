@@ -380,6 +380,68 @@ function renderExpList(){
     });
   });
 
+  html += '<button onclick="toggleQuarterlyReport()" style="width:100%;margin-top:12px;padding:10px;background:#EFF6FF;color:#1E40AF;border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">📊 דוח רבעוני ▾</button>';
+  html += '<div id="quarterly-report" style="display:none;"></div>';
+  el.innerHTML = html;
+}
+
+
+function toggleQuarterlyReport(){
+  var el = document.getElementById('quarterly-report');
+  if(!el) return;
+  var isHidden = el.style.display === 'none' || el.style.display === '';
+  if(isHidden){
+    el.style.display = 'block';
+    renderQuarterlyReport();
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderQuarterlyReport(){
+  var el = document.getElementById('quarterly-report');
+  if(!el) return;
+  var now = new Date();
+  var MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  var html = '<div style="padding:12px 0;">';
+  for(var i=2; i>=0; i--){
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var mk = monthKey(d);
+    var mName = fmtMonth(d);
+    // הכנסות
+    var income = 0;
+    Object.keys(DB.approvedReceipts||{}).forEach(function(k){
+      var keyMk = k.slice(k.indexOf('-')+1);
+      if(keyMk === mk) income += parseFloat(DB.approvedReceipts[k].amount)||0;
+    });
+    // הוצאות
+    var expenses = 0;
+    (DB.finance.expenses||[]).forEach(function(e){
+      var amt = parseFloat(e.amount)||0;
+      if(e.expType==='קבועה'){ expenses += amt; }
+      else if(e.month === MONTHS_HE[d.getMonth()]){ expenses += amt; }
+    });
+    var balance = income - expenses;
+    var balColor = balance >= 0 ? '#16A34A' : '#DC2626';
+    html += '<div style="border-bottom:1px solid #F1F5F9;padding:10px 0;">'+
+      '<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">'+mName+'</div>'+
+      '<div style="display:flex;gap:8px;">'+
+        '<div style="flex:1;background:#F0FDF4;border-radius:10px;padding:10px;text-align:center;">'+
+          '<div style="font-size:14px;font-weight:900;color:#16A34A;">₪'+num(income)+'</div>'+
+          '<div style="font-size:10px;color:var(--slate);">הכנסות</div>'+
+        '</div>'+
+        '<div style="flex:1;background:#FEF2F2;border-radius:10px;padding:10px;text-align:center;">'+
+          '<div style="font-size:14px;font-weight:900;color:#DC2626;">₪'+num(expenses)+'</div>'+
+          '<div style="font-size:10px;color:var(--slate);">הוצאות</div>'+
+        '</div>'+
+        '<div style="flex:1;background:#F8FAFC;border-radius:10px;padding:10px;text-align:center;">'+
+          '<div style="font-size:14px;font-weight:900;color:'+balColor+';">₪'+num(balance)+'</div>'+
+          '<div style="font-size:10px;color:var(--slate);">יתרה</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  html += '</div>';
   el.innerHTML = html;
 }
 
