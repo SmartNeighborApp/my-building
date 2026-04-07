@@ -207,3 +207,62 @@ function _shareApp(){
     try{ navigator.clipboard.writeText(url); showToast('הלינק הועתק — שלחי לחברים! ✅'); } catch(e){ window.open(url,'_blank'); }
   }
 }
+
+/* ── Building Card ─────────────────────────────────────────── */
+function _showBuildingCard(){
+  try{
+    var raw = localStorage.getItem('sn_building_data');
+    if(!raw){ showToast('לא נמצאו פרטי בניין'); return; }
+    var bd = JSON.parse(raw);
+    var slug = bd.unique_slug || '';
+    var code = bd.access_code || '';
+    var url  = 'https://smartneighborapp.github.io/my-building/app.html?b=' + slug;
+
+    // יצירת overlay
+    var existing = document.getElementById('building-card-overlay');
+    if(existing) existing.remove();
+
+    var ov = document.createElement('div');
+    ov.id = 'building-card-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.onclick = function(e){ if(e.target===ov) ov.remove(); };
+
+    ov.innerHTML = '<div style="background:#fff;border-radius:24px;padding:28px 24px;max-width:400px;width:100%;direction:rtl;font-family:var(--font);box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
+        '<div style="font-size:18px;font-weight:900;color:#1A3A5C;">🏢 כניסה לבניין</div>' +
+        '<button onclick="document.getElementById(\'building-card-overlay\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94A3B8;">✕</button>' +
+      '</div>' +
+      '<div style="background:#F8FAFC;border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;">' +
+        '<div style="font-size:12px;color:#64748B;margin-bottom:8px;">🔗 הקישור לאפליקציה</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#2563EB;word-break:break-all;margin-bottom:12px;">' + url + '</div>' +
+        '<button onclick="_copyBuildingUrl(\'' + url + '\')" style="width:100%;padding:10px;background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);">📋 העתק לינק</button>' +
+      '</div>' +
+      '<div style="background:#FFF9E6;border-radius:16px;padding:16px;text-align:center;">' +
+        '<div style="font-size:12px;color:#92400E;margin-bottom:8px;">🔑 קוד גישה — 6 ספרות</div>' +
+        '<div style="font-size:36px;font-weight:900;color:#C9A84C;letter-spacing:6px;margin-bottom:12px;">' + code + '</div>' +
+        '<button onclick="_copyCode(\'' + code + '\')" style="width:100%;padding:10px;background:linear-gradient(135deg,#C9A84C,#E2C05A);color:#1A3A5C;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);">📋 העתק קוד</button>' +
+      '</div>' +
+      '<button onclick="_shareBuilding(\'' + url + '\',\'' + code + '\')" style="width:100%;margin-top:16px;padding:12px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--font);">💬 שלח לדייר בוואטסאפ</button>' +
+    '</div>';
+
+    document.body.appendChild(ov);
+  } catch(e){ showToast('שגיאה בטעינת פרטי בניין'); }
+}
+
+function _copyBuildingUrl(url){
+  try{ navigator.clipboard.writeText(url); showToast('הלינק הועתק ✅'); } catch(e){ showToast('לא ניתן להעתיק'); }
+}
+
+function _copyCode(code){
+  try{ navigator.clipboard.writeText(code); showToast('הקוד הועתק ✅'); } catch(e){ showToast('לא ניתן להעתיק'); }
+}
+
+function _shareBuilding(url, code){
+  var msg = 'שלום! הוזמנת לאפליקציית ועד הבית שלנו 🏢\n\nלחצו על הקישור:\n' + url + '\n\nקוד גישה: ' + code;
+  if(navigator.share){
+    navigator.share({ title:'שכנות טובה', text:msg }).catch(function(){});
+  } else {
+    var wa = 'https://wa.me/?text=' + encodeURIComponent(msg);
+    window.open(wa, '_blank');
+  }
+}
