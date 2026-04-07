@@ -788,7 +788,7 @@ function renderCollectionCenter(){
     var phone = (DB.residentPhones&&DB.residentPhones[i])||'—';
     // סכום ששולם לחודש זה
     var paidAmt = 0;
-    Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===i&&(r.monthKey===mk||r.month_key===mk)) paidAmt+=parseFloat(r.amount)||0; });
+    var unitKey=i+'-'+mk; if(DB.approvedReceipts[unitKey]) paidAmt+=parseFloat(DB.approvedReceipts[unitKey].amount)||0;
     var isPending = DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; });
     var debt = Math.max(0, fee - paidAmt);
     var status = paidAmt>=fee ? 'paid' : (isPending ? 'pending' : (paidAmt>0 ? 'partial' : 'unpaid'));
@@ -860,7 +860,7 @@ function exportCollectionCSV(){
     var name  = DB.unitNames[i]||('דירה '+i);
     var phone = (DB.residentPhones&&DB.residentPhones[i])||'';
     var paidAmt = 0;
-    Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===i&&(r.monthKey===mk||r.month_key===mk)) paidAmt+=parseFloat(r.amount)||0; });
+    var unitKey=i+'-'+mk; if(DB.approvedReceipts[unitKey]) paidAmt+=parseFloat(DB.approvedReceipts[unitKey].amount)||0;
     var isPending = DB.pendingPayments.some(function(p){ return p.unit===i&&p.monthKey===mk; });
     var debt = Math.max(0,fee-paidAmt);
     var status = paidAmt>=fee?'paid':(isPending?'pending':(paidAmt>0?'partial':'unpaid'));
