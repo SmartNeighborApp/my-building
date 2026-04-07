@@ -679,7 +679,6 @@ function _showSyncStatus(msg, type){
 }
 
 function copyField(id){
-function copyField(id){
   var el = document.getElementById(id);
   if(!el) return;
   try{ navigator.clipboard.writeText(el.textContent||el.value); } catch(e){}
@@ -696,7 +695,6 @@ function copyAllBank(){
 /* ═══════════════════════════════════════════════════════════════
    SHEETS
 ═══════════════════════════════════════════════════════════════ */
-function openNoticeSheet(type){
 function renderResidentsList(){
   var el = document.getElementById('residents-list-admin');
   if(!el) return;
