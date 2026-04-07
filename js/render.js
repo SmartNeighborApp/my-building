@@ -166,17 +166,7 @@ function updateMyPill(mk, unit){
 function renderCollDots(mk){
   var el = document.getElementById('coll-dots-public');
   if(!el) return;
-  var tot = DB.building.total_units;
-  var html = '';
-  for(var i=1;i<=tot;i++){
-    var unitKey = i+'-'+mk;
-    var cls = 'unit-dot';
-    if(DB.approvedReceipts[unitKey]) cls+=' paid';
-    else if(DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; })) cls+=' pending';
-    else cls+=' unpaid';
-    html += '<div class="'+cls+'" title="דירה '+i+'">'+i+'</div>';
-  }
-  el.innerHTML = html;
+  el.innerHTML = '';
 }
 
 function countPaid(mk){
