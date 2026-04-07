@@ -1859,7 +1859,6 @@ a{text-decoration:none;color:inherit;}
       <!-- admin: גבייה מאוחד -->
       <div class="sett-section admin-only" id="collection-center-card">
         <div class="admin-sec-title">📊 ניהול וגבייה</div>
-        <!-- סיכום מהיר -->
         <div style="padding:12px 16px 0;">
           <div class="coll-stats-row">
             <div class="coll-stat-box"><div class="coll-stat-val" id="adm-paid-val">0</div><div class="coll-stat-lbl">שילמו</div></div>
@@ -1869,12 +1868,10 @@ a{text-decoration:none;color:inherit;}
           <div class="coll-bar-wrap"><div class="coll-bar-fill" id="coll-bar" style="width:0%"></div></div>
           <div class="coll-pct-row"><span style="color:var(--green);" id="coll-paid-count">0 שילמו</span><span style="color:var(--rose);" id="coll-missing-amt">₪0 חסר</span></div>
         </div>
-        <!-- ממתינים לאישור -->
         <div id="pending-payments-section" style="display:none;padding:0 16px 8px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="font-size:13px;font-weight:800;color:var(--navy);">⏳ ממתינים לאישור</div><div id="pending-count-badge" class="nav-dot" style="display:inline-flex;position:static;border:none;"></div></div>
           <div id="pending-list"></div>
         </div>
-        <!-- בורר חודש + טבלה -->
         <div style="padding:8px 16px 4px;">
           <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
             <select id="cc-month-sel" class="admin-inp" style="flex:1;min-width:120px;" onchange="renderCollectionCenter()"></select>
@@ -1883,11 +1880,12 @@ a{text-decoration:none;color:inherit;}
           <div id="cc-summary" style="display:flex;gap:8px;margin-bottom:10px;"></div>
           <div id="cc-table" style="overflow-x:auto;"></div>
         </div>
-        <!-- תזכורות -->
         <div style="padding:0 16px 16px;">
           <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">📲 תזכורות לחייבים</div>
           <div id="cc-reminders-list" style="margin-bottom:10px;font-size:12px;color:var(--slate);"></div>
           <button id="cc-send-all-btn" onclick="sendAllReminders()" style="width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;">📲 שלח תזכורת לכל החייבים</button>
+          <button onclick="openAdminReceiptsModal()" style="width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;margin-top:8px;">🧾 היסטוריית קבלות הבניין</button>
+          <div id="admin-receipts-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)this.style.display='none'"><div style="background:#fff;border-radius:20px 20px 0 0;margin-top:60px;min-height:calc(100vh - 60px);padding:20px 16px 40px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div style="font-size:16px;font-weight:900;color:var(--navy);">🧾 היסטוריית קבלות</div><button onclick="document.getElementById('admin-receipts-modal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--slate);">✕</button></div><div id="admin-receipts-list"></div></div></div>
         </div>
       </div>
       <!-- admin: budget manager -->
@@ -2560,12 +2558,6 @@ a{text-decoration:none;color:inherit;}
 
 
 
-    } else {
-      showAuthScreen();
-  }
-  }, 1200);
-});
-</script>
 
 <div style="height: 100px; clear: both;"></div> <footer style="text-align: center; padding: 30px 10px; background-color: #f0f4f8; border-top: 1px solid #d1d9e0; direction: rtl; position: relative; z-index: 5;">
     <div style="margin-bottom: 18px;">
