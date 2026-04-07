@@ -51,7 +51,7 @@ function submitVaadOrder(){
   if(!p){ showToast('שגיאה: לא נמצא בעל מקצוע'); return; }
 
   var slug     = _getBuildingSlug();
-  var bldgName = (DB.building && DB.building.name) ? DB.building.name : 'הבניין';
+  var bldgName = (DB.building && DB.building.name) ? DB.building.name : (function(){ try{ var bd=JSON.parse(localStorage.getItem('sn_building_data')||'{}'); return bd.building_name||'הבניין'; }catch(e){ return 'הבניין'; } })();
   var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName);
   var msg      = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך לטיפול בתחום ' + p.cat + '.\nלאחר סיום — דווח דרך הקישור:\n' + reportUrl);
   var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
