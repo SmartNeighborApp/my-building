@@ -81,8 +81,9 @@ function savePaySettings(){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PAYMENT SHEET
+   BUDGET MANAGER
 ═══════════════════════════════════════════════════════════════ */
+function renderBudgetManager(){
   var el = document.getElementById('budget-rows-container');
   if(!el) return;
   var MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
