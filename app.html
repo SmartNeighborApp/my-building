@@ -1903,37 +1903,6 @@ a{text-decoration:none;color:inherit;}
       </div>
       <!-- admin: budget manager -->
       <!-- admin: faults management -->
-      <div class="sett-section admin-only" id="admin-faults-card">
-        <div class="admin-sec-title">🔧 ניהול תקלות</div>
-        <div style="padding:12px 16px 16px;">
-          <div style="font-size:12px;color:var(--slate);margin-bottom:12px;line-height:1.55;">
-            סמן תקלות כבוצעות — הדיירים יראו שעון עצר של 48 שעות ולאחר מכן התקלה תיעלם.
-          </div>
-          <div id="admin-faults-list"></div>
-        </div>
-      </div>
-
-      <div class="sett-section admin-only" id="budget-manager-card">
-        <div class="admin-sec-title" id="budget-mgr-title">💰 ניהול תקציב חודשי</div>
-        <div style="padding:12px 16px 16px;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-            <span style="font-size:11px;font-weight:700;color:var(--slate);" id="budget-col-cat">קטגוריה</span>
-            <span style="font-size:11px;font-weight:700;color:var(--slate);" id="budget-col-amt">סכום (₪)</span>
-          </div>
-          <div id="budget-rows-container"></div>
-          <div style="display:flex;justify-content:space-between;margin-top:10px;align-items:center;">
-            <span style="font-size:12px;color:var(--slate);" id="budget-total-lbl">סה"כ:</span>
-            <span style="font-size:15px;font-weight:900;color:var(--navy);" id="budget-total-val">₪0</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="save-btn" style="flex:1;background:#F1F5F9;color:var(--navy);" id="budget-add-btn" onclick="addBudgetRow()">+ קטגוריה</button>
-            <button class="save-btn" style="flex:1;" id="budget-save-btn" onclick="saveBudget()">💾 עדכן גרפים</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- admin: drive link -->
-      <!-- admin: building documents -->
       <div class="sett-section admin-only" id="building-docs-card">
         <div class="admin-sec-title">📁 מסמכי הבניין</div>
         <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;">
@@ -1967,8 +1936,7 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
-      <!-- admin: CSV export -->
-id="residents-mgr-card">
+      <div class="sett-section admin-only" id="residents-mgr-card">
         <div class="admin-sec-title">👥 ניהול דיירים ו-WhatsApp</div>
         <div style="padding:12px 16px 16px;">
           <div id="residents-list-admin"></div>
@@ -1985,11 +1953,7 @@ id="residents-mgr-card">
         </div>
       </div>
 
-      <!-- install instructions -->
-      <!-- danger zone -->
-      <div style="padding:0 14px 20px;text-align:center;">
-        <button class="danger-btn" onclick="if(confirm('איפוס כל הנתונים?'))resetApp()">🗑️ איפוס נתוני האפליקציה</button>
-      </div>
+      
     </div><!-- /page-settings -->
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
