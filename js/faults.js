@@ -75,15 +75,18 @@ function openOrderProfSheet(faultId, domain){
     } else {
       var html = '';
       profs.forEach(function(p){
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F1F5F9;">'+
-          '<div>'+
-            '<div style="font-size:13px;font-weight:800;color:#1E3A5C;">'+escHtml(p.name)+'</div>'+
-            '<div style="font-size:11px;color:#3B82F6;">'+escHtml(p.cat)+'</div>'+
+        html += '<label for="op-chk-'+p.id+'" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:6px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;cursor:pointer;transition:all .15s;">'+
+          '<div style="display:flex;align-items:center;gap:10px;">'+
+            '<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);display:flex;align-items:center;justify-content:center;font-size:16px;">🔧</div>'+
+            '<div>'+
+              '<div style="font-size:13px;font-weight:800;color:#1E3A5C;">'+escHtml(p.name)+'</div>'+
+              '<div style="font-size:11px;font-weight:600;color:#3B82F6;">'+escHtml(p.cat)+'</div>'+
+            '</div>'+
           '</div>'+
           '<input type="checkbox" id="op-chk-'+p.id+'" value="'+p.id+'" '+
             'onchange="toggleOrderProfSelect(this)" '+
-            'style="width:20px;height:20px;cursor:pointer;">'+
-        '</div>';
+            'style="width:20px;height:20px;cursor:pointer;accent-color:#1E3A5C;">'+
+        '</label>';
       });
       listEl.innerHTML = html;
     }
