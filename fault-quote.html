@@ -78,16 +78,17 @@ body{ font-family:'Heebo',sans-serif; background:linear-gradient(160deg,#0F2744,
     <!-- זמן הגעה -->
     <div>
       <div class="section-title">📅 זמן הגעה משוער</div>
-      <label class="field-label">מתי תוכל להגיע? *</label>
-      <select id="quote-arrival" class="field-input">
-        <option value="">בחר זמן הגעה...</option>
-        <option value="היום">היום</option>
-        <option value="מחר">מחר</option>
-        <option value="תוך יומיים">תוך יומיים</option>
-        <option value="תוך 3 ימים">תוך 3 ימים</option>
-        <option value="תוך שבוע">תוך שבוע</option>
-        <option value="לתיאום">לתיאום</option>
-      </select>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="flex:1;">
+          <label class="field-label">תאריך *</label>
+          <input id="quote-date" class="field-input" type="date" style="direction:ltr;">
+          <div id="quote-date-label" style="font-size:12px;font-weight:700;color:#3B82F6;margin-top:4px;text-align:center;"></div>
+        </div>
+        <div style="flex:1;">
+          <label class="field-label">שעה *</label>
+          <input id="quote-time" class="field-input" type="time" style="direction:ltr;">
+        </div>
+      </div>
     </div>
 
     <!-- הערות -->
@@ -141,6 +142,33 @@ if(faultPhoto){
   document.getElementById('fault-photo-img').src = faultPhoto;
 }
 
+// הגדרת תאריך ברירת מחדל + תווית
+(function(){
+  var today = new Date();
+  var pad = function(n){ return n < 10 ? '0'+n : ''+n; };
+  var todayStr = today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+  var dateEl = document.getElementById('quote-date');
+  if(dateEl){
+    dateEl.value = todayStr;
+    dateEl.max = (function(){
+      var d = new Date(); d.setDate(d.getDate()+2);
+      return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    })();
+    dateEl.addEventListener('change', function(){
+      var label = document.getElementById('quote-date-label');
+      if(!label) return;
+      var sel = new Date(this.value+'T00:00:00');
+      var diff = Math.round((sel - new Date(todayStr+'T00:00:00')) / 86400000);
+      if(diff === 0) label.textContent = 'היום';
+      else if(diff === 1) label.textContent = 'מחר';
+      else if(diff === 2) label.textContent = 'מחרתיים';
+      else label.textContent = '';
+    });
+    // הפעלה מיידית
+    document.getElementById('quote-date-label').textContent = 'היום';
+  }
+})();
+
 function showErr(msg){
   var el = document.getElementById('form-err');
   el.textContent = msg;
@@ -150,13 +178,15 @@ function showErr(msg){
 
 function submitQuote(){
   var price   = parseFloat(document.getElementById('quote-price').value)||0;
-  var arrival = document.getElementById('quote-arrival').value;
+  var dateVal = document.getElementById('quote-date').value;
+  var timeVal = document.getElementById('quote-time').value;
   var notes   = (document.getElementById('quote-notes').value||'').trim();
+  var arrival = dateVal && timeVal ? (document.getElementById('quote-date-label').textContent||dateVal) + ' בשעה ' + timeVal : '';
 
   document.getElementById('form-err').style.display = 'none';
 
   if(!price || price <= 0){ showErr('נא להזין סכום'); return; }
-  if(!arrival){ showErr('נא לבחור זמן הגעה משוער'); return; }
+  if(!dateVal || !timeVal){ showErr('נא למלא תאריך ושעה'); return; }
 
   var btn = document.getElementById('submit-btn');
   btn.disabled = true;
