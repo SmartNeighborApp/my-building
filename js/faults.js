@@ -427,6 +427,7 @@ function submitFault(){
   loc = loc;
   var desc = (document.getElementById('fault-desc').value||'').trim();
   var pri  = document.getElementById('fault-pri').value||'med';
+  var domain = (document.getElementById('fault-domain') ? document.getElementById('fault-domain').value : '')||'';
   var err  = document.getElementById('fault-err');
 
   if(!loc||!desc){
@@ -448,7 +449,8 @@ function submitFault(){
     status:      'open',
     date:        fmtDate(new Date()),
     reporter:    DB.user ? DB.user.name : 'דייר',
-    unit:        DB.user ? DB.user.unit : null
+    unit:        DB.user ? DB.user.unit : null,
+    domain:      domain
   };
 
   function _doInsertFault(photoUrl){
@@ -458,6 +460,7 @@ function submitFault(){
       document.getElementById('fault-loc').value='';
       document.getElementById('fault-desc').value='';
       document.getElementById('fault-pri').value='med';
+      var domEl = document.getElementById('fault-domain'); if(domEl) domEl.value='';
       var otherInp2 = document.getElementById('fault-loc-other');
       if(otherInp2){ otherInp2.value=''; otherInp2.style.display='none'; }
       var suggestBox = document.getElementById('fault-prof-suggest');
