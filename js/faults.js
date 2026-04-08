@@ -1,3 +1,50 @@
+/* ═══════════════════════════════════════════════════════════════
+   FAULT PAGE ADMIN PIN — כניסת מנהל ישירות מעמוד תקלות
+═══════════════════════════════════════════════════════════════ */
+function openFaultAdminPin(){
+  var popup = document.getElementById('fault-admin-pin-popup');
+  if(!popup) return;
+  // ניקוי שדות
+  for(var i=0;i<4;i++){ var b=document.getElementById('fap'+i); if(b) b.value=''; }
+  var errEl = document.getElementById('fap-err');
+  if(errEl) errEl.style.display='none';
+  popup.style.display = 'block';
+  setTimeout(function(){ var b=document.getElementById('fap0'); if(b) b.focus(); },200);
+}
+
+function fapNext(idx){
+  var cur = document.getElementById('fap'+idx);
+  if(!cur || cur.value.length < 1) return;
+  if(idx < 3){
+    var next = document.getElementById('fap'+(idx+1));
+    if(next) next.focus();
+  } else {
+    submitFaultAdminPin();
+  }
+}
+
+function submitFaultAdminPin(){
+  var pin = '';
+  for(var i=0;i<4;i++){ var b=document.getElementById('fap'+i); if(b) pin+=b.value; }
+  var errEl = document.getElementById('fap-err');
+  if(pin !== DB.adminPin){
+    if(errEl) errEl.style.display='block';
+    for(var j=0;j<4;j++){ var bx=document.getElementById('fap'+j); if(bx) bx.value=''; }
+    var b0=document.getElementById('fap0'); if(b0) b0.focus();
+    return;
+  }
+  // קוד נכון — הפעלת מצב מנהל
+  if(errEl) errEl.style.display='none';
+  ADMIN_ON = true;
+  var popup = document.getElementById('fault-admin-pin-popup');
+  if(popup) popup.style.display='none';
+  var btn = document.getElementById('fault-admin-pin-btn');
+  if(btn){ btn.textContent='✅ מנהל פעיל'; btn.style.background='linear-gradient(135deg,#16A34A,#15803D)'; }
+  renderFaultsPage();
+  renderHomePage();
+  showToast('✅ מצב מנהל פעיל');
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    ORDER PROF FROM FAULT — הזמנת ספק מתוך תקלה
