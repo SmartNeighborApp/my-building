@@ -1001,13 +1001,9 @@ function renderSettingsPage(){
     updateCfgLive();
     renderAdminCollBoard();
     renderBudgetManager();
-    renderExpCatManager();
-    renderDocCatManager();
+    loadBuildingDocs();
     renderResidentsList();
     renderAdminFaultsList();
-    renderCustomDocsAdmin();
-    // drive link prefill
-    val('admin-drive-link', DB.driveLink||'');
     initCollectionCenter();
   }
 }
