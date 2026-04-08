@@ -1958,48 +1958,6 @@ a{text-decoration:none;color:inherit;}
 
       <!-- admin: custom documents -->
       <!-- admin: unified docs manager -->
-      <div class="sett-section admin-only" id="doc-cat-card">
-        <div class="admin-sec-title">📁 ניהול מסמכים וקטגוריות</div>
-        <div style="padding:12px 16px 16px;">
-          <div style="font-size:12px;color:var(--slate);margin-bottom:14px;line-height:1.55;">
-            נהל קטגוריות ופרסם מסמכים לדיירים — טקסט חופשי או קישור ל-Drive/Dropbox.
-          </div>
-
-          <!-- קטגוריות + פרסום משולב -->
-          <div id="doc-cat-manager"></div>
-
-          <!-- רשימת פרסומים קיימים -->
-          <div style="margin-top:16px;border-top:1px solid #F1F5F9;padding-top:14px;">
-            <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:10px;">📋 פרסומים קיימים</div>
-            <div id="custom-docs-admin-list"></div>
-          </div>
-
-          <!-- טופס הוספה -->
-          <div style="background:#F8FAFC;border-radius:14px;padding:14px;border:1.5px dashed #CBD5E1;margin-top:10px;">
-            <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:10px;">+ פרסם מסמך חדש לדיירים</div>
-            <div class="doc-type-tabs">
-              <button class="doc-type-tab active" id="new-doc-tab-text" onclick="switchNewDocTab('text')">✏️ טקסט חופשי</button>
-              <button class="doc-type-tab" id="new-doc-tab-link" onclick="switchNewDocTab('link')">🔗 קישור חיצוני</button>
-            </div>
-            <select id="new-doc-cat" class="admin-inp" style="margin-bottom:8px;">
-              <option value="">בחר קטגוריה (אופציונלי)</option>
-            </select>
-            <input id="new-doc-title" class="admin-inp" type="text" placeholder="כותרת המסמך / הפרסום" style="margin-bottom:8px;">
-            <div id="new-doc-text-wrap">
-              <textarea id="new-doc-text" class="admin-inp" rows="4"
-                placeholder="הדבק או הקלד את תוכן המסמך...&#10;(פרוטוקול, החלטה, הודעה, כל טקסט)"
-                style="resize:vertical;line-height:1.65;"></textarea>
-            </div>
-            <div id="new-doc-link-wrap" style="display:none;flex-direction:column;gap:6px;">
-              <input id="new-doc-link" class="admin-inp" type="url" placeholder="https://drive.google.com/... או כל קישור אחר">
-              <div style="font-size:11px;color:var(--slate);">קישור ל-Google Drive, Dropbox, PDF מקוון, או כל אתר</div>
-            </div>
-            <button class="save-btn" style="width:100%;margin-top:10px;" onclick="addCustomDoc()">💾 פרסם לדיירים</button>
-          </div>
-        </div>
-      </div>
-
-
       <!-- admin: change PIN -->
       <div class="sett-section admin-only">
         <div class="admin-sec-title" id="pin-change-lbl">🔑 שינוי קוד מנהל</div>
@@ -2010,21 +1968,7 @@ a{text-decoration:none;color:inherit;}
       </div>
 
       <!-- admin: CSV export -->
-      <div class="sett-section admin-only" id="export-card">
-        <div class="admin-sec-title" id="export-card-title">📥 ייצוא נתונים</div>
-        <div style="padding:12px 16px 16px;">
-          <div style="font-size:11px;color:var(--slate);margin-bottom:10px;" id="export-card-sub">ייצוא לאקסל / CSV</div>
-          <div class="export-btns">
-            <button class="export-btn income" id="export-btn-income" onclick="exportCSV('income')">📥 הכנסות לאקסל</button>
-            <button class="export-btn expense" id="export-btn-expenses" onclick="exportCSV('expenses')">📤 הוצאות לאקסל</button>
-            <button class="export-btn full" id="export-btn-full" onclick="exportCSV('full')"><span id="export-btn-full-txt">📊 דוח שנתי — CSV</span></button>
-            <button class="export-btn full" style="background:linear-gradient(135deg,#1E40AF,#2563EB);color:#ffffff;font-weight:900;" onclick="exportAnnualPDF()">🖨️ דוח שנתי — PDF להדפסה</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- admin: residents manager -->
-      <div class="sett-section admin-only" id="residents-mgr-card">
+id="residents-mgr-card">
         <div class="admin-sec-title">👥 ניהול דיירים ו-WhatsApp</div>
         <div style="padding:12px 16px 16px;">
           <div id="residents-list-admin"></div>
