@@ -988,7 +988,8 @@ function renderSettingsPage(){
 
   if(ADMIN_ON){
     // prefill fields
-    val('admin-bldg-name', DB.building.name);
+    var _sbName=(function(){try{var _d=JSON.parse(localStorage.getItem('sn_building_data')||'{}');return _d.building_name||DB.building.name||'';}catch(e){return DB.building.name||'';}}());
+    val('admin-bldg-name', _sbName);
     val('admin-units',     DB.building.total_units);
     val('admin-fee',       DB.building.monthly_fee);
     val('admin-vaad-phone', DB.paySettings.vaadPhone||'');
@@ -1003,7 +1004,6 @@ function renderSettingsPage(){
     renderBudgetManager();
     loadBuildingDocs();
     renderResidentsList();
-    renderAdminFaultsList();
     initCollectionCenter();
   }
 }
