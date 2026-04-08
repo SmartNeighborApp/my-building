@@ -246,6 +246,7 @@ a{text-decoration:none;color:inherit;}
 .hdr-user{
   padding:0 18px 12px;
   display:flex;align-items:center;justify-content:space-between;
+  pointer-events:none;
 }
 .hdr-greeting-row{display:flex;align-items:baseline;gap:4px;}
 .hdr-greeting{font-size:14px;color:rgba(255,255,255,.6);font-weight:400;}
@@ -2564,6 +2565,17 @@ a{text-decoration:none;color:inherit;}
       <button onclick="document.getElementById('fault-quotes-popup').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748B;">×</button>
     </div>
     <div id="fault-quotes-list"></div>
+  </div>
+</div>
+
+<!-- receipts modal -->
+<div id="receipts-modal" onclick="if(event.target===this)closeReceiptsModal()" style="display:none;position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:20px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto;direction:rtl;font-family:var(--font);padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:18px;font-weight:900;color:#1E3A5C;">🧾 הקבלות שלי</div>
+      <button onclick="closeReceiptsModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#64748B;">×</button>
+    </div>
+    <div id="receipts-modal-list"></div>
   </div>
 </div>
 </body>
