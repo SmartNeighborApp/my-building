@@ -2273,6 +2273,21 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 
+<!-- ORDER PROF FROM FAULT SHEET -->
+<div id="sheet-order-prof" class="sheet-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sheet-box">
+    <div class="sheet-title">🔧 הזמן ספק — <span id="order-prof-domain-label"></span></div>
+    <div style="font-size:12px;color:#64748B;margin-bottom:12px;">בחר עד 3 ספקים — כל אחד יקבל הודעה נפרדת בוואטספ</div>
+    <div id="order-prof-list" style="max-height:300px;overflow-y:auto;"></div>
+    <div id="order-prof-count" style="font-size:12px;font-weight:700;color:#3B82F6;margin-top:8px;text-align:center;">0/3 נבחרו</div>
+    <div id="order-prof-err" class="err-msg"></div>
+    <div class="sheet-2col" style="margin-top:12px;">
+      <button class="btn-cancel" onclick="document.getElementById('sheet-order-prof').classList.remove('open')">ביטול</button>
+      <button class="btn-submit" onclick="submitOrderProf()">שלח הזמנה ✉</button>
+    </div>
+  </div>
+</div>
+
 <!-- NOTICE SHEET -->
 <div id="sheet-notice" class="sheet-overlay" onclick="if(event.target===this)closeSheet('notice')">
   <div class="sheet">
