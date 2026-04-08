@@ -736,7 +736,8 @@ function _doRenderCollectionCenter(mk, fee, tot){
       '<td style="padding:8px 6px;">'+escHtml(r.name)+'</td>'+
       '<td style="padding:8px 6px;color:var(--green);font-weight:700;">₪'+num(r.paidAmt)+'</td>'+
       '<td style="padding:8px 6px;color:var(--rose);font-weight:700;">'+(r.debt>0?'₪'+num(r.debt):'—')+'</td>'+
-      '<td style="padding:8px 6px;color:'+stCols[r.status]+';font-weight:800;">'+stLbls[r.status]+'</td></tr>';
+      '<td style="padding:8px 6px;color:'+stCols[r.status]+';font-weight:800;">'+stLbls[r.status]+'</td>'+
+      '<td style="padding:4px 6px;">'+(r.phone!=='—'?'<button onclick="sendReminderToUnit('+r.unit+')" style="padding:4px 8px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">📲</button>':'<span style="color:#CBD5E1;font-size:11px;">—</span>')+'</td></tr>';
   });
   thtml += '</table>';
   var tEl = document.getElementById('cc-table');
@@ -892,4 +893,14 @@ function deleteBuildingDoc(id, fileUrl){
   }
   showToast('מסמך נמחק ✅');
   loadBuildingDocs();
+}
+
+function sendReminderToUnit(unit){
+  var phone = (DB.residentPhones && DB.residentPhones[unit]) || '';
+  if(!phone){ showToast('לא הוזן טלפון לדירה '+unit); return; }
+  var name = DB.unitNames[unit] || ('דירה '+unit);
+  var bldg = DB.building.name || 'הבניין';
+  var msg = 'שלום '+name+', ועד הבית של '+bldg+' מזכיר לך שתשלום דמי הועד עדיין לא התקבל. נא לשלם בהקדם דרך האפליקציה הדיגיטלית. תודה ð¢';
+  var clean = phone.replace(/\D/g,'').replace(/^0/,'972');
+  window.open('https://wa.me/'+clean+'?text='+encodeURIComponent(msg),'_blank');
 }
