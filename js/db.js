@@ -186,3 +186,82 @@ function loadPaymentsFromSupabase(cb){
     if(cb) cb();
   });
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPENSES — Supabase CRUD
+   טעינה, שמירה, עדכון, מחיקה של הוצאות
+═══════════════════════════════════════════════════════════════ */
+
+function loadExpensesFromSupabase(cb){
+  var slug = _getBuildingSlug();
+  if(!slug){ if(cb) cb(); return; }
+  sbClient.from('expenses').select('*').eq('building_slug', slug).order('created_at', {ascending:true}).then(function(res){
+    if(!res.error && res.data){
+      DB.finance.expenses = res.data.map(function(r){
+        return {
+          id:              r.id,
+          cat:             r.cat             || 'כללי',
+          amount:          r.amount          || 0,
+          expType:         r.exp_type        || 'חד פעמית',
+          month:           r.month           || '',
+          year:            r.year            || new Date().getFullYear(),
+          receiptDate:     r.receipt_date    || '',
+          receiptSupplier: r.receipt_supplier|| '',
+          details:         r.details         || '',
+          photo_url:       r.photo_url       || null,
+          invoice_link:    r.invoice_link    || null,
+          fault_id:        r.fault_id        || null,
+          source:          r.source          || 'manual',
+          color:           '#3B82F6'
+        };
+      });
+    }
+    if(cb) cb();
+  });
+}
+
+function saveExpenseToSupabase(expense, cb){
+  var slug = _getBuildingSlug();
+  if(!slug){ if(cb) cb(null); return; }
+  var record = {
+    building_slug:    slug,
+    cat:              expense.cat             || 'כללי',
+    amount:           expense.amount          || 0,
+    exp_type:         expense.expType         || 'חד פעמית',
+    month:            expense.month           || '',
+    year:             expense.year            || new Date().getFullYear(),
+    receipt_date:     expense.receiptDate     || '',
+    receipt_supplier: expense.receiptSupplier || '',
+    details:          expense.details         || '',
+    photo_url:        expense.photo_url       || null,
+    invoice_link:     expense.invoice_link    || null,
+    fault_id:         expense.fault_id        || null,
+    source:           expense.source          || 'manual'
+  };
+  sbClient.from('expenses').insert([record]).select().then(function(res){
+    if(!res.error && res.data && res.data[0]){
+      if(cb) cb(res.data[0].id);
+    } else {
+      if(cb) cb(null);
+    }
+  });
+}
+
+function updateExpenseInSupabase(id, fields){
+  if(!id) return;
+  var record = {};
+  if(fields.cat             !== undefined) record.cat              = fields.cat;
+  if(fields.amount          !== undefined) record.amount           = fields.amount;
+  if(fields.expType         !== undefined) record.exp_type         = fields.expType;
+  if(fields.month           !== undefined) record.month            = fields.month;
+  if(fields.year            !== undefined) record.year             = fields.year;
+  if(fields.receiptDate     !== undefined) record.receipt_date     = fields.receiptDate;
+  if(fields.receiptSupplier !== undefined) record.receipt_supplier = fields.receiptSupplier;
+  if(fields.details         !== undefined) record.details          = fields.details;
+  sbClient.from('expenses').update(record).eq('id', id).then(function(){});
+}
+
+function deleteExpenseFromSupabase(id){
+  if(!id) return;
+  sbClient.from('expenses').delete().eq('id', id).then(function(){});
+}
