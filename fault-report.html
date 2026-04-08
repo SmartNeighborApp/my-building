@@ -74,6 +74,17 @@ body{ font-family:'Heebo',sans-serif; background:linear-gradient(160deg,#0F2744,
       <div style="font-size:12px;color:#64748B;margin-top:6px;line-height:1.5;">הסכום ייכנס אוטומטית למערכת הוצאות הבניין</div>
     </div>
 
+    <!-- חשבונית — צילום או קישור -->
+    <div>
+      <div class="section-title">🧾 חשבונית</div>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px;line-height:1.5;">צרף חשבונית — צלם תמונה <strong>או</strong> הדבק קישור (Google Drive, Dropbox וכו')</p>
+      <input type="file" id="invoice-photo" accept="image/*" capture="environment" style="display:none;" onchange="previewInvoice(this)">
+      <button class="photo-btn" onclick="document.getElementById('invoice-photo').click()">📷 צלם / העלה תמונת חשבונית</button>
+      <img id="invoice-preview" class="preview-img" alt="תצוגה מקדימה חשבונית">
+      <div style="text-align:center;font-size:12px;color:#94A3B8;margin:8px 0;">— או —</div>
+      <input id="invoice-link" class="field-input" type="url" placeholder="הדבק קישור לחשבונית..." style="font-size:13px;">
+    </div>
+
     <!-- הערות -->
     <div>
       <label class="field-label">הערות נוספות (רשות)</label>
@@ -125,6 +136,15 @@ function previewPhoto(input){
   }
 }
 
+function previewInvoice(input){
+  var prev = document.getElementById('invoice-preview');
+  if(input.files && input.files[0]){
+    var reader = new FileReader();
+    reader.onload = function(e){ prev.src = e.target.result; prev.style.display = 'block'; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 function showErr(msg){
   var el = document.getElementById('form-err');
   el.textContent = msg;
@@ -133,9 +153,11 @@ function showErr(msg){
 }
 
 function submitReport(){
-  var amount  = parseFloat(document.getElementById('invoice-amount').value)||0;
-  var notes   = (document.getElementById('notes').value||'').trim();
-  var photoFile = document.getElementById('after-photo').files[0] || null;
+  var amount       = parseFloat(document.getElementById('invoice-amount').value)||0;
+  var notes        = (document.getElementById('notes').value||'').trim();
+  var photoFile    = document.getElementById('after-photo').files[0] || null;
+  var invoiceFile  = document.getElementById('invoice-photo').files[0] || null;
+  var invoiceLink  = (document.getElementById('invoice-link').value||'').trim();
 
   document.getElementById('form-err').style.display = 'none';
 
@@ -174,14 +196,15 @@ function submitReport(){
 
     // שמירה ב-Supabase — טבלת supplier_reports
     sbClient.from('supplier_reports').insert([{
-      building_slug: slug,
-      prof_name:     profName,
-      cat:           cat,
-      amount:        amount,
-      notes:         notes,
-      photo_after_url: photoUrl || null,
-      fault_id:      faultId || null,
-      submitted_at:  now.toISOString()
+      building_slug:    slug,
+      prof_name:        profName,
+      cat:              cat,
+      amount:           amount,
+      notes:            notes,
+      photo_after_url:  photoUrl || null,
+      fault_id:         faultId || null,
+      submitted_at:     now.toISOString(),
+      invoice_link:     invoiceLink || null
     }]).then(function(res){
       document.getElementById('loading-screen').style.display = 'none';
       document.getElementById('success-screen').style.display = 'block';
@@ -191,17 +214,30 @@ function submitReport(){
     });
   }
 
+  function _uploadInvoice(afterUrl, cb){
+    if(invoiceFile){
+      var ext2 = invoiceFile.name.split('.').pop() || 'jpg';
+      var invName = (slug||'bldg')+'-invoice-'+Date.now()+'.'+ext2;
+      sbClient.storage.from('fault-images').upload(invName, invoiceFile, { contentType: invoiceFile.type, upsert: true }).then(function(r){
+        invoiceLink = (!r.error && r.data) ? (sbClient.storage.from('fault-images').getPublicUrl(invName).data.publicUrl||invoiceLink) : invoiceLink;
+        cb(afterUrl);
+      }).catch(function(){ cb(afterUrl); });
+    } else {
+      cb(afterUrl);
+    }
+  }
+
   if(photoFile){
     var ext = photoFile.name.split('.').pop() || 'jpg';
     var fileName = (slug||'bldg')+'-after-'+Date.now()+'.'+ext;
     sbClient.storage.from('fault-images').upload(fileName, photoFile, { contentType: photoFile.type, upsert: true }).then(function(res){
-      if(res.error){ _doSave(null); return; }
+      if(res.error){ _uploadInvoice(null, _doSave); return; }
       var urlRes = sbClient.storage.from('fault-images').getPublicUrl(fileName);
       var publicUrl = urlRes.data && urlRes.data.publicUrl ? urlRes.data.publicUrl : null;
-      _doSave(publicUrl);
-    }).catch(function(){ _doSave(null); });
+      _uploadInvoice(publicUrl, _doSave);
+    }).catch(function(){ _uploadInvoice(null, _doSave); });
   } else {
-    _doSave(null);
+    _uploadInvoice(null, _doSave);
   }
 }
 </script>
