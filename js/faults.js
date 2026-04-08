@@ -1,7 +1,9 @@
+var _faultPhotoFile = null;
 function previewFaultPhoto(input){
   var prev = document.getElementById('fault-photo-preview');
   if(!prev) return;
   if(input.files && input.files[0]){
+    _faultPhotoFile = input.files[0];
     var reader = new FileReader();
     reader.onload = function(e){ prev.src=e.target.result; prev.style.display='block'; };
     reader.readAsDataURL(input.files[0]);
@@ -464,13 +466,13 @@ function submitFault(){
       if(prev){ prev.src=''; prev.style.display='none'; }
       var photoInp = document.getElementById('fault-photo');
       if(photoInp) photoInp.value='';
+      _faultPhotoFile = null;
       closeSheet('fault');
       loadFaultsFromSupabase(function(){ renderFaultsPage(); renderHomePage(); });
       showToast('תקלה דווחה ✅');
     });
   }
-  var photoInput = document.getElementById('fault-photo');
-  var photoFile = photoInput && photoInput.files && photoInput.files[0] ? photoInput.files[0] : null;
+  var photoFile = _faultPhotoFile || null;
   if(photoFile){
     var ext = photoFile.name.split('.').pop() || 'jpg';
     var fileName = slug+'-'+Date.now()+'.'+ext;
