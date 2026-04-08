@@ -874,7 +874,7 @@ function renderBuildingDocsList(docs){
       '</div>'+
       '<div style="display:flex;gap:6px;">'+
         '<a href="'+d.file_url+'" target="_blank" style="padding:6px 10px;background:#EFF6FF;color:#1E40AF;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">ð ×¦×¤×</a>'+
-        '<button onclick="deleteBuildingDoc(''+d.id+'',''+d.file_url+'')" style="padding:6px 10px;background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">ðï¸</button>'+
+        '<button onclick="deleteBuildingDoc(\''+d.id+'\',\''+d.file_url+'\')" style="padding:6px 10px;background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">ðï¸</button>'+
       '</div>'+
     '</div>';
   });
