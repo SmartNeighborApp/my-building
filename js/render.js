@@ -365,11 +365,11 @@ function renderExpList(){
         var typeBadge = e.expType==='קבועה'
           ? '<span style="font-size:9px;background:#DBEAFE;color:#1E40AF;border-radius:3px;padding:1px 5px;">קבועה</span>'
           : '<span style="font-size:9px;background:#FEF9C3;color:#92400E;border-radius:3px;padding:1px 5px;">חד פעמית</span>';
-        var bg = i%2===0 ? '#FFFFFF' : '#F8FAFC';
+        var supplierTag = e.source==='supplier_report' ? '<span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:3px;padding:1px 5px;margin-right:3px;">ספק</span>' : '';
         html += '<div onclick="openExpDetail('+idx+')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:'+bg+';cursor:pointer;border-top:1px solid #F1F5F9;">'+
           '<div style="width:10px;height:10px;border-radius:3px;flex-shrink:0;background:'+e.color+';"></div>'+
           '<div style="flex:1;min-width:0;">'+
-            '<div style="font-size:12px;font-weight:700;color:var(--navy);">'+escHtml(e.cat)+'</div>'+
+            '<div style="font-size:12px;font-weight:700;color:var(--navy);">'+supplierTag+escHtml(e.cat)+'</div>'+
             '<div style="font-size:10px;color:var(--slate);display:flex;gap:4px;align-items:center;">'+typeBadge+(e.receiptSupplier?'<span>· '+escHtml(e.receiptSupplier)+'</span>':'')+'</div>'+
           '</div>'+
           '<div style="font-size:13px;font-weight:900;color:var(--navy);">₪'+num(e.amount)+'</div>'+
@@ -443,6 +443,34 @@ function renderQuarterlyReport(){
   }
   html += '</div>';
   el.innerHTML = html;
+}
+
+function openExpDetail(idx){
+  var e = DB.finance.expenses[idx];
+  if(!e) return;
+  var existing = document.getElementById('exp-detail-overlay');
+  if(existing) existing.remove();
+  var ov = document.createElement('div');
+  ov.id = 'exp-detail-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:16px;';
+  ov.onclick = function(ev){ if(ev.target===ov) ov.remove(); };
+  var photoBtn = e.photo_url ? '<button onclick="window.open(\''+e.photo_url+'\',\'_blank\')" style="flex:1;padding:10px;background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);"> תמונות</button>' : '';
+  var invBtn = e.invoice_link ? '<button onclick="window.open(\''+e.invoice_link+'\',\'_blank\')" style="flex:1;padding:10px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);"> חשבונית</button>' : '';
+  ov.innerHTML = '<div style="background:#fff;border-radius:20px;max-width:400px;width:100%;padding:20px;direction:rtl;font-family:var(--font);">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">'+
+      '<div style="font-size:16px;font-weight:900;color:#1E3A5C;">פרטי הוצאה</div>'+
+      '<button onclick="document.getElementById(\'exp-detail-overlay\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#64748B;">×</button>'+
+    '</div>'+
+    '<div style="background:#F8FAFC;border-radius:14px;padding:14px;margin-bottom:12px;">'+
+      '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E2E8F0;font-size:14px;"><span style="color:#64748B;">קטגוריה</span><span style="font-weight:800;color:#1E3A5C;">'+escHtml(e.cat)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E2E8F0;font-size:14px;"><span style="color:#64748B;">סכום</span><span style="font-weight:800;color:#1E3A5C;">₪'+num(e.amount)+'</span></div>'+
+      (e.receiptSupplier?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E2E8F0;font-size:14px;"><span style="color:#64748B;">ספק</span><span style="font-weight:800;color:#1E3A5C;">'+escHtml(e.receiptSupplier)+'</span></div>':'')+
+      (e.receiptDate?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E2E8F0;font-size:14px;"><span style="color:#64748B;">תאריך</span><span style="font-weight:800;color:#1E3A5C;">'+escHtml(e.receiptDate)+'</span></div>':'')+
+      (e.details?'<div style="padding:6px 0;font-size:13px;color:#475569;">'+escHtml(e.details)+'</div>':'')+
+    '</div>'+
+    (photoBtn||invBtn ? '<div style="display:flex;gap:8px;">'+photoBtn+invBtn+'</div>' : '')+
+  '</div>';
+  document.body.appendChild(ov);
 }
 
 function toggleExpMonth(key){
