@@ -567,7 +567,8 @@ function renderMaintItem(m, showAdmin){
         '<span class="mi-date">'+m.date+'</span>'+
         (ADMIN_ON
           ? '<button class="mark-done-btn" onclick="updateMaintStatus(\''+m.id+'\',\'done\')">✅ סמן כבוצע</button>'+
-            '<button class="mark-done-btn" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);margin-right:4px;" onclick="openOrderProfSheet(\''+m.id+'\',\''+escHtml(m.domain||'')+'\')">הזמן ספק</button>'
+            '<button class="mark-done-btn" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);margin-right:4px;" onclick="openOrderProfSheet(\''+m.id+'\',\''+escHtml(m.domain||'')+'\')">הזמן ספק</button>'+
+            '<button class="mark-done-btn" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);margin-right:4px;" onclick="showFaultQuotes(\''+m.id+'\')"> הצעות מחיר</button>'
           : '')+
       '</div>'+
     '</div></div>';
