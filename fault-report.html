@@ -121,7 +121,7 @@ var slug    = params.get('slug') || '';
 var profName= params.get('prof') || '';
 var cat     = params.get('cat')  || '';
 var bldg    = params.get('bldg') || '';
-var faultId = params.get('fid')  || '';
+var faultId = params.get('faultId') || params.get('fid') || '';
 
 document.getElementById('info-bldg').textContent = bldg || '—';
 document.getElementById('info-prof').textContent = profName || '—';
@@ -179,21 +179,6 @@ function submitReport(){
       sbClient.from('faults').update({ photo_after_url: photoUrl }).eq('id', faultId).then(function(){});
     }
 
-    // שמירת הוצאה
-    var expense = {
-      building_slug:  slug,
-      cat:            cat || 'כללי',
-      amount:         amount,
-      receipt_date:   fmtDate(now),
-      receipt_supplier: profName,
-      details:        'עבודה: ' + cat + (notes ? ' — ' + notes : ''),
-      exp_type:       'חד פעמית',
-      month:          monthHe,
-      year:           now.getFullYear(),
-      photo_url:      photoUrl || null,
-      source:         'supplier_report'
-    };
-
     // שמירה ב-Supabase — טבלת supplier_reports
     sbClient.from('supplier_reports').insert([{
       building_slug:    slug,
@@ -206,6 +191,22 @@ function submitReport(){
       submitted_at:     now.toISOString(),
       invoice_link:     invoiceLink || null
     }]).then(function(res){
+      // שמירה גם בטבלת expenses לתמונה כלכלית מאוחדת
+      sbClient.from('expenses').insert([{
+        building_slug:    slug,
+        cat:              cat || 'כללי',
+        amount:           amount,
+        exp_type:         'חד פעמית',
+        month:            monthHe,
+        year:             now.getFullYear(),
+        receipt_date:     fmtDate(now),
+        receipt_supplier: profName,
+        details:          'עבודה: ' + cat + (notes ? ' — ' + notes : ''),
+        photo_url:        photoUrl || null,
+        invoice_link:     invoiceLink || null,
+        fault_id:         faultId || null,
+        source:           'supplier_report'
+      }]).then(function(){});
       document.getElementById('loading-screen').style.display = 'none';
       document.getElementById('success-screen').style.display = 'block';
     }).catch(function(){
