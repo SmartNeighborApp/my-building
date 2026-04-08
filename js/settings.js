@@ -234,30 +234,12 @@ function renderCustomDocsAdmin(){
   el.innerHTML = html;
 }
 
-function saveDriveLink(){
-  var v = (document.getElementById('admin-drive-link').value||'').trim();
-  DB.driveLink = v;
-  saveDB();
-  showToast(v ? 'קישור Drive נשמר ✅' : 'קישור נמחק');
-  renderDocsPage();
-}
+
 
 /* ── EXPENSE DETAILS FORM (admin) ────────────────────────────── */
 /* ═══════════════════════════════════════════════════════════════
    CATEGORY MANAGERS
 ═══════════════════════════════════════════════════════════════ */
-function renderExpCatManager(){
-  var el = document.getElementById('exp-cat-manager');
-  if(!el) return;
-  var html = '';
-  (DB.expenseCategories||[]).forEach(function(c,i){
-    html += '<div class="cat-row">'+
-      '<input class="admin-inp" value="'+escAttr(c)+'" oninput="DB.expenseCategories['+i+']=this.value">'+
-      '<button class="cat-del-btn" onclick="DB.expenseCategories.splice('+i+',1);saveDB();renderExpCatManager()">🗑️</button></div>';
-  });
-  html += '<button class="cat-add-btn" onclick="DB.expenseCategories.push(\'חדשה\');saveDB();renderExpCatManager()">+ הוסף קטגוריה</button>';
-  el.innerHTML = html;
-}
 
 function renderDocCatManager(){
   var el = document.getElementById('doc-cat-manager');
@@ -607,86 +589,6 @@ function exportAnnualPDF(){
 /* ═══════════════════════════════════════════════════════════════
    SYNC: JSON EXPORT / IMPORT
 ═══════════════════════════════════════════════════════════════ */
-function exportSyncJSON(){
-  try{
-    // גרסה 2 — כולל DB מלא (הגדרות, הוצאות, adminPin, הגדרות תשלום)
-    // הערה: notices/faults/posts/professionals/payments נשמרים בסופרבייס ולא בקובץ זה
-    var syncPayload = {
-      _version: 2,
-      _exportedAt: new Date().toISOString(),
-      _building: DB.building.name,
-      db: DB,
-      residents: {}
-    };
-    // איסוף כל רישומי הדיירים מ-localStorage
-    for(var i=0; i<localStorage.length; i++){
-      var k = localStorage.key(i);
-      if(k && k.indexOf('sn21_residents_')===0){
-        try{ syncPayload.residents[k] = JSON.parse(localStorage.getItem(k)); } catch(e){}
-      }
-    }
-    var json = JSON.stringify(syncPayload, null, 2);
-    var bl   = new Blob([json],{type:'application/json;charset=utf-8;'});
-    var url  = URL.createObjectURL(bl);
-    var a    = document.createElement('a');
-    var dateStr = new Date().toISOString().slice(0,10);
-    a.href     = url;
-    a.download = 'smartneighbor-sync-'+dateStr+'.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    _showSyncStatus('✅ הקובץ יוצא בהצלחה! שלח אותו למכשיר השני.', 'success');
-  } catch(e){
-    _showSyncStatus('❌ שגיאה בייצוא: '+e.message, 'error');
-  }
-}
-
-function importSyncJSON(event){
-  var file = event.target.files && event.target.files[0];
-  if(!file){ return; }
-  var reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      var payload = JSON.parse(e.target.result);
-      // בדיקת מבנה — תומך גם בגרסה 1 (ישנה) וגם בגרסה 2 (עדכנית)
-      if(!payload._version || !payload.db || !payload.db.building){
-        _showSyncStatus('❌ קובץ לא תקין — ודא שזה קובץ סנכרון של SmartNeighbor', 'error');
-        return;
-      }
-      if(!confirm('ייבוא נתונים מ"'+payload._building+'" (יוצא ב-'+payload._exportedAt.slice(0,10)+').\nהנתונים הנוכחיים יוחלפו. להמשיך?')){
-        event.target.value='';
-        return;
-      }
-      // ייבוא DB — שמירה תחת מפתח sn22_db הנוכחי
-      localStorage.setItem(DB_KEY, JSON.stringify(payload.db));
-      // ייבוא רישומי דיירים
-      if(payload.residents){
-        Object.keys(payload.residents).forEach(function(k){
-          try{ localStorage.setItem(k, JSON.stringify(payload.residents[k])); } catch(ex){}
-        });
-      }
-      // ניקוי session — המשתמש יתחבר מחדש
-      try{ localStorage.removeItem(SESS_KEY); } catch(ex){}
-      _showSyncStatus('✅ ייבוא הצליח! הדף יטען מחדש...', 'success');
-      setTimeout(function(){ location.reload(); }, 1800);
-    } catch(ex){
-      _showSyncStatus('❌ שגיאה בקריאת הקובץ: '+ex.message, 'error');
-    }
-    event.target.value='';
-  };
-  reader.readAsText(file);
-}
-
-function _showSyncStatus(msg, type){
-  var el = document.getElementById('sync-status');
-  if(!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.style.background = type==='success' ? '#DCFCE7' : '#FEE2E2';
-  el.style.color      = type==='success' ? '#166534' : '#DC2626';
-  el.style.border     = type==='success' ? '1px solid #86EFAC' : '1px solid #FECACA';
-  setTimeout(function(){ el.style.display='none'; }, 5000);
-}
-
 function copyField(id){
   var el = document.getElementById(id);
   if(!el) return;
@@ -897,4 +799,97 @@ function exportCollectionCSV(){
   var a = document.createElement('a');
   a.href=url; a.download='גבייה_'+mk+'.csv'; a.click();
   URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUILDING DOCS — מסמכי בניין
+═══════════════════════════════════════════════════════════════ */
+var _buildingDocFile = null;
+
+function previewBuildingDoc(input){
+  var prev = document.getElementById('building-doc-preview');
+  if(input.files && input.files[0]){
+    _buildingDocFile = input.files[0];
+    if(prev){ prev.textContent = 'קובץ נבחר: ' + _buildingDocFile.name; prev.style.display='block'; }
+  }
+}
+
+function uploadBuildingDoc(){
+  var title = (document.getElementById('building-doc-title').value||'').trim();
+  var cat   = document.getElementById('building-doc-cat').value || 'אחר';
+  if(!title){ showToast('נא להזין כותרת מסמך'); return; }
+  if(!_buildingDocFile){ showToast('נא לבחור קובץ'); return; }
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  var ext = _buildingDocFile.name.split('.').pop() || 'bin';
+  var fileType = ext.toLowerCase();
+  var fileName = slug + '-doc-' + Date.now() + '.' + ext;
+  showToast('מעלה...');
+  sbClient.storage.from('building-docs').upload(fileName, _buildingDocFile, { contentType: _buildingDocFile.type, upsert: true }).then(function(res){
+    if(res.error){ showToast('שגיאה בהעלאה: ' + res.error.message); return; }
+    var urlRes = sbClient.storage.from('building-docs').getPublicUrl(fileName);
+    var fileUrl = urlRes.data && urlRes.data.publicUrl ? urlRes.data.publicUrl : '';
+    sbClient.from('building_docs').insert([{
+      building_slug: slug,
+      title:         title,
+      file_url:      fileUrl,
+      file_type:     fileType,
+      category:      cat
+    }]).then(function(r){
+      if(r.error){ showToast('שגיאה בשמירה'); return; }
+      showToast('מסמך הועלה ✅');
+      document.getElementById('building-doc-title').value = '';
+      document.getElementById('building-doc-cat').value = '';
+      document.getElementById('building-doc-preview').style.display = 'none';
+      document.getElementById('building-doc-file').value = '';
+      _buildingDocFile = null;
+      loadBuildingDocs();
+    });
+  });
+}
+
+function loadBuildingDocs(){
+  var slug = _getBuildingSlug();
+  if(!slug) return;
+  sbClient.from('building_docs').select('*').eq('building_slug', slug).order('created_at', {ascending:false}).then(function(res){
+    if(res.error) return;
+    renderBuildingDocsList(res.data||[]);
+  });
+}
+
+function renderBuildingDocsList(docs){
+  var el = document.getElementById('building-docs-list');
+  if(!el) return;
+  if(!docs.length){ el.innerHTML = '<div style="font-size:12px;color:#94A3B8;text-align:center;padding:12px;">אין מסמכים עדיין</div>'; return; }
+  var html = '';
+  docs.forEach(function(d){
+    var icon = d.file_type==='pdf' ? 'ð' : (d.file_type==='jpg'||d.file_type==='jpeg'||d.file_type==='png') ? 'ð¼ï¸' : (d.file_type==='doc'||d.file_type==='docx') ? 'ð' : (d.file_type==='xls'||d.file_type==='xlsx') ? 'ð' : 'ð';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F1F5F9;">'+
+      '<div style="display:flex;align-items:center;gap:8px;">'+
+        '<span style="font-size:18px;">'+icon+'</span>'+
+        '<div>'+
+          '<div style="font-size:13px;font-weight:700;color:#1E3A5C;">'+escHtml(d.title)+'</div>'+
+          '<div style="font-size:11px;color:#64748B;">'+escHtml(d.category||'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;">'+
+        '<a href="'+d.file_url+'" target="_blank" style="padding:6px 10px;background:#EFF6FF;color:#1E40AF;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">ð ×¦×¤×</a>'+
+        '<button onclick="deleteBuildingDoc(''+d.id+'',''+d.file_url+'')" style="padding:6px 10px;background:#FEE2E2;color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">ðï¸</button>'+
+      '</div>'+
+    '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function deleteBuildingDoc(id, fileUrl){
+  if(!confirm('למחוק את המסמך?')) return;
+  // מחיקת הרשומה
+  sbClient.from('building_docs').delete().eq('id', id).then(function(){});
+  // מחיקת הקובץ מ-Storage
+  var parts = fileUrl.split('building-docs/');
+  if(parts.length > 1){
+    sbClient.storage.from('building-docs').remove([parts[1]]).then(function(){});
+  }
+  showToast('מסמך נמחק ✅');
+  loadBuildingDocs();
 }
