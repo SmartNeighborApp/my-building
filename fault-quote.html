@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>הצעת מחיר — שכנות טובה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Heebo',sans-serif; background:linear-gradient(160deg,#0F2744,#1A3A5C); min-height:100vh; padding:20px 16px 40px; }
+.card{ background:#fff; border-radius:20px; max-width:480px; margin:0 auto; box-shadow:0 20px 60px rgba(0,0,0,.3); overflow:hidden; }
+.hdr{ background:linear-gradient(135deg,#1A3A5C,#2563EB); padding:24px; text-align:center; }
+.hdr img{ width:60px; height:60px; border-radius:14px; margin-bottom:10px; }
+.hdr-title{ font-size:20px; font-weight:900; color:#fff; }
+.hdr-sub{ font-size:13px; color:rgba(255,255,255,.7); margin-top:4px; }
+.body{ padding:20px; display:flex; flex-direction:column; gap:16px; }
+.info-box{ background:#EFF6FF; border-radius:14px; padding:14px; border:1.5px solid #BFDBFE; }
+.info-title{ font-size:12px; font-weight:800; color:#1E40AF; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px; }
+.info-row{ display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #DBEAFE; font-size:14px; }
+.info-row:last-child{ border-bottom:none; }
+.info-lbl{ color:#64748B; font-weight:600; }
+.info-val{ color:#1A3A5C; font-weight:800; }
+.section-title{ font-size:14px; font-weight:800; color:#1A3A5C; margin-bottom:8px; }
+.field-label{ font-size:13px; font-weight:700; color:#475569; margin-bottom:5px; display:block; }
+.field-input{ width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #E2E8F0; font-size:15px; font-family:'Heebo',sans-serif; background:#FAFAFA; }
+.field-input:focus{ outline:none; border-color:#1A3A5C; background:#fff; }
+.submit-btn{ width:100%; padding:16px; border:none; border-radius:14px; background:linear-gradient(135deg,#1A3A5C,#2563EB); color:#fff; font-size:16px; font-weight:900; font-family:'Heebo',sans-serif; cursor:pointer; }
+.submit-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.err-msg{ color:#EF4444; font-size:13px; font-weight:700; padding:10px; background:#FEE2E2; border-radius:10px; display:none; text-align:center; }
+#success-screen{ display:none; text-align:center; padding:40px 24px; }
+.success-icon{ font-size:72px; margin-bottom:16px; }
+.success-title{ font-size:22px; font-weight:900; color:#15803D; margin-bottom:8px; }
+.success-sub{ font-size:14px; color:#475569; line-height:1.6; }
+.loading{ display:none; text-align:center; padding:40px; }
+.loading-icon{ font-size:40px; animation:spin 1s linear infinite; display:block; margin-bottom:12px; }
+@keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="hdr">
+    <img src="favicon.png" alt="שכנות טובה" onerror="this.style.display='none'">
+    <div class="hdr-title">💼 הצעת מחיר</div>
+    <div class="hdr-sub">שכנות טובה · SmartNeighbor</div>
+  </div>
+
+  <div class="body" id="form-screen">
+
+    <!-- פרטי הקריאה -->
+    <div class="info-box">
+      <div class="info-title">📋 פרטי הקריאה</div>
+      <div class="info-row"><span class="info-lbl">בניין</span><span class="info-val" id="info-bldg">—</span></div>
+      <div class="info-row"><span class="info-lbl">בעל מקצוע</span><span class="info-val" id="info-prof">—</span></div>
+      <div class="info-row"><span class="info-lbl">תחום</span><span class="info-val" id="info-cat">—</span></div>
+      <div class="info-row"><span class="info-lbl">תיאור התקלה</span><span class="info-val" id="info-fault">—</span></div>
+    </div>
+
+    <!-- תמונת התקלה -->
+    <div id="fault-photo-box" style="display:none;">
+      <div class="section-title">📸 תמונת התקלה</div>
+      <img id="fault-photo-img" src="" alt="תמונת התקלה" style="width:100%;border-radius:14px;max-height:220px;object-fit:cover;">
+    </div>
+
+    <!-- הסבר קצר -->
+    <div style="background:#F0FDF4;border-radius:14px;padding:14px;border:1.5px solid #BBF7D0;">
+      <div style="font-size:13px;font-weight:700;color:#15803D;line-height:1.6;">📌 אנא מלא את הצעת המחיר. הוועד יבחן את ההצעה ויחזור אליך בהקדם.</div>
+    </div>
+
+    <!-- סכום מוצע -->
+    <div>
+      <div class="section-title">💰 סכום מוצע</div>
+      <label class="field-label">מחיר כולל מע"מ (₪) *</label>
+      <input id="quote-price" class="field-input" type="number" placeholder="0" inputmode="numeric" min="0">
+      <div style="font-size:12px;color:#64748B;margin-top:6px;">הזן את הסכום הסופי כולל מע"מ</div>
+    </div>
+
+    <!-- זמן הגעה -->
+    <div>
+      <div class="section-title">📅 זמן הגעה משוער</div>
+      <label class="field-label">מתי תוכל להגיע? *</label>
+      <select id="quote-arrival" class="field-input">
+        <option value="">בחר זמן הגעה...</option>
+        <option value="היום">היום</option>
+        <option value="מחר">מחר</option>
+        <option value="תוך יומיים">תוך יומיים</option>
+        <option value="תוך 3 ימים">תוך 3 ימים</option>
+        <option value="תוך שבוע">תוך שבוע</option>
+        <option value="לתיאום">לתיאום</option>
+      </select>
+    </div>
+
+    <!-- הערות -->
+    <div>
+      <div class="section-title">📝 הערות</div>
+      <label class="field-label">פרטים נוספים על העבודה (רשות)</label>
+      <textarea id="quote-notes" class="field-input" rows="3" placeholder="תאר את היקף העבודה, חומרים נדרשים, תנאים מיוחדים..."></textarea>
+    </div>
+
+    <div id="form-err" class="err-msg"></div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitQuote()">📨 שלח הצעת מחיר</button>
+  </div>
+
+  <!-- loading -->
+  <div class="loading" id="loading-screen">
+    <span class="loading-icon">⏳</span>
+    <div style="font-size:15px;font-weight:700;color:#1A3A5C;">שולח הצעת מחיר...</div>
+  </div>
+
+  <!-- success -->
+  <div id="success-screen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">הצעת המחיר נשלחה!</div>
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#F0FDF4;border:2px solid #BBF7D0;border-radius:50px;padding:10px 20px;margin:16px 0;font-size:14px;font-weight:800;color:#15803D;">💼 הוועד יבחן את הצעתך ויחזור אליך</div>
+    <div class="success-sub">תודה על המקצועיות!<br>אם תיבחר — תקבל קישור לדיווח סיום העבודה. 🏆</div>
+  </div>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk';
+var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var params    = new URLSearchParams(window.location.search);
+var slug      = params.get('slug')    || '';
+var profName  = params.get('prof')    || '';
+var profPhone = params.get('phone')   || '';
+var cat       = params.get('cat')     || '';
+var bldg      = params.get('bldg')    || '';
+var faultId   = params.get('faultId') || '';
+var faultTitle= params.get('fault')   || '';
+
+document.getElementById('info-bldg').textContent  = bldg       || '—';
+document.getElementById('info-prof').textContent  = profName   || '—';
+document.getElementById('info-cat').textContent   = cat        || '—';
+document.getElementById('info-fault').textContent = faultTitle || '—';
+var faultPhoto = params.get('photo') || '';
+if(faultPhoto){
+  document.getElementById('fault-photo-box').style.display = 'block';
+  document.getElementById('fault-photo-img').src = faultPhoto;
+}
+
+function showErr(msg){
+  var el = document.getElementById('form-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function submitQuote(){
+  var price   = parseFloat(document.getElementById('quote-price').value)||0;
+  var arrival = document.getElementById('quote-arrival').value;
+  var notes   = (document.getElementById('quote-notes').value||'').trim();
+
+  document.getElementById('form-err').style.display = 'none';
+
+  if(!price || price <= 0){ showErr('נא להזין סכום'); return; }
+  if(!arrival){ showErr('נא לבחור זמן הגעה משוער'); return; }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'block';
+
+  sbClient.from('fault_quotes').insert([{
+    building_slug: slug,
+    fault_id:      faultId || null,
+    prof_name:     profName,
+    prof_phone:    profPhone,
+    prof_cat:      cat,
+    price:         price,
+    arrival_time:  arrival,
+    notes:         notes,
+    status:        'pending'
+  }]).then(function(res){
+    document.getElementById('loading-screen').style.display = 'none';
+    if(res.error){
+      btn.disabled = false;
+      document.getElementById('form-screen').style.display = 'flex';
+      showErr('שגיאה בשליחה — נסה שוב');
+      return;
+    }
+    document.getElementById('success-screen').style.display = 'block';
+  }).catch(function(){
+    document.getElementById('loading-screen').style.display = 'none';
+    btn.disabled = false;
+    document.getElementById('form-screen').style.display = 'flex';
+    showErr('שגיאה בשליחה — נסה שוב');
+  });
+}
+</script>
+</body>
+</html>
