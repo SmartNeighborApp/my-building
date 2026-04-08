@@ -105,7 +105,7 @@ function loadFaultsFromSupabase(cb){
   sbClient.from('faults').select('*').eq('building_slug', slug).order('created_at', {ascending:false}).then(function(res){
     if(!res.error && res.data){
       DB.maintenance = res.data.map(function(r){
-        return { id:r.id, title:r.title, loc:r.loc, desc:r.description, pri:r.pri, status:r.status, date:r.date, reporter:r.reporter, unit:r.unit, doneAt:r.done_at, completionDate:r.completion_date };
+        return { id:r.id, title:r.title, loc:r.loc, desc:r.description, pri:r.pri, status:r.status, date:r.date, reporter:r.reporter, unit:r.unit, doneAt:r.done_at, completionDate:r.completion_date, photo_url:r.photo_url||null, photo_after_url:r.photo_after_url||null };
       });
     }
     if(cb) cb();
