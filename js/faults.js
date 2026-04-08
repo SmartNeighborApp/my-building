@@ -209,8 +209,9 @@ function submitOrderProf(){
   _selectedProfIds.forEach(function(profId){
     var p = (DB.professionals||[]).find(function(x){ return String(x.id)===String(profId); });
     if(!p) return;
-    var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(_orderProfFaultId||'');
-    var msg = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך לטיפול בתחום ' + _orderProfDomain + '. תיאור: ' + faultTitle + (faultDesc ? ' - ' + faultDesc : '') + '. לאחר סיום הטיפול דווח דרך: ' + reportUrl);
+    var faultPhoto = fault ? (fault.photo_url||'') : '';
+    var quoteUrl = 'https://smartneighborapp.github.io/my-building/fault-quote.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&phone='+encodeURIComponent(p.phone||'')+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(_orderProfFaultId||'')+'&fault='+encodeURIComponent(faultTitle)+'&photo='+encodeURIComponent(faultPhoto);
+    var msg = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך להגיש הצעת מחיר לטיפול בתחום ' + _orderProfDomain + '. תיאור: ' + faultTitle + (faultDesc ? ' - ' + faultDesc : '') + '. להגשת הצעה: ' + quoteUrl);
     var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
     setTimeout(function(){ window.open('https://wa.me/972'+phoneClean+'?text='+msg, '_blank'); }, 300);
   });
