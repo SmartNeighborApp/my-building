@@ -1957,6 +1957,19 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
+      <div class="sett-section admin-only" id="export-card">
+        <div class="admin-sec-title" id="export-card-title">📥 ייצוא נתונים</div>
+        <div style="padding:12px 16px 16px;">
+          <div style="font-size:11px;color:var(--slate);margin-bottom:10px;" id="export-card-sub">ייצוא לאקסל / CSV</div>
+          <div class="export-btns">
+            <button class="export-btn income" id="export-btn-income" onclick="exportCSV('income')">📥 הכנסות לאקסל</button>
+            <button class="export-btn expense" id="export-btn-expenses" onclick="exportCSV('expenses')">📤 הוצאות לאקסל</button>
+            <button class="export-btn full" id="export-btn-full" onclick="exportCSV('full')"><span id="export-btn-full-txt">📊 דוח שנתי — CSV</span></button>
+            <button class="export-btn full" style="background:linear-gradient(135deg,#1E40AF,#2563EB);color:#ffffff;font-weight:900;" onclick="exportAnnualPDF()">🖨️ דוח שנתי — PDF להדפסה</button>
+          </div>
+        </div>
+      </div>
+
       <div class="sett-section admin-only" id="residents-mgr-card">
         <div class="admin-sec-title">👥 הוסף / עדכן דייר</div>
         <div style="padding:12px 16px 16px;">
