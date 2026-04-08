@@ -863,7 +863,7 @@ function renderBuildingDocsList(docs){
   if(!docs.length){ el.innerHTML = '<div style="font-size:12px;color:#94A3B8;text-align:center;padding:12px;">אין מסמכים עדיין</div>'; return; }
   var html = '';
   docs.forEach(function(d){
-    var icon = d.file_type==='pdf' ? 'ð' : (d.file_type==='jpg'||d.file_type==='jpeg'||d.file_type==='png') ? 'ð¼ï¸' : (d.file_type==='doc'||d.file_type==='docx') ? 'ð' : (d.file_type==='xls'||d.file_type==='xlsx') ? 'ð' : 'ð';
+    var icon = d.file_type==='pdf' ? '📄' : (d.file_type==='jpg'||d.file_type==='jpeg'||d.file_type==='png') ? '🖼️' : (d.file_type==='doc'||d.file_type==='docx') ? '📝' : (d.file_type==='xls'||d.file_type==='xlsx') ? '📊' : '📁';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F1F5F9;">'+
       '<div style="display:flex;align-items:center;gap:8px;">'+
         '<span style="font-size:18px;">'+icon+'</span>'+
