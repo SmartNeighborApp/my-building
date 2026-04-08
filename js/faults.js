@@ -1,3 +1,105 @@
+
+/* ═══════════════════════════════════════════════════════════════
+   ORDER PROF FROM FAULT — הזמנת ספק מתוך תקלה
+═══════════════════════════════════════════════════════════════ */
+var _orderProfFaultId = null;
+var _orderProfDomain  = '';
+var _selectedProfIds  = [];
+
+function openOrderProfSheet(faultId, domain){
+  _orderProfFaultId = faultId;
+  _orderProfDomain  = domain || '';
+  _selectedProfIds  = [];
+
+  // סינון ספקים לפי תחום
+  var profs = (DB.professionals||[]).filter(function(p){
+    if(p.is_suspended) return false;
+    if(!_orderProfDomain || _orderProfDomain === 'כללי' || _orderProfDomain === 'אחר') return true;
+    return (p.cat||'').indexOf(_orderProfDomain) !== -1 || _orderProfDomain.indexOf(p.cat||'') !== -1;
+  });
+
+  var domEl = document.getElementById('order-prof-domain-label');
+  if(domEl) domEl.textContent = _orderProfDomain || 'כללי';
+
+  var listEl = document.getElementById('order-prof-list');
+  if(listEl){
+    if(!profs.length){
+      listEl.innerHTML = '<div style="text-align:center;color:#94A3B8;padding:16px;">אין ספקים זמינים בתחום זה</div>';
+    } else {
+      var html = '';
+      profs.forEach(function(p){
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F1F5F9;">'+
+          '<div>'+
+            '<div style="font-size:13px;font-weight:800;color:#1E3A5C;">'+escHtml(p.name)+'</div>'+
+            '<div style="font-size:11px;color:#3B82F6;">'+escHtml(p.cat)+'</div>'+
+          '</div>'+
+          '<input type="checkbox" id="op-chk-'+p.id+'" value="'+p.id+'" '+
+            'onchange="toggleOrderProfSelect(this)" '+
+            'style="width:20px;height:20px;cursor:pointer;">'+
+        '</div>';
+      });
+      listEl.innerHTML = html;
+    }
+  }
+
+  var errEl = document.getElementById('order-prof-err');
+  if(errEl) errEl.style.display = 'none';
+
+  var sheet = document.getElementById('sheet-order-prof');
+  if(sheet) sheet.classList.add('open');
+}
+
+function toggleOrderProfSelect(chk){
+  var id = chk.value;
+  if(chk.checked){
+    if(_selectedProfIds.length >= 3){
+      chk.checked = false;
+      showToast('ניתן לבחור עד 3 ספקים');
+      return;
+    }
+    _selectedProfIds.push(id);
+  } else {
+    _selectedProfIds = _selectedProfIds.filter(function(x){ return x !== id; });
+  }
+  var countEl = document.getElementById('order-prof-count');
+  if(countEl) countEl.textContent = _selectedProfIds.length + '/3 נבחרו';
+}
+
+function submitOrderProf(){
+  if(!_selectedProfIds.length){
+    var errEl = document.getElementById('order-prof-err');
+    if(errEl){ errEl.textContent = 'נא לבחור לפחות ספק אחד'; errEl.style.display='block'; }
+    return;
+  }
+  var slug = _getBuildingSlug();
+  var fault = (DB.maintenance||[]).find(function(m){ return String(m.id)===String(_orderProfFaultId); });
+  var faultTitle = fault ? fault.title : 'תקלה בבניין';
+  var faultDesc  = fault ? (fault.desc||'') : '';
+  var bd = {};
+  try{ bd = JSON.parse(localStorage.getItem('sn_building_data')||'{}'); }catch(e){}
+  var bldgName = (bd.building_name||DB.building.name||'הבניין') + (bd.address?' · '+bd.address:'') + (bd.city?' '+bd.city:'');
+
+  _selectedProfIds.forEach(function(profId){
+    var p = (DB.professionals||[]).find(function(x){ return String(x.id)===String(profId); });
+    if(!p) return;
+    var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(_orderProfFaultId||'');
+    var msg = encodeURIComponent(
+      'שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך לטיפול בתחום ' + _orderProfDomain + '.
+' +
+      'תיאור התקלה: ' + faultTitle + (faultDesc ? ' — ' + faultDesc : '') + '
+' +
+      'לאחר סיום הטיפול — דווח דרך הקישור:
+' + reportUrl
+    );
+    var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
+    setTimeout(function(){ window.open('https://wa.me/972'+phoneClean+'?text='+msg, '_blank'); }, 300);
+  });
+
+  var sheet = document.getElementById('sheet-order-prof');
+  if(sheet) sheet.classList.remove('open');
+  showToast('✅ הזמנה נשלחה ל-' + _selectedProfIds.length + ' ספקים');
+}
+
 var _faultPhotoFile = null;
 function previewFaultPhoto(input){
   var prev = document.getElementById('fault-photo-preview');
