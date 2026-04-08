@@ -729,7 +729,7 @@ function _doRenderCollectionCenter(mk, fee, tot){
   var stLbls = {paid:'✅ שולם',pending:'⏳ ממתין',partial:'🔶 חלקי',unpaid:'❌ חסר'};
   var stCols = {paid:'#16A34A',pending:'#F59E0B',partial:'#EA580C',unpaid:'#E11D48'};
   var thtml = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-  thtml += '<tr style="background:#F8FAFC;"><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">דירה</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שולם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">חוב</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">סטטוס</th></tr>';
+  thtml += '<tr style="background:#F8FAFC;"><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">דירה</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">שולם</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">חוב</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">סטטוס</th><th style="padding:8px 6px;text-align:right;font-weight:800;color:var(--navy);">תזכורת</th></tr>';
   rows.forEach(function(r){
     thtml += '<tr style="border-bottom:1px solid #F1F5F9;">'+
       '<td style="padding:8px 6px;font-weight:700;">'+r.unit+'</td>'+
