@@ -101,15 +101,15 @@ function renderBudgetManager(){
       MONTHS.forEach(function(m){
         mOpts += '<option value="'+m+'"'+(e.month===m?' selected':'')+'>'+m+'</option>';
       });
-      monthSel = '<select class="admin-inp" style="width:88px;" onchange="DB.finance.expenses['+i+'].month=this.value;saveDB()">'+mOpts+'</select>';
+      monthSel = '<select class="admin-inp" style="width:88px;" onchange="DB.finance.expenses['+i+'].month=this.value;saveDB();if(DB.finance.expenses['+i+']&&DB.finance.expenses['+i+'].id)updateExpenseInSupabase(DB.finance.expenses['+i+'].id,{month:DB.finance.expenses['+i+'].month})">'+mOpts+'</select>';
     } else {
       monthSel = '<span style="font-size:11px;color:var(--slate);width:88px;text-align:center;display:inline-block;">כל חודש</span>';
     }
     html += '<div class="budget-row" style="flex-wrap:wrap;gap:4px;">'+
       '<div class="br-color" style="background:'+e.color+'" onclick="cycleBrColor('+i+')"></div>'+
-      '<input class="admin-inp" style="flex:1;min-width:80px;" value="'+escAttr(e.cat)+'" oninput="DB.finance.expenses['+i+'].cat=this.value;updateBudgetTotal()" onblur="saveDB()">'+
-      '<input class="admin-inp" style="width:80px;" type="number" value="'+e.amount+'" oninput="DB.finance.expenses['+i+'].amount=+this.value||0;updateBudgetTotal()" onblur="saveDB()">'+
-      '<select class="admin-inp" style="width:88px;" onchange="DB.finance.expenses['+i+'].expType=this.value;saveDB();renderBudgetManager()">'+typeOpts+'</select>'+
+      '<input class="admin-inp" style="flex:1;min-width:80px;" value="'+escAttr(e.cat)+'" oninput="DB.finance.expenses['+i+'].cat=this.value;updateBudgetTotal()" onblur="saveDB();if(DB.finance.expenses['+i+']&&DB.finance.expenses['+i+'].id)updateExpenseInSupabase(DB.finance.expenses['+i+'].id,{cat:DB.finance.expenses['+i+'].cat})">'+
+      '<input class="admin-inp" style="width:80px;" type="number" value="'+e.amount+'" oninput="DB.finance.expenses['+i+'].amount=+this.value||0;updateBudgetTotal()" onblur="saveDB();if(DB.finance.expenses['+i+']&&DB.finance.expenses['+i+'].id)updateExpenseInSupabase(DB.finance.expenses['+i+'].id,{amount:DB.finance.expenses['+i+'].amount})">'+
+      '<select class="admin-inp" style="width:88px;" onchange="DB.finance.expenses['+i+'].expType=this.value;saveDB();if(DB.finance.expenses['+i+']&&DB.finance.expenses['+i+'].id)updateExpenseInSupabase(DB.finance.expenses['+i+'].id,{expType:DB.finance.expenses['+i+'].expType});renderBudgetManager()">'+typeOpts+'</select>'+
       monthSel+
       '<button class="br-del" onclick="delBudgetRow('+i+')">🗑️</button></div>';
   });
@@ -125,12 +125,18 @@ function cycleBrColor(i){
 }
 
 function addBudgetRow(){
-  DB.finance.expenses.push({cat:'חדש', amount:0, color:COLORS[DB.finance.expenses.length%COLORS.length], receiptDate:fmtDate(new Date()), receiptSupplier:'', details:'', expType:'חד פעמית', month:''});
+  var newExp = {cat:'חדש', amount:0, color:COLORS[DB.finance.expenses.length%COLORS.length], receiptDate:fmtDate(new Date()), receiptSupplier:'', details:'', expType:'חד פעמית', month:'', year:new Date().getFullYear(), source:'manual'};
+  DB.finance.expenses.push(newExp);
   saveDB();
+  saveExpenseToSupabase(newExp, function(id){
+    if(id) DB.finance.expenses[DB.finance.expenses.length-1].id = id;
+  });
   renderBudgetManager();
 }
 
 function delBudgetRow(i){
+  var exp = DB.finance.expenses[i];
+  if(exp && exp.id) deleteExpenseFromSupabase(exp.id);
   DB.finance.expenses.splice(i,1);
   saveDB();
   renderBudgetManager();
