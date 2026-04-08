@@ -1003,7 +1003,6 @@ function renderSettingsPage(){
     renderAdminCollBoard();
     renderBudgetManager();
     loadBuildingDocs();
-    renderResidentsList();
     initCollectionCenter();
   }
 }
