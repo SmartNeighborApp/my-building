@@ -30,7 +30,7 @@ function showFaultQuotes(faultId){
             '</div>'+
             (q.notes ? '<div style="font-size:12px;color:#475569;margin-bottom:8px;">'+escHtml(q.notes)+'</div>' : '')+
             (q.status !== 'approved'
-              ? '<button onclick="approveFaultQuote(''+q.id+'',''+faultId+'',''+escHtml(q.prof_name)+'',''+escHtml(q.prof_phone||'')+'',''+escHtml(q.prof_cat||'')+'')" style="width:100%;padding:10px;background:linear-gradient(135deg,#16A34A,#15803D);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">✅ אשר ספק זה</button>'
+              ? '<button onclick="approveFaultQuote(\''+q.id+'\',\''+faultId+'\',\''+escHtml(q.prof_name)+'\',\''+escHtml(q.prof_phone||'')+'\',\''+escHtml(q.prof_cat||'')+'\')" style="width:100%;padding:10px;background:linear-gradient(135deg,#16A34A,#15803D);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);"> אשר ספק זה</button>'
               : '')+
           '</div>';
       });
