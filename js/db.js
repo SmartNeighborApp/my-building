@@ -265,3 +265,12 @@ function deleteExpenseFromSupabase(id){
   if(!id) return;
   sbClient.from('expenses').delete().eq('id', id).then(function(){});
 }
+
+function loadBuildingDocsFromSupabase(cb){
+  var slug = _getBuildingSlug();
+  if(!slug){ if(cb) cb(); return; }
+  sbClient.from('building_docs').select('*').eq('building_slug', slug).order('created_at', {ascending:false}).then(function(res){
+    if(!res.error && res.data) DB.buildingDocs = res.data;
+    if(cb) cb();
+  });
+}
