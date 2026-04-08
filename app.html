@@ -1933,12 +1933,26 @@ a{text-decoration:none;color:inherit;}
       </div>
 
       <!-- admin: drive link -->
-      <div class="sett-section admin-only" id="drive-link-card">
-        <div class="admin-sec-title">🔗 קישור Google Drive לקבצי הוועד</div>
-        <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:12px;color:var(--slate);line-height:1.55;">הזן קישור לתיקיית Google Drive המשותפת. הקישור יוצג לכלל הדיירים באזור המסמכים לצפייה בחשבוניות, קבלות וקבצים.</div>
-          <input id="admin-drive-link" class="admin-inp" type="url" placeholder="https://drive.google.com/drive/folders/...">
-          <button class="save-btn" onclick="saveDriveLink()">💾 שמור קישור Drive</button>
+      <!-- admin: building documents -->
+      <div class="sett-section admin-only" id="building-docs-card">
+        <div class="admin-sec-title">📁 מסמכי הבניין</div>
+        <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;color:var(--slate);line-height:1.55;">העלה מסמכים לדיירים — תקנון, הסכמים, חשבוניות ועוד. נתמך PDF, תמונה, Word או Excel.</div>
+          <select id="building-doc-cat" class="admin-inp">
+            <option value="">בחר קטגוריה...</option>
+            <option value="תקנון">📜 תקנון בניין</option>
+            <option value="הסכמים">🤝 הסכמים</option>
+            <option value="חשבוניות">🟡 חשבוניות</option>
+            <option value="ביטוחים">🛡️ ביטוחים</option>
+            <option value="פרוטוקולים">📋 פרוטוקולים</option>
+            <option value="אחר">אחר</option>
+          </select>
+          <input id="building-doc-title" class="admin-inp" type="text" placeholder="כותרת המסמך">
+          <input type="file" id="building-doc-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" style="display:none;" onchange="previewBuildingDoc(this)">
+          <button class="save-btn" style="background:#F8FAFC;color:#1E3A5C;border:1.5px dashed #CBD5E1;" onclick="document.getElementById('building-doc-file').click()">📄 בחר קובץ (PDF, תמונה, Word, Excel)</button>
+          <div id="building-doc-preview" style="display:none;font-size:12px;font-weight:700;color:#16A34A;padding:8px;background:#F0FDF4;border-radius:8px;"></div>
+          <button class="save-btn" onclick="uploadBuildingDoc()">💾 העלה מסמך</button>
+          <div id="building-docs-list" style="margin-top:8px;"></div>
         </div>
       </div>
 
@@ -1985,12 +1999,6 @@ a{text-decoration:none;color:inherit;}
         </div>
       </div>
 
-      <!-- admin: expense details -->
-      <!-- admin: expense categories -->
-      <div class="sett-section admin-only" id="exp-cat-card">
-        <div class="admin-sec-title">🏷️ קטגוריות הוצאות</div>
-        <div style="padding:12px 16px 16px;" id="exp-cat-manager"></div>
-      </div>
 
       <!-- admin: change PIN -->
       <div class="sett-section admin-only">
@@ -2034,48 +2042,6 @@ a{text-decoration:none;color:inherit;}
       </div>
 
       <!-- install instructions -->
-      <div class="sett-section" id="install-card">
-        <div class="admin-sec-title">📱 התקנת האפליקציה</div>
-        <div style="padding:12px 16px 16px;">
-          <div class="install-platform-tabs">
-            <button class="install-tab active" id="tab-ios" onclick="switchInstallTab('ios')">🍎 iOS</button>
-            <button class="install-tab" id="tab-android" onclick="switchInstallTab('android')">🤖 Android</button>
-          </div>
-          <div id="install-steps-ios" class="install-steps">
-            <div class="install-step"><div class="install-step-num">1</div><div>פתח את האפליקציה ב-Safari</div></div>
-            <div class="install-step"><div class="install-step-num">2</div><div>לחץ על כפתור השיתוף <strong>⬆️</strong> בתחתית המסך</div></div>
-            <div class="install-step"><div class="install-step-num">3</div><div>גלול ולחץ על <strong>"הוסף למסך הבית"</strong></div></div>
-            <div class="install-step"><div class="install-step-num">4</div><div>לחץ <strong>"הוסף"</strong> בפינה הימנית העליונה</div></div>
-          </div>
-          <div id="install-steps-android" class="install-steps" style="display:none;">
-            <div class="install-step"><div class="install-step-num">1</div><div>פתח את האפליקציה ב-Chrome</div></div>
-            <div class="install-step"><div class="install-step-num">2</div><div>לחץ על תפריט ⋮ (שלוש נקודות) בפינה</div></div>
-            <div class="install-step"><div class="install-step-num">3</div><div>לחץ על <strong>"הוסף למסך הבית"</strong></div></div>
-            <div class="install-step"><div class="install-step-num">4</div><div>לחץ <strong>"הוסף"</strong> לאישור</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- sync section (visible to all) -->
-      <div class="sett-section" id="sync-card">
-        <div class="admin-sec-title">🔄 סנכרון נתונים בין מכשירים</div>
-        <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:12px;color:var(--slate);line-height:1.6;">
-            ייצא את כל נתוני הבניין לקובץ JSON כדי להעביר אותם למכשיר אחר, או ייבא קובץ שנוצר קודם.
-          </div>
-          <div class="export-btns">
-            <button class="export-btn sync-export" onclick="exportSyncJSON()">
-              📤 ייצא נתונים (JSON)
-            </button>
-            <label class="sync-import-label">
-              📥 ייבא נתונים (JSON)
-              <input type="file" accept=".json" onchange="importSyncJSON(event)">
-            </label>
-          </div>
-          <div id="sync-status" style="display:none;font-size:12px;font-weight:700;text-align:center;padding:8px;border-radius:10px;"></div>
-        </div>
-      </div>
-
       <!-- danger zone -->
       <div style="padding:0 14px 20px;text-align:center;">
         <button class="danger-btn" onclick="if(confirm('איפוס כל הנתונים?'))resetApp()">🗑️ איפוס נתוני האפליקציה</button>
