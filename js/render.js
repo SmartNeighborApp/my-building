@@ -365,6 +365,7 @@ function renderExpList(){
         var typeBadge = e.expType==='קבועה'
           ? '<span style="font-size:9px;background:#DBEAFE;color:#1E40AF;border-radius:3px;padding:1px 5px;">קבועה</span>'
           : '<span style="font-size:9px;background:#FEF9C3;color:#92400E;border-radius:3px;padding:1px 5px;">חד פעמית</span>';
+        var bg = i%2===0 ? '#FFFFFF' : '#F8FAFC';
         var supplierTag = e.source==='supplier_report' ? '<span style="font-size:9px;background:#FEF3C7;color:#92400E;border-radius:3px;padding:1px 5px;margin-right:3px;">ספק</span>' : '';
         html += '<div onclick="openExpDetail('+idx+')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:'+bg+';cursor:pointer;border-top:1px solid #F1F5F9;">'+
           '<div style="width:10px;height:10px;border-radius:3px;flex-shrink:0;background:'+e.color+';"></div>'+
