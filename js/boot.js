@@ -35,14 +35,16 @@ function renderAll(){
           loadProfessionalsFromSupabase(function(){
             loadPaymentsFromSupabase(function(){
               loadExpensesFromSupabase(function(){
-                try{ renderHeader(); }catch(e){}
-                try{ renderHomePage(); }catch(e){}
-                try{ renderFundPage(); }catch(e){}
-                try{ renderFaultsPage(); }catch(e){}
-                try{ renderCommunityPage(); }catch(e){}
-                try{ renderDocsPage(); }catch(e){}
-                try{ renderSettingsPage(); }catch(e){}
-                try{ renderProfessionalsPage(); }catch(e){}
+                loadBuildingDocsFromSupabase(function(){
+                  try{ renderHeader(); }catch(e){}
+                  try{ renderHomePage(); }catch(e){}
+                  try{ renderFundPage(); }catch(e){}
+                  try{ renderFaultsPage(); }catch(e){}
+                  try{ renderCommunityPage(); }catch(e){}
+                  try{ renderDocsPage(); }catch(e){}
+                  try{ renderSettingsPage(); }catch(e){}
+                  try{ renderProfessionalsPage(); }catch(e){}
+                });
               });
             });
           });
