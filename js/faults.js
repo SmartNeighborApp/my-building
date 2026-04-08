@@ -1,3 +1,80 @@
+
+/* ═══════════════════════════════════════════════════════════════
+   FAULT QUOTES — הצגת הצעות מחיר ואישור ספק
+═══════════════════════════════════════════════════════════════ */
+function showFaultQuotes(faultId){
+  var slug = _getBuildingSlug();
+  sbClient.from('fault_quotes').select('*').eq('fault_id', faultId).eq('building_slug', slug).order('created_at', {ascending:true}).then(function(res){
+    if(res.error){ showToast('שגיאה בטעינת הצעות'); return; }
+    var quotes = res.data || [];
+    var popup = document.getElementById('fault-quotes-popup');
+    var list  = document.getElementById('fault-quotes-list');
+    if(!popup || !list) return;
+    if(!quotes.length){
+      list.innerHTML = '<div style="text-align:center;color:#94A3B8;padding:20px;">אין הצעות מחיר עדיין</div>';
+    } else {
+      var html = '';
+      quotes.forEach(function(q){
+        var statusBadge = q.status === 'approved'
+          ? '<span style="background:#DCFCE7;color:#15803D;font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;">✅ נבחר</span>'
+          : '<span style="background:#EFF6FF;color:#1D4ED8;font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;">ממתין</span>';
+        html +=
+          '<div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:14px;padding:14px;margin-bottom:10px;">'+
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
+              '<div style="font-size:14px;font-weight:800;color:#1E3A5C;">'+escHtml(q.prof_name)+'</div>'+
+              statusBadge+
+            '</div>'+
+            '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">'+
+              '<div style="font-size:13px;"><span style="color:#64748B;">סכום: </span><span style="font-weight:800;color:#1E3A5C;">₪'+q.price+'</span></div>'+
+              '<div style="font-size:13px;"><span style="color:#64748B;">הגעה: </span><span style="font-weight:700;color:#1E3A5C;">'+escHtml(q.arrival_time||'—')+'</span></div>'+
+            '</div>'+
+            (q.notes ? '<div style="font-size:12px;color:#475569;margin-bottom:8px;">'+escHtml(q.notes)+'</div>' : '')+
+            (q.status !== 'approved'
+              ? '<button onclick="approveFaultQuote(''+q.id+'',''+faultId+'',''+escHtml(q.prof_name)+'',''+escHtml(q.prof_phone||'')+'',''+escHtml(q.prof_cat||'')+'')" style="width:100%;padding:10px;background:linear-gradient(135deg,#16A34A,#15803D);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">✅ אשר ספק זה</button>'
+              : '')+
+          '</div>';
+      });
+      list.innerHTML = html;
+    }
+    popup.style.display = 'flex';
+  });
+}
+
+function approveFaultQuote(quoteId, faultId, profName, profPhone, profCat){
+  var slug = _getBuildingSlug();
+  var bd = {};
+  try{ bd = JSON.parse(localStorage.getItem('sn_building_data')||'{}'); }catch(e){}
+  var bldgName = (bd.building_name||DB.building.name||'הבניין') + (bd.address?' · '+bd.address:'') + (bd.city?' '+bd.city:'');
+
+  // 1. עדכון סטטוס ההצעה שנבחרה ל-approved
+  sbClient.from('fault_quotes').update({status:'approved'}).eq('id', quoteId).then(function(){});
+
+  // 2. עדכון כל שאר ההצעות לאותה תקלה ל-rejected
+  sbClient.from('fault_quotes').update({status:'rejected'}).eq('fault_id', faultId).neq('id', quoteId).then(function(res){
+    if(!res.error && res.data){
+      // שליחת וואטסאפ סירוב לכל הדחויים
+      res.data.forEach(function(q){
+        if(q.prof_phone){
+          var phoneClean = (q.prof_phone||'').replace(/^0/,'').replace(/-/g,'');
+          var rejectMsg = encodeURIComponent('שלום '+q.prof_name+', תודה על הצעתך. הפעם בחרנו ספק אחר. נשמח לעבוד איתך בהזדמנות הבאה. ועד '+bldgName);
+          setTimeout(function(){ window.open('https://wa.me/972'+phoneClean+'?text='+rejectMsg,'_blank'); },500);
+        }
+      });
+    }
+  });
+
+  // 3. שליחת וואטסאפ אישור + קישור סיום עבודה לספק שנבחר
+  if(profPhone){
+    var phoneClean = (profPhone||'').replace(/^0/,'').replace(/-/g,'');
+    var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(profName)+'&cat='+encodeURIComponent(profCat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(faultId);
+    var approveMsg = encodeURIComponent('שלום '+profName+', בשמחה נבחרת־! ועד '+bldgName+' מאשר את הצעתך. לאחר סיום העבודה — דווח דרך: '+reportUrl);
+    window.open('https://wa.me/972'+phoneClean+'?text='+approveMsg,'_blank');
+  }
+
+  document.getElementById('fault-quotes-popup').style.display = 'none';
+  showToast('✅ הספק אושר והודעותות נשלחו');
+}
+
 /* ═══════════════════════════════════════════════════════════════
    FAULT PAGE ADMIN PIN — כניסת מנהל ישירות מעמוד תקלות
 ═══════════════════════════════════════════════════════════════ */
@@ -132,9 +209,8 @@ function submitOrderProf(){
   _selectedProfIds.forEach(function(profId){
     var p = (DB.professionals||[]).find(function(x){ return String(x.id)===String(profId); });
     if(!p) return;
-    var faultPhoto = fault ? (fault.photo_url||'') : '';
-    var quoteUrl = 'https://smartneighborapp.github.io/my-building/fault-quote.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&phone='+encodeURIComponent(p.phone||'')+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(_orderProfFaultId||'')+'&fault='+encodeURIComponent(faultTitle)+'&photo='+encodeURIComponent(faultPhoto);
-    var msg = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך להגיש הצעת מחיר לטיפול בתחום ' + _orderProfDomain + '. תיאור: ' + faultTitle + (faultDesc ? ' - ' + faultDesc : '') + '. להגשת הצעה: ' + quoteUrl);
+    var reportUrl = 'https://smartneighborapp.github.io/my-building/fault-report.html?slug='+slug+'&prof='+encodeURIComponent(p.name)+'&cat='+encodeURIComponent(p.cat)+'&bldg='+encodeURIComponent(bldgName)+'&faultId='+encodeURIComponent(_orderProfFaultId||'');
+    var msg = encodeURIComponent('שלום ' + p.name + ', ועד ' + bldgName + ' מזמין אותך לטיפול בתחום ' + _orderProfDomain + '. תיאור: ' + faultTitle + (faultDesc ? ' - ' + faultDesc : '') + '. לאחר סיום הטיפול דווח דרך: ' + reportUrl);
     var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
     setTimeout(function(){ window.open('https://wa.me/972'+phoneClean+'?text='+msg, '_blank'); }, 300);
   });
