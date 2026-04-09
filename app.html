@@ -2584,41 +2584,43 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 <!-- MEDIATION SHEET -->
-<div id="sheet-mediation" class="bottom-sheet" style="max-height:90vh;overflow-y:auto;">
-  <div class="sheet-handle"></div>
-  <div style="padding:0 16px 32px;">
-    <div style="font-size:17px;font-weight:900;color:var(--navy);margin-bottom:4px;">⚖️ בוררות שכנותית</div>
-    <div style="font-size:12px;color:var(--slate);margin-bottom:16px;">כל צד כותב את עמדתו — AI יבחן ויפסוק לפי החוק הישראלי</div>
+<div id="sheet-mediation" class="sheet-overlay" onclick="if(event.target===this)closeSheet('mediation')">
+  <div class="sheet" style="max-height:90vh;overflow-y:auto;">
+    <div class="sheet-handle"></div>
+    <div style="padding:0 16px 32px;">
+      <div style="font-size:17px;font-weight:900;color:var(--navy);margin-bottom:4px;">⚖️ בוררות שכנותית</div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:16px;">כל צד כותב את עמדתו — AI יבחן ויפסוק לפי החוק הישראלי</div>
 
-    <!-- שלב א — צד ראשון -->
-    <div id="mediation-step1">
-      <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">✍️ כתוב את הצד שלך</div>
-      <textarea id="med-text-a" rows="5" placeholder="תאר את הבעיה מנקודת מבטך בפירוט..." style="width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-family:var(--font);resize:none;box-sizing:border-box;margin-bottom:12px;"></textarea>
-      <button onclick="submitMediationSideA()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);margin-bottom:10px;">שלח ✅</button>
-      <div style="text-align:center;font-size:12px;color:var(--slate);">או — <span onclick="switchToMediationJoin()" style="color:var(--blue);cursor:pointer;text-decoration:underline;">יש לי קוד מהצד השני</span></div>
-    </div>
+      <!-- שלב א — צד ראשון -->
+      <div id="mediation-step1">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">✍️ כתוב את הצד שלך</div>
+        <textarea id="med-text-a" rows="5" placeholder="תאר את הבעיה מנקודת מבטך בפירוט..." style="width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-family:var(--font);resize:none;box-sizing:border-box;margin-bottom:12px;"></textarea>
+        <button onclick="submitMediationSideA()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);margin-bottom:10px;">שלח ✅</button>
+        <div style="text-align:center;font-size:12px;color:var(--slate);">או — <span onclick="switchToMediationJoin()" style="color:var(--blue);cursor:pointer;text-decoration:underline;">יש לי קוד מהצד השני</span></div>
+      </div>
 
-    <!-- אחרי שמירת צד א — הצג קוד -->
-    <div id="mediation-step1-done" style="display:none;text-align:center;padding:16px 0;">
-      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">✅ הצד שלך נשמר!<br>שתף את הקוד עם הצד השני:</div>
-      <div id="med-session-code" style="font-size:40px;font-weight:900;color:#7C3AED;letter-spacing:8px;background:#F5F3FF;border-radius:16px;padding:16px;margin-bottom:16px;"></div>
-      <div style="font-size:11px;color:var(--slate);">הצד השני יזין קוד זה ויכתוב את עמדתו — ואז AI יפסוק</div>
-    </div>
+      <!-- אחרי שמירת צד א — הצג קוד -->
+      <div id="mediation-step1-done" style="display:none;text-align:center;padding:16px 0;">
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">✅ הצד שלך נשמר!<br>שתף את הקוד עם הצד השני:</div>
+        <div id="med-session-code" style="font-size:40px;font-weight:900;color:#7C3AED;letter-spacing:8px;background:#F5F3FF;border-radius:16px;padding:16px;margin-bottom:16px;"></div>
+        <div style="font-size:11px;color:var(--slate);">הצד השני יזין קוד זה ויכתוב את עמדתו — ואז AI יפסוק</div>
+      </div>
 
-    <!-- שלב ב — צד שני -->
-    <div id="mediation-step2" style="display:none;">
-      <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">🔑 הזן קוד סשן</div>
-      <input id="med-session-input" type="text" maxlength="6" placeholder="קוד 6 תווים..." style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:4px;text-align:center;font-family:var(--font);box-sizing:border-box;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">✍️ כתוב את הצד שלך</div>
-      <textarea id="med-text-b" rows="5" placeholder="תאר את הבעיה מנקודת מבטך בפירוט..." style="width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-family:var(--font);resize:none;box-sizing:border-box;margin-bottom:12px;"></textarea>
-      <button onclick="submitMediationSideB()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);">⚖️ קבל פסיקה</button>
-    </div>
+      <!-- שלב ב — צד שני -->
+      <div id="mediation-step2" style="display:none;">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">🔑 הזן קוד סשן</div>
+        <input id="med-session-input" type="text" maxlength="6" placeholder="קוד 6 תווים..." style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:16px;font-weight:900;letter-spacing:4px;text-align:center;font-family:var(--font);box-sizing:border-box;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">✍️ כתוב את הצד שלך</div>
+        <textarea id="med-text-b" rows="5" placeholder="תאר את הבעיה מנקודת מבטך בפירוט..." style="width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-family:var(--font);resize:none;box-sizing:border-box;margin-bottom:12px;"></textarea>
+        <button onclick="submitMediationSideB()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);">⚖️ קבל פסיקה</button>
+      </div>
 
-    <!-- תוצאת AI -->
-    <div id="mediation-result-wrap" style="display:none;margin-top:16px;">
-      <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚖️ פסיקת AI</div>
-      <div id="mediation-result-text" style="font-size:13px;color:#1E293B;line-height:1.7;background:#F8FAFC;border-radius:14px;padding:16px;white-space:pre-wrap;"></div>
-      <div style="font-size:11px;color:var(--slate);margin-top:10px;text-align:center;">⚠️ זהו ייעוץ כללי בלבד — לענייני משפט מורכבים פנה לעורך דין</div>
+      <!-- תוצאת AI -->
+      <div id="mediation-result-wrap" style="display:none;margin-top:16px;">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚖️ פסיקת AI</div>
+        <div id="mediation-result-text" style="font-size:13px;color:#1E293B;line-height:1.7;background:#F8FAFC;border-radius:14px;padding:16px;white-space:pre-wrap;"></div>
+        <div style="font-size:11px;color:var(--slate);margin-top:10px;text-align:center;">⚠️ זהו ייעוץ כללי בלבד — לענייני משפט מורכבים פנה לעורך דין</div>
+      </div>
     </div>
   </div>
 </div>
