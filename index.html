@@ -940,7 +940,7 @@ footer {
   </h1>
 
   <p class="hero-sub fade-up-2">
-    <img src="favicon.png" alt="SmartNeighbor" style="width:36px;height:36px;border-radius:10px;vertical-align:middle;margin-left:8px;">חברת ניהול בכף היד —<br>
+    חברת ניהול בכף היד <img src="favicon.png" alt="SmartNeighbor" style="width:56px;height:56px;border-radius:14px;vertical-align:middle;margin-right:4px;box-shadow:0 4px 16px rgba(0,0,0,.25);"><br>
     גבייה, תחזוקה, קהילה וגישור שכנותי חכם, בלחיצת כפתור.
   </p>
 
@@ -2114,11 +2114,4 @@ function submitExistingLogin(){
           .eq('access_code', String(code))
           .then(function(res2){
             loading.style.display = 'none';
-            if(res2.error || !res2.data || res2.data.length === 0){
-              err.textContent = 'קוד לא נמצא במערכת — בדקו שוב';
-              err.style.display = 'block';
-              boxes.forEach(function(b){ b.style.borderColor='#EF4444'; });
-              return;
-            }
-            var slug = res2.data[0].unique_slug;
-            window.location
+            if(r
