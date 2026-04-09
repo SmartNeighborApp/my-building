@@ -1907,7 +1907,7 @@ function goStep(n){
     if(fsi) fsi.textContent = i<n ? '✓' : i;
   });
   var regSection = document.getElementById('register');
-  if(regSection) regSection.scrollIntoView({behavior:'smooth', block:'start'});
+  if(regSection && n > 1) regSection.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function copyAppUrl(){
@@ -2100,10 +2100,4 @@ function submitExistingLogin(){
   boxes.forEach(function(b){ b.style.borderColor='#E2E8F0'; });
   loading.style.display = 'block';
 
-  // חיפוש בניין לפי access_code
-  supabaseClient
-    .from('buildings')
-    .select('unique_slug,building_name')
-    .eq('access_code', code)
-    .then(function(res){
- 
+  // חיפוש בני�
