@@ -931,24 +931,23 @@ footer {
     מערכת ניהול חכמה לבתים משותפים
   </div>
 
-  <!-- שינוי 1: כותרת ראשית מעודכנת -->
   <h1 class="hero-title fade-up-1">
-    דואגים לסדר בבניין:<br>
-    ניהול <span class="accent">חכם ויעיל</span><br>
-    <span class="accent2">יוצר קהילה</span>
+    הבניין שלך<br>
+    מנוהל ב<span class="accent">וואטסאפ?</span><br>
+    <span class="accent2">יש דרך טובה יותר.</span>
   </h1>
 
   <p class="hero-sub fade-up-2">
-    ניהול ועד בית מעולם לא היה פשוט כל כך.<br>
-    שקיפות מלאה, קהילה חזקה יותר, וראש שקט לוועד ולדיירים.
+    שכנות טובה היא חברת הניהול שלך — בכף היד.<br>
+    גבייה, תחזוקה, קהילה וגישור שכנותי חכם. הכל במקום אחד.
   </p>
 
   <div class="hero-btns fade-up-3">
     <button class="btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
-      🏢 הצטרפו למשפחת "שכנות טובה"
+      🏢 הקם בניין עכשיו — חינם ל-30 יום
     </button>
-    <button class="btn-ghost" onclick="document.getElementById('calculator').scrollIntoView({behavior:'smooth'})">
-      💡 חשב את המחיר שלך
+    <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+      💡 מה כולל?
     </button>
   </div>
 
@@ -1030,6 +1029,11 @@ footer {
       <div class="feat-text">כל מסמכי הבניין — תקנון, ביטוחים, פרוטוקולים — נגישים לכל דייר בכל עת.</div>
     </div>
     <div class="feat-card reveal">
+      <div class="feat-icon fi-purple">⚖️</div>
+      <div class="feat-title">גישור שכנותי חכם — ייחודי בישראל</div>
+      <div class="feat-text">סכסוך עם שכן? כל צד כותב את עמדתו — ומערכת ה-AI פוסקת לפי חוק המקרקעין הישראלי, בטון מפשר ולא מריבתי. לא קיים בשום מקום אחר.</div>
+    </div>
+    <div class="feat-card reveal">
       <div class="feat-icon fi-gold">🔨</div>
       <div class="feat-title">בעלי מקצוע לבניין</div>
       <div class="feat-text">רשימת בעלי מקצוע מומלצים לפי קטגוריה — אינסטלטור, חשמלאי, מנעולן ועוד. כולל דירוג דיירים וכפתור התקשרות ישיר.</div>
@@ -1067,57 +1071,31 @@ footer {
 </section>
 
 <!-- ═══════════════════════════════════
-     CALCULATOR — שינוי 3: מחיר אחיד
+     PRICING
 ═══════════════════════════════════ -->
 <section id="calculator">
   <div class="section-hd centered reveal">
-    <span class="section-label">מחשבון מחיר</span>
-    <h2 class="section-title">מחיר פשוט ושקוף</h2>
+    <span class="section-label">מחיר</span>
+    <h2 class="section-title">פחות מקפה בחודש לדייר</h2>
     <p class="section-sub">כל הפיצ'רים פתוחים — ללא הפתעות, ללא עלויות הקמה.</p>
   </div>
-
-  <div class="calc-wrap reveal">
+  <div class="calc-wrap reveal" style="max-width:480px;">
     <div class="calc-top">
-      <div class="calc-top-title">💡 מחשבון SmartNeighbor</div>
-      <div class="calc-top-sub">מחיר אחיד לכולם · ללא עלויות הקמה · ביטול בכל עת</div>
+      <div class="calc-top-title">💡 מחיר אחיד לכולם</div>
+      <div class="calc-top-sub">ללא עלויות הקמה · ביטול בכל עת</div>
     </div>
-    <div class="calc-body">
-
-      <!-- מסר מחיר אחיד במקום טבלת חבילות -->
+    <div class="calc-body" style="text-align:center;">
       <div class="flat-price-banner">
         <div class="fpb-label">✨ כל הפיצ'רים פתוחים</div>
-        <div class="fpb-price">₪7 <span>לדייר / חודש</span></div>
+        <div class="fpb-price">₪11 <span>לדייר / חודש</span></div>
         <div class="fpb-sub">💚 מחיר אחיד לכל גדלי הבניין</div>
         <div class="fpb-note">ללא עלויות הקמה · ביטול בכל עת · 30 יום ניסיון חינם</div>
       </div>
-
-      <div class="calc-slider-label">
-        <span class="csl-lbl">מספר דיירים בבניין</span>
-        <span class="csl-val" id="calc-units-val">20</span>
+      <div style="background:#F0FDF4;border-radius:14px;padding:16px;margin:16px 0;font-size:13px;color:#166534;font-weight:700;line-height:1.8;">
+        בניין של 20 דיירים — <strong>₪220 לחודש</strong><br>
+        חברת ניהול — ₪1,500–3,000 לחודש<br>
+        <span style="font-size:15px;">החיסכון מדבר בעד עצמו 💚</span>
       </div>
-      <input type="range" id="calc-slider" min="4" max="80" value="20"
-        oninput="updateCalc(this.value)" onchange="updateCalc(this.value)">
-      <div class="range-labels">
-        <span>4</span><span>20</span><span>40</span><span>60</span><span>80</span>
-      </div>
-
-      <div class="calc-price-row">
-        <div class="calc-price-box">
-          <div class="cpb-label">עלות חודשית</div>
-          <div class="cpb-val" id="calc-monthly">₪<span>200</span></div>
-          <div class="cpb-sub">לחודש</div>
-        </div>
-        <div class="calc-price-box highlight">
-          <div class="cpb-label">עלות שנתית</div>
-          <div class="cpb-val" id="calc-yearly">₪<span>2,400</span></div>
-          <div class="cpb-sub" id="calc-yearly-sub">לשנה</div>
-        </div>
-      </div>
-
-      <div class="calc-per-unit" id="calc-per-unit">
-        💚 עלות לדייר: ₪10/חודש · ₪120/שנה
-      </div>
-
       <button class="calc-cta" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">
         🏢 התחילו 30 יום חינם — ללא כרטיס אשראי
       </button>
@@ -1185,7 +1163,7 @@ footer {
   <div class="section-hd centered reveal">
     <span class="section-label">שאלות נפוצות</span>
     <h2 class="section-title">כל מה שרציתם לדעת</h2>
-    <p class="section-sub">יש לכם עוד שאלה? דברו איתנו בוואטסאפ ונשמח לעזור.</p>
+    <p class="section-sub">יש לכם עוד שאלה? שלחו לנו מייל ונשמח לעזור תוך 24 שעות.</p>
   </div>
 
   <div class="faq-grid">
@@ -1242,7 +1220,7 @@ footer {
         <span class="faq-q-text">🛠️ מה קורה אם יש תקלה טכנית?</span>
         <div class="faq-icon">+</div>
       </div>
-      <div class="faq-a">אנו מציעים תמיכה טכנית מלאה בעברית דרך וואטסאפ ואימייל. זמן התגובה הממוצע שלנו עד שעתיים בשעות הפעילות. הבניין שלכם לא יישאר לבד.</div>
+      <div class="faq-a">אנו מציעים תמיכה טכנית מלאה בעברית דרך אימייל. זמן התגובה שלנו עד 24 שעות. הבניין שלכם לא יישאר לבד.</div>
     </div>
   </div>
 </section>
@@ -1518,18 +1496,18 @@ footer {
       <div class="footer-col-title">יצירת קשר</div>
       <div class="footer-contact-row">
         <span>📧</span>
-        <a href="/cdn-cgi/l/email-protection#2e474048416e5d434f5c5a404b4749464c415c004f5e5e"><span class="__cf_email__" data-cfemail="85ecebe3eac5f6e8e4f7f1ebe0ece2ede7eaf7abe4f5f5">[email&#160;protected]</span></a>
+        <a href="mailto:ssmartneighbor@gmail.com">ssmartneighbor@gmail.com</a>
       </div>
       <div class="footer-contact-row">
-        <span>💬</span>
-        <a href="https://wa.me/972525551935" target="_blank" rel="noopener">וואטסאפ — זמינים לשאלות</a>
+        <span>⏱️</span>
+        <span>מענה תוך 24 שעות</span>
       </div>
     </div>
 
     <div class="footer-col">
       <div class="footer-col-title">קישורים מהירים</div>
       <div class="footer-contact-row"><a href="#features">יכולות המערכת</a></div>
-      <div class="footer-contact-row"><a href="#calculator">מחשבון מחיר</a></div>
+      <div class="footer-contact-row"><a href="#calculator">מחיר</a></div>
       <div class="footer-contact-row"><a href="#faq">שאלות נפוצות</a></div>
       <div class="footer-contact-row"><a href="#register">הצטרפות</a></div>
     </div>
@@ -1545,20 +1523,30 @@ footer {
 </footer>
 
 <!-- ═══════════════════════════════════
-     WHATSAPP FLOAT BUTTON
-     מספר: 972525551935 — לא מוצג כטקסט
+     AI BOT FLOAT
 ═══════════════════════════════════ -->
-<div class="wa-float">
-  <div class="wa-bubble">💬 יש לכם שאלה? דברו איתנו</div>
-  <a class="wa-btn" href="https://wa.me/972525551935" target="_blank" rel="noopener" title="שלחו לנו הודעה בוואטסאפ">
-    <span>💬</span>
-    <div class="wa-dot"></div>
-  </a>
+<div id="ai-bot-wrap" style="position:fixed;left:20px;bottom:24px;z-index:9998;display:flex;flex-direction:column;align-items:flex-start;gap:10px;">
+  <div id="ai-bot-window" style="display:none;width:320px;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden;border:1px solid #E2E8F0;">
+    <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;">🤖</span>
+        <div>
+          <div style="font-size:13px;font-weight:900;color:#fff;">עוזר שכנות טובה</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);">מענה מיידי לכל שאלה</div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('ai-bot-window').style.display='none'" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="ai-bot-messages" style="height:260px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#F8FAFC;">
+      <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;line-height:1.5;">שלום! אני העוזר החכם של שכנות טובה 🏢<br>שאל אותי כל שאלה על האפליקציה!</div>
+    </div>
+    <div style="padding:10px 12px;border-top:1px solid #E2E8F0;display:flex;gap:8px;background:#fff;">
+      <input id="ai-bot-input" type="text" placeholder="כתוב שאלה..." style="flex:1;padding:8px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;" onkeydown="if(event.key==='Enter')sendBotMessage()">
+      <button onclick="sendBotMessage()" style="width:36px;height:36px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
+    </div>
+  </div>
+  <button onclick="var w=document.getElementById('ai-bot-window');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('ai-bot-input').focus();" style="width:54px;height:54px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 8px 24px rgba(26,58,92,.4);display:flex;align-items:center;justify-content:center;">🤖</button>
 </div>
-
-<!-- ═══════════════════════════════════
-     EXISTING BUILDING LOGIN MODAL
-═══════════════════════════════════ -->
 <div class="modal-overlay" id="existing-login-modal" onclick="if(event.target===this)closeExistingLogin()" style="display:none;">
   <div class="modal-card" style="max-width:400px;">
     <div class="modal-hd">
@@ -1973,6 +1961,61 @@ document.querySelectorAll('.field-inp').forEach(function(inp){
 /* ══════════════════════════════════════
    FAQ TOGGLE
 ══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   AI BOT
+══════════════════════════════════════ */
+function sendBotMessage(){
+  var input = document.getElementById('ai-bot-input');
+  var msgs  = document.getElementById('ai-bot-messages');
+  var text  = (input.value||'').trim();
+  if(!text) return;
+  input.value = '';
+
+  // הוסף הודעת משתמש
+  var userDiv = document.createElement('div');
+  userDiv.style.cssText = 'background:#E0F2FE;color:#1A3A5C;border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13px;max-width:85%;align-self:flex-end;line-height:1.5;margin-right:auto;margin-left:0;direction:rtl;';
+  userDiv.textContent = text;
+  msgs.appendChild(userDiv);
+
+  // הודעת המתנה
+  var waitDiv = document.createElement('div');
+  waitDiv.style.cssText = 'background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;line-height:1.5;';
+  waitDiv.textContent = '⏳ חושב...';
+  msgs.appendChild(waitDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  var prompt = 'אתה עוזר חכם של אפליקציית "שכנות טובה" — מערכת ניהול בתים משותפים ישראלית.\n\n' +
+    'פרטי האפליקציה:\n' +
+    '• מחיר: ₪11 לדייר לחודש, מחיר אחיד לכולם\n' +
+    '• ניסיון חינם: 30 יום ללא כרטיס אשראי\n' +
+    '• מתאים לבניינים עד 12 קומות ללא חברת ניהול\n' +
+    '• פיצ\'רים: גבייה ותשלומים, מעקב תקלות, קהילת שכנים, בעלי מקצוע, מסמכי בניין, סקרים, דוחות שנתיים\n' +
+    '• גישור שכנותי: AI שפוסק לפי חוק המקרקעין הישראלי — ייחודי בישראל\n' +
+    '• אין צורך להוריד מחנות — אפליקציית Web\n' +
+    '• הקמה תוך 2 דקות — קישור ייחודי לבניין\n' +
+    '• תמיכה: מייל בלבד — ssmartneighbor@gmail.com — מענה תוך 24 שעות\n' +
+    '• ביטול בכל עת ללא קנסות\n\n' +
+    'הנחיות: ענה בעברית בלבד, בצורה קצרה וידידותית. אם אינך יודע — הפנה למייל ssmartneighbor@gmail.com\n\n' +
+    'שאלת המשתמש: ' + text;
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var reply = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'מצטער, לא הצלחתי לענות. שלח מייל ל-ssmartneighbor@gmail.com';
+    waitDiv.textContent = reply;
+    msgs.scrollTop = msgs.scrollHeight;
+  }).catch(function(){
+    waitDiv.textContent = 'שגיאת חיבור. שלח מייל ל-ssmartneighbor@gmail.com ונחזור תוך 24 שעות.';
+    msgs.scrollTop = msgs.scrollHeight;
+  });
+}
+
 function toggleFaq(item) {
   var isOpen = item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
