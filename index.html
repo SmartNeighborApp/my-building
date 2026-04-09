@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta name="cf-2fa-verify" content="disabled">
+<meta http-equiv="x-cloudflare-email" content="off">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
@@ -1380,7 +1381,7 @@ footer {
         <!-- שדות כרטיס אשראי — מוצגים רק בבחירת תשלום מיידי -->
         <div id="credit-card-fields" style="display:none;">
           <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6;">
-            ⚠️ הפרטים יועברו בצורה מאובטחת ל-ssmartneighbor@gmail.com. החיוב יתבצע תוך 24 שעות וחשבונית תישלח לאימייל שהזנתם.
+            ⚠️ הפרטים יועברו בצורה מאובטחת ל-ssmartneighbor&#64;gmail.com. החיוב יתבצע תוך 24 שעות וחשבונית תישלח לאימייל שהזנתם.
           </div>
           <label class="field-label">מספר כרטיס</label>
           <input id="cc-number" type="tel" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"
@@ -1498,7 +1499,7 @@ footer {
       <div class="footer-col-title">יצירת קשר</div>
       <div class="footer-contact-row">
         <span>📧</span>
-        <a href="mailto:ssmartneighbor@gmail.com">ssmartneighbor@gmail.com</a>
+        <a href="mailto:ssmartneighbor&#64;gmail.com">ssmartneighbor&#64;gmail.com</a>
       </div>
       <div class="footer-contact-row">
         <span>⏱️</span>
@@ -2105,13 +2106,4 @@ function submitExistingLogin(){
     .select('unique_slug,building_name')
     .eq('access_code', code)
     .then(function(res){
-      loading.style.display = 'none';
-      if(res.error || !res.data || res.data.length === 0){
-        // ניסיון שני: כ-text
-        supabaseClient
-          .from('buildings')
-          .select('unique_slug,building_name')
-          .eq('access_code', String(code))
-          .then(function(res2){
-            loading.style.display = 'none';
-            if(r
+ 
