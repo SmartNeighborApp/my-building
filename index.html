@@ -934,12 +934,12 @@ footer {
   <h1 class="hero-title fade-up-1">
     הבניין שלך<br>
     מנוהל ב<span class="accent">וואטסאפ?</span><br>
-    <span class="accent2">יש דרך טובה יותר.</span>
+    <span class="accent2">יש דרך חכמה יותר.</span>
   </h1>
 
   <p class="hero-sub fade-up-2">
-    שכנות טובה היא חברת הניהול שלך — בכף היד.<br>
-    גבייה, תחזוקה, קהילה וגישור שכנותי חכם. הכל במקום אחד.
+    חברת ניהול בכף היד —<br>
+    גבייה, תחזוקה, קהילה וגישור שכנותי חכם, בלחיצת כפתור.
   </p>
 
   <div class="hero-btns fade-up-3">
@@ -1496,7 +1496,7 @@ footer {
       <div class="footer-col-title">יצירת קשר</div>
       <div class="footer-contact-row">
         <span>📧</span>
-        <a href="mailto:ssmartneighbor@gmail.com">ssmartneighbor@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#3142425c5043455f54585659535e4371565c50585d1f525e5c"><span class="__cf_email__" data-cfemail="90e3e3fdf1e2e4fef5f9f7f8f2ffe2d0f7fdf1f9fcbef3fffd">[email&#160;protected]</span></a>
       </div>
       <div class="footer-contact-row">
         <span>⏱️</span>
@@ -1525,27 +1525,36 @@ footer {
 <!-- ═══════════════════════════════════
      AI BOT FLOAT
 ═══════════════════════════════════ -->
+<style>
+.agent-avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1A3A5C,#2563EB);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(26,58,92,.4);cursor:pointer;border:3px solid #fff;position:relative;}
+.agent-dot{position:absolute;top:3px;right:3px;width:11px;height:11px;background:#22C55E;border-radius:50%;border:2px solid #fff;z-index:10;}
+</style>
 <div id="ai-bot-wrap" style="position:fixed;left:20px;bottom:24px;z-index:9998;display:flex;flex-direction:column;align-items:flex-start;gap:10px;">
   <div id="ai-bot-window" style="display:none;width:320px;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden;border:1px solid #E2E8F0;">
     <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:20px;">🤖</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.4);">
+          <span style="font-size:20px;line-height:1;">❓</span>
+        </div>
         <div>
-          <div style="font-size:13px;font-weight:900;color:#fff;">עוזר שכנות טובה</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.6);">מענה מיידי לכל שאלה</div>
+          <div style="font-size:13px;font-weight:900;color:#fff;">שירה · נציגת שירות</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);">🟢 זמינה עכשיו</div>
         </div>
       </div>
       <button onclick="document.getElementById('ai-bot-window').style.display='none'" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <div id="ai-bot-messages" style="height:260px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#F8FAFC;">
-      <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;line-height:1.5;">שלום! אני העוזר החכם של שכנות טובה 🏢<br>שאל אותי כל שאלה על האפליקציה!</div>
+      <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;line-height:1.5;">שלום! אני שירה, נציגת שירות של שכנות טובה 🏢<br>שאלי אותי כל שאלה על האפליקציה!</div>
     </div>
     <div style="padding:10px 12px;border-top:1px solid #E2E8F0;display:flex;gap:8px;background:#fff;">
-      <input id="ai-bot-input" type="text" placeholder="כתוב שאלה..." style="flex:1;padding:8px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;" onkeydown="if(event.key==='Enter')sendBotMessage()">
+      <input id="ai-bot-input" type="text" placeholder="כתבי שאלה..." style="flex:1;padding:8px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;" onkeydown="if(event.key==='Enter')sendBotMessage()">
       <button onclick="sendBotMessage()" style="width:36px;height:36px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
     </div>
   </div>
-  <button onclick="var w=document.getElementById('ai-bot-window');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('ai-bot-input').focus();" style="width:54px;height:54px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 8px 24px rgba(26,58,92,.4);display:flex;align-items:center;justify-content:center;">🤖</button>
+  <div class="agent-avatar" onclick="var w=document.getElementById('ai-bot-window');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('ai-bot-input').focus();">
+    <span style="font-size:26px;line-height:1;">❓</span>
+    <div class="agent-dot"></div>
+  </div>
 </div>
 <div class="modal-overlay" id="existing-login-modal" onclick="if(event.target===this)closeExistingLogin()" style="display:none;">
   <div class="modal-card" style="max-width:400px;">
@@ -1607,7 +1616,7 @@ footer {
 ═══════════════════════════════════ -->
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ══════════════════════════════════════
    SUPABASE CLIENT
 ══════════════════════════════════════ */
@@ -2129,14 +2138,4 @@ function submitExistingLogin(){
         return;
       }
       var slug = res.data[0].unique_slug;
-      window.location.href = '/my-building/app.html?b=' + encodeURIComponent(slug);
-    })
-    .catch(function(e){
-      loading.style.display = 'none';
-      err.textContent = 'שגיאת חיבור — נסו שוב';
-      err.style.display = 'block';
-    });
-}
-</script>
-</body>
-</html>
+      window.location.href = '/my-bui
