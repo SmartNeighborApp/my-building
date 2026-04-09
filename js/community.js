@@ -176,13 +176,29 @@ function loadPollFromSupabase(cb){
         opts:        (r.options || []).map(function(o){ return {label:o.label, votes:o.votes||0}; }),
         unitVotes:   r.unit_votes || {},
         userVote:    null,
-        votedDevices:[]
+        votedDevices:[],
+        createdBy:   r.created_by || '',
+        creatorUnit: r.creator_unit || null
       };
     } else {
       // אין סקר פעיל — אפס
       DB.poll = { q:'', opts:[], unitVotes:{}, userVote:null, votedDevices:[] };
     }
     if(cb) cb();
+  });
+}
+
+function deletePoll(){
+  var poll = DB.poll;
+  if(!poll || !poll.id) return;
+  var unit = DB.user ? DB.user.unit : null;
+  var canDelete = ADMIN_ON || (unit && poll.creatorUnit && unit === poll.creatorUnit);
+  if(!canDelete){ showToast('אין הרשאה למחוק סקר זה'); return; }
+  if(!confirm('למחוק את הסקר?')) return;
+  sbClient.from('polls').update({is_active:false}).eq('id', String(poll.id)).then(function(res){
+    if(res.error){ showToast('שגיאה במחיקה: '+res.error.message); return; }
+    showToast('הסקר נמחק');
+    loadPollFromSupabase(function(){ renderCommunityPage(); });
   });
 }
 
