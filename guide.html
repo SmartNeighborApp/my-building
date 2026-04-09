@@ -148,8 +148,8 @@ body {
   border: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
-.step-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
-.step-desc { font-size: 12px; color: #64748B; line-height: 1.6; }
+.step-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
+.step-desc { font-size: 14px; color: #64748B; line-height: 1.6; }
 .step-tag {
   display: inline-block;
   font-size: 10px;
@@ -200,15 +200,15 @@ body {
   cursor: default;
 }
 .feat-item:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
-.feat-icon { font-size: 26px; margin-bottom: 6px; }
-.feat-name { font-size: 12px; font-weight: 800; color: var(--navy); }
-.feat-desc { font-size: 11px; color: var(--gray); margin-top: 2px; line-height: 1.5; }
+.feat-icon { font-size: 28px; margin-bottom: 6px; }
+.feat-name { font-size: 14px; font-weight: 800; color: var(--navy); }
+.feat-desc { font-size: 13px; color: var(--gray); margin-top: 2px; line-height: 1.5; }
 
 /* ── TIP BOX ── */
 .tip {
   border-radius: 12px;
   padding: 12px 14px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.6;
   margin-bottom: 12px;
@@ -308,7 +308,7 @@ body {
 .faq-a {
   display: none;
   padding: 0 16px 14px;
-  font-size: 12px;
+  font-size: 14px;
   color: #475569;
   line-height: 1.7;
 }
@@ -503,12 +503,57 @@ body {
     <div class="feat-item">
       <div class="feat-icon">📊</div>
       <div class="feat-name">סקרים</div>
-      <div class="feat-desc">הצבעה פר דירה — ניתן לשנות</div>
+      <div class="feat-desc">כל דייר יכול לפתוח סקר — הצבעה פר דירה, ניתן לשנות. היוצר יכול למחוק את הסקר שלו.</div>
     </div>
     <div class="feat-item">
       <div class="feat-icon">🗑️</div>
       <div class="feat-name">מחיקה עצמית</div>
       <div class="feat-desc">כל דייר מוחק פוסט שלו בלבד</div>
+    </div>
+  </div>
+
+  <div class="sec-title">⚖️ בוררות שכנותית — ייחודי!</div>
+  <div class="tip tip-blue">
+    <span class="tip-icon">⚖️</span>
+    <div>פיצ'ר ייחודי שאין בשום מקום אחר — AI שפוסק לפי חוק המקרקעין הישראלי, בטון מפשר ולא מריבתי.</div>
+  </div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">לחצו ⚖️ בוררות בעמוד קהילה</div>
+        <div class="step-desc">כתבו את הצד שלכם בפירוט — מה קרה ומה אתם טוענים</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">קבלו קוד סשן לשיתוף</div>
+        <div class="step-desc">שתפו את הקוד (6 תווים) עם הצד השני — הוא יכתוב את עמדתו</div>
+        <span class="step-tag tag-blue">הקוד חד פעמי ופרטי — הוועד לא רואה</span>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-circle green">✓</div>
+      <div class="step-body">
+        <div class="step-title">AI פוסק — פסיקה מיידית</div>
+        <div class="step-desc">המערכת קוראת את שני הצדדים ומספקת ניתוח משפטי + המלצה לגישור</div>
+        <span class="step-tag tag-green">לפי חוק המקרקעין תשכ"ט-1969 וחוק הבתים המשותפים</span>
+      </div>
+    </div>
+  </div>
+  <div class="tip tip-yellow">
+    <span class="tip-icon">⚠️</span>
+    <div>הפסיקה היא ייעוץ כללי בלבד. לענייני משפט מורכבים — מומלץ לפנות לעורך דין.</div>
+  </div>
+
+  <div class="sec-title">🧾 הסתרת קבלות</div>
+  <div class="info-card">
+    <div class="info-card-title">🙈 איך מסתירים קבלה</div>
+    <div style="font-size:14px;color:#64748B;line-height:1.8;">
+      הגדרות ← <strong>צפה בקבלות</strong> ← לחצו <strong>"הסתר"</strong> על הקבלה הרצויה.<br>
+      הקבלה נעלמת מהתצוגה הרגילה אך <strong>לא נמחקת</strong>.<br>
+      ניתן להחזיר בכל עת — לחצו <strong>"הצג קבלות מוסתרות"</strong> בתחתית הרשימה.
     </div>
   </div>
 
@@ -724,6 +769,16 @@ body {
     <div>מומלץ לייצא דוח שנתי PDF בסוף כל שנה להגשה לרואה חשבון</div>
   </div>
 
+  <div class="sec-title">🗑️ ניקוי היסטוריית קבלות</div>
+  <div class="info-card">
+    <div class="info-card-title">📋 איך מנקים היסטוריה</div>
+    <div style="font-size:14px;color:#64748B;line-height:1.8;">
+      הגדרות ← <strong>היסטוריית קבלות הבניין</strong> ← גללו לתחתית ← בחרו תאריך גבול ← לחצו <strong>"ייצא ומחק"</strong>.<br>
+      <strong>חשוב:</strong> המערכת תייצא CSV אוטומטית לפני המחיקה — הנתונים נשמרים אצלכם.<br>
+      המחיקה היא <strong>לצמיתות</strong> — לא ניתן לשחזר ללא הקובץ המיוצא.
+    </div>
+  </div>
+
 </div>
 
 <!-- ══════════════════════════════════════
@@ -760,7 +815,7 @@ body {
       <div class="step-circle">4</div>
       <div class="step-body">
         <div class="step-title">אימייל אוטומטי לשכנות טובה</div>
-        <div class="step-desc">כל פרטי ההסכם נשלחים ל<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0edb3b3ada1b2b4aea5a9a7a8a2afb280a7ada1a9aceea3afad">[email&#160;protected]</a> לבדיקה</div>
+        <div class="step-desc">כל פרטי ההסכם נשלחים ל-ssmartneighbor@gmail.com לבדיקה</div>
       </div>
     </div>
     <div class="flow-step">
@@ -895,16 +950,12 @@ body {
   </div>
   <div class="faq-item">
     <div class="faq-q" onclick="toggleFaq(this)">איך מעבירים נתוני בניין בין מכשירים? <span class="arr">▾</span></div>
-    <div class="faq-a">הגדרות ← סנכרון נתונים ← "📤 ייצא נתונים (JSON)" ← שלחו למכשיר השני ← "📥 ייבא נתונים".</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">איך לקשר Google Drive לדיירים? <span class="arr">▾</span></div>
-    <div class="faq-a">הגדרות ← "🔗 קישור Google Drive" ← הדביקו את הקישור לתיקיית Drive ← שמרו. הדיירים יוכלו לראות חשבוניות וקבלות.</div>
+    <div class="faq-a">כל הנתונים שמורים בענן (Supabase) — פשוט היכנסו עם אותו קוד בניין ואותה דירה מכל מכשיר. אין צורך בייצוא ידני.</div>
   </div>
 
   <div class="tip tip-blue">
     <span class="tip-icon">📬</span>
-    <div>לתמיכה נוספת: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5e2d2d333f2c2a303b3739363c312c1e39333f3732703d3133">[email&#160;protected]</a></strong></div>
+    <div>לתמיכה נוספת: <strong>ssmartneighbor@gmail.com</strong> · מענה תוך 24 שעות</div>
   </div>
 
 </div>
