@@ -208,12 +208,12 @@ a{text-decoration:none;color:inherit;}
 .hdr-top{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 18px 10px;
+  gap:8px;
 }
-.hdr-brand{display:flex;align-items:center;gap:8px;}
-.hdr-icon{font-size:22px;line-height:1;}
-.hdr-names{line-height:1.2;}
-.hdr-bldg-name{font-size:15px;font-weight:800;color:#fff;}
-.hdr-bldg-city{font-size:12px;color:rgba(255,255,255,.55);font-weight:500;}
+.hdr-brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.hdr-names{line-height:1.2;min-width:0;}
+.hdr-bldg-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-bldg-city{font-size:12px;color:rgba(255,255,255,.55);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hdr-right{display:flex;align-items:center;gap:10px;}
 .hdr-refer-btn{
   display:inline-flex;align-items:center;gap:4px;
@@ -1657,7 +1657,7 @@ a{text-decoration:none;color:inherit;}
         <button class="comm-act-btn comm-act-wish" onclick="openSheet('wish')">
           <span class="ca-icon">🎉</span>איחול
         </button>
-        <button class="comm-act-btn" onclick="openMediationSheet()" style="background:linear-gradient(135deg,#7C3AED,#A78BFA);">
+        <button class="comm-act-btn" onclick="openMediationSheet()" style="background:linear-gradient(135deg,#C4B5FD,#DDD6FE);color:#4C1D95;">
           <span class="ca-icon">⚖️</span>בוררות
         </button>
       </div>
