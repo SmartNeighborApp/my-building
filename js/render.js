@@ -702,9 +702,9 @@ function renderPoll(){
   var poll = DB.poll;
   if(!poll) return;
 
-  // הצג/הסתר כפתור סקר חדש לפי מצב מנהל
+  // הצג כפתור סקר חדש לכל דייר מחובר
   var newPollBtn = document.getElementById('new-poll-btn');
-  if(newPollBtn) newPollBtn.style.display = ADMIN_ON ? 'inline-block' : 'none';
+  if(newPollBtn) newPollBtn.style.display = (DB.user && DB.user.unit) ? 'inline-block' : 'none';
 
   // אין סקר פעיל
   if(!poll.q || !poll.opts || !poll.opts.length){
@@ -715,6 +715,13 @@ function renderPoll(){
   }
 
   setText('poll-q', poll.q);
+  // שם יוצר + מחיקה
+  var creatorEl = document.getElementById('poll-creator-line');
+  if(creatorEl){
+    var canDelete = ADMIN_ON || (DB.user && poll.creatorUnit && DB.user.unit === poll.creatorUnit);
+    creatorEl.innerHTML = (poll.createdBy ? '<span style="font-size:11px;color:var(--slate);">יוצר/ת: '+escHtml(poll.createdBy)+'</span>' : '') +
+      (canDelete ? ' <button onclick="deletePoll()" style="padding:2px 8px;background:#FEE2E2;color:#EF4444;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:6px;">🗑️ מחק</button>' : '');
+  }
   var total = poll.opts.reduce(function(a,o){ return a+o.votes; },0);
 
   // הצבעה לפי דירה
@@ -855,18 +862,24 @@ function removePollOptInput(idx){
 }
 
 function createNewPoll(){
-  if(!ADMIN_ON){ showToast('נדרשת כניסת מנהל'); return; }
   var slug = _getBuildingSlug();
   if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  var unit = DB.user ? DB.user.unit : null;
+  if(!unit){ showToast('נא להיכנס קודם'); return; }
   var q=(document.getElementById('poll-new-q').value||'').trim();
   if(!q){ showToast('נא להזין שאלת סקר'); return; }
+  if(!moderateText(q)){ showModToast(); return; }
   var opts=[];
   for(var i=0;i<_pollOptCount;i++){
     var inp=document.getElementById('poll-new-opt-'+i);
     var v=inp?(inp.value||'').trim():'';
-    if(v) opts.push({label:v,votes:0});
+    if(v){
+      if(!moderateText(v)){ showModToast(); return; }
+      opts.push({label:v,votes:0});
+    }
   }
   if(opts.length<2){ showToast('נדרשות לפחות 2 אפשרויות'); return; }
+  var creatorName = DB.unitNames[unit] || DB.user.name || ('דירה '+unit);
   // בטל סקרים קודמים ואז הוסף חדש
   sbClient.from('polls').update({is_active:false}).eq('building_slug', slug).then(function(){
     sbClient.from('polls').insert([{
@@ -874,7 +887,9 @@ function createNewPoll(){
       question:      q,
       options:       opts,
       unit_votes:    {},
-      is_active:     true
+      is_active:     true,
+      created_by:    creatorName,
+      creator_unit:  unit
     }]).then(function(res){
       if(res.error){ showToast('שגיאה בפרסום סקר: '+res.error.message); return; }
       loadPollFromSupabase(function(){
