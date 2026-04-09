@@ -624,6 +624,36 @@ function openAdminReceiptsModal(){
   if(modal) modal.style.display='block';
 }
 
+function clearReceiptsHistory(){
+  var dateEl = document.getElementById('clear-receipts-date');
+  if(!dateEl || !dateEl.value){ showToast('נא לבחור תאריך'); return; }
+  var cutoff = dateEl.value; // YYYY-MM-DD
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  if(!ADMIN_ON){ showToast('⛔ נדרשת כניסת מנהל'); return; }
+  var toDelete = [];
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){
+    var r = DB.approvedReceipts[k];
+    if(r && r.approvedDate && r.approvedDate <= cutoff) toDelete.push(r);
+  });
+  if(!toDelete.length){ showToast('אין קבלות לפני תאריך זה'); return; }
+  if(!confirm('נמצאו '+toDelete.length+' קבלות לפני '+cutoff+'.\nהפעולה תייצא לאקסל ותמחק לצמיתות. להמשיך?')) return;
+  // ייצוא לאקסל לפני מחיקה
+  var rows = [['תאריך אישור','דירה','שם','חודש','סכום','אמצעי תשלום']];
+  toDelete.forEach(function(r){ rows.push([r.approvedDate||'', r.unit, DB.unitNames[r.unit]||('דירה '+r.unit), r.monthLabel||'', r.amount||'', r.methodLabel||'']); });
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='קבלות_לפני_'+cutoff+'.csv'; a.click();
+  // מחיקה מסופרבייס
+  var ids = toDelete.map(function(r){ return r.id; }).filter(Boolean);
+  sbClient.from('payments').delete().in('id', ids).then(function(res){
+    if(res.error){ showToast('שגיאה במחיקה: '+res.error.message); return; }
+    showToast('✅ '+toDelete.length+' קבלות נמחקו לאחר ייצוא');
+    document.getElementById('admin-receipts-modal').style.display='none';
+    loadPaymentsFromSupabase(function(){ renderAll(); });
+  });
+}
+
 function _openAdminReceipt(i){
   var all = window._adminReceipts || [];
   var r = all[i];
