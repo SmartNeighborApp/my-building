@@ -187,5 +187,115 @@ function loadPollFromSupabase(cb){
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   MEDIATION — בוררות שכנותית
+═══════════════════════════════════════════════════════════════ */
+function openMediationSheet(){
+  var el = document.getElementById('mediation-step1');
+  if(el) el.style.display='block';
+  var el2 = document.getElementById('mediation-step2');
+  if(el2) el2.style.display='none';
+  var el3 = document.getElementById('mediation-result-wrap');
+  if(el3) el3.style.display='none';
+  var ta = document.getElementById('med-text-a');
+  if(ta) ta.value='';
+  var inp = document.getElementById('med-session-input');
+  if(inp) inp.value='';
+  openSheet('mediation');
+}
+
+function _genSessionId(){
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function submitMediationSideA(){
+  var text = (document.getElementById('med-text-a').value||'').trim();
+  if(!text){ showToast('נא לכתוב את הצד שלך'); return; }
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  var unit = DB.user ? DB.user.unit : 0;
+  var sessionId = _genSessionId();
+  showToast('שומר...');
+  sbClient.from('mediations').insert([{
+    building_slug: slug,
+    session_id: sessionId,
+    unit_a: unit,
+    text_a: text
+  }]).then(function(res){
+    if(res.error){ showToast('שגיאה: '+res.error.message); return; }
+    // הצג קוד סשן לשיתוף
+    var codeEl = document.getElementById('med-session-code');
+    if(codeEl) codeEl.textContent = sessionId;
+    document.getElementById('mediation-step1').style.display='none';
+    document.getElementById('mediation-step1-done').style.display='block';
+    showToast('נשמר ✅ שתף את הקוד עם הצד השני');
+  });
+}
+
+function switchToMediationJoin(){
+  document.getElementById('mediation-step1').style.display='none';
+  document.getElementById('mediation-step1-done').style.display='none';
+  document.getElementById('mediation-step2').style.display='block';
+}
+
+function submitMediationSideB(){
+  var sessionId = (document.getElementById('med-session-input').value||'').trim().toUpperCase();
+  var text = (document.getElementById('med-text-b').value||'').trim();
+  if(!sessionId){ showToast('נא להזין קוד סשן'); return; }
+  if(!text){ showToast('נא לכתוב את הצד שלך'); return; }
+  var slug = _getBuildingSlug();
+  var unit = DB.user ? DB.user.unit : 0;
+  showToast('מחפש סשן...');
+  sbClient.from('mediations').select('*').eq('building_slug', slug).eq('session_id', sessionId).is('text_b', null).then(function(res){
+    if(res.error || !res.data || !res.data.length){ showToast('קוד לא נמצא או כבר שומש'); return; }
+    var med = res.data[0];
+    if(med.unit_a === unit){ showToast('לא ניתן להיות שני הצדדים'); return; }
+    sbClient.from('mediations').update({ unit_b: unit, text_b: text }).eq('id', String(med.id)).then(function(res2){
+      if(res2.error){ showToast('שגיאה: '+res2.error.message); return; }
+      _runMediation(med.id, med.text_a, text);
+    });
+  });
+}
+
+function _runMediation(medId, textA, textB){
+  var resultWrap = document.getElementById('mediation-result-wrap');
+  var resultEl   = document.getElementById('mediation-result-text');
+  if(resultWrap) resultWrap.style.display='block';
+  if(resultEl)   resultEl.textContent = '⏳ AI בוחן את המצב...';
+  document.getElementById('mediation-step2').style.display='none';
+
+  var prompt = 'אתה יועץ משפטי ומגשר שכנותי מנוסה בדיני מקרקעין ישראלי.\n\n' +
+    'קיבלת שני צדדים בסכסוך שכנים:\n\n' +
+    'צד א: ' + textA + '\n\n' +
+    'צד ב: ' + textB + '\n\n' +
+    'הנחיות חובה:\n' +
+    '1. פסוק לפי חוק המקרקעין תשכ"ט-1969, חוק הבתים המשותפים, תקנות ניהול הבית המשותף — ציין סעיפים מדויקים בלבד\n' +
+    '2. אם אינך בטוח בסעיף חוק מדויק — אמור זאת במפורש. אל תמציא סעיפים\n' +
+    '3. אם הנושא מורכב — המלץ לפנות לעורך דין\n' +
+    '4. לאחר הניתוח המשפטי — הצע דרך גישור מפשרת מתוך רצון לשמור על שכנות טובה\n' +
+    '5. הטון יהיה מכבד, מפשר ולא מריבתי\n' +
+    '6. כתוב בעברית בלבד\n\n' +
+    'מבנה התשובה:\n' +
+    '⚖️ ניתוח משפטי\n' +
+    '🤝 המלצה לגישור';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var txt = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'לא התקבלה תשובה';
+    if(resultEl) resultEl.textContent = txt;
+    // שמור תוצאה בסופרבייס
+    sbClient.from('mediations').update({ result: txt }).eq('id', String(medId)).then(function(){});
+  }).catch(function(e){
+    if(resultEl) resultEl.textContent = 'שגיאה בתקשורת עם AI. נסה שוב.';
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
    PROFESSIONALS SUPABASE
 ═══════════════════════════════════════════════════════════════ */
