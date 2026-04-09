@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <title>SmartNeighbor · ניהול חכם ויעיל יוצר קהילה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1525,17 +1527,11 @@ footer {
 <!-- ═══════════════════════════════════
      AI BOT FLOAT
 ═══════════════════════════════════ -->
-<style>
-.agent-avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1A3A5C,#2563EB);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(26,58,92,.4);cursor:pointer;border:3px solid #fff;position:relative;}
-.agent-dot{position:absolute;top:3px;right:3px;width:11px;height:11px;background:#22C55E;border-radius:50%;border:2px solid #fff;z-index:10;}
-</style>
 <div id="ai-bot-wrap" style="position:fixed;left:20px;bottom:24px;z-index:9998;display:flex;flex-direction:column;align-items:flex-start;gap:10px;">
   <div id="ai-bot-window" style="display:none;width:320px;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden;border:1px solid #E2E8F0;">
     <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.4);">
-          <span style="font-size:20px;line-height:1;">❓</span>
-        </div>
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.4);"><span style="font-size:20px;line-height:1;">❓</span></div>
         <div>
           <div style="font-size:13px;font-weight:900;color:#fff;">שירה · נציגת שירות</div>
           <div style="font-size:10px;color:rgba(255,255,255,.7);">🟢 זמינה עכשיו</div>
@@ -1547,14 +1543,11 @@ footer {
       <div style="background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;line-height:1.5;">שלום! אני שירה, נציגת שירות של שכנות טובה 🏢<br>שאלי אותי כל שאלה על האפליקציה!</div>
     </div>
     <div style="padding:10px 12px;border-top:1px solid #E2E8F0;display:flex;gap:8px;background:#fff;">
-      <input id="ai-bot-input" type="text" placeholder="כתבי שאלה..." style="flex:1;padding:8px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;" onkeydown="if(event.key==='Enter')sendBotMessage()">
+      <input id="ai-bot-input" type="text" placeholder="כתוב שאלה..." style="flex:1;padding:8px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;" onkeydown="if(event.key==='Enter')sendBotMessage()">
       <button onclick="sendBotMessage()" style="width:36px;height:36px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
     </div>
   </div>
-  <div class="agent-avatar" onclick="var w=document.getElementById('ai-bot-window');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('ai-bot-input').focus();">
-    <span style="font-size:26px;line-height:1;">❓</span>
-    <div class="agent-dot"></div>
-  </div>
+  <button onclick="var w=document.getElementById('ai-bot-window');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('ai-bot-input').focus();" style="width:54px;height:54px;background:linear-gradient(135deg,#1A3A5C,#2563EB);border:none;border-radius:50%;color:#fff;font-size:28px;cursor:pointer;box-shadow:0 8px 24px rgba(26,58,92,.4);display:flex;align-items:center;justify-content:center;">❓</button>
 </div>
 <div class="modal-overlay" id="existing-login-modal" onclick="if(event.target===this)closeExistingLogin()" style="display:none;">
   <div class="modal-card" style="max-width:400px;">
