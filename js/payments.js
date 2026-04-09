@@ -514,39 +514,7 @@ function reportPaidFromBanner(){
   openSheet('pay');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   V21: RESIDENTS MANAGER
-═══════════════════════════════════════════════════════════════ */
 
-/* ── My Receipts ───────────────────────────────────────────── */
-function renderMyReceipts(){
-  var el = document.getElementById('my-receipts-list');
-  if(!el) return;
-  var unit = DB.user ? DB.user.unit : 0;
-  if(!unit){ el.innerHTML='<div class="empty-state">יש להיכנס עם מספר דירה</div>'; return; }
-  var receipts = [];
-  Object.keys(DB.approvedReceipts).forEach(function(k){
-    var r = DB.approvedReceipts[k];
-    if(Number(r.unit) === Number(unit)) receipts.push(r);
-  });
-  if(!receipts.length){ el.innerHTML='<div class="empty-state">אין קבלות עדיין</div>'; return; }
-  receipts.sort(function(a,b){ return (b.approvedDate||b.monthLabel||'').localeCompare(a.approvedDate||a.monthLabel||''); });
-  var html = '';
-  receipts.forEach(function(r,i){
-    html += '<div onclick="_openReceipt('+i+')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F1F5F9;cursor:pointer;">'+
-      '<div>'+
-        '<div style="font-size:14px;font-weight:800;color:var(--navy);">'+escHtml(r.monthLabel||'')+'</div>'+
-        '<div style="font-size:12px;color:var(--slate);">'+escHtml(r.methodLabel||'')+(r.approvedDate?' · '+escHtml(r.approvedDate):'')+'</div>'+
-      '</div>'+
-      '<div style="display:flex;align-items:center;gap:8px;">'+
-        '<span style="font-size:16px;font-weight:900;color:var(--green);">&#8362;'+num(r.amount)+'</span>'+
-        '<span style="font-size:12px;color:var(--blue);">&#128196;</span>'+
-      '</div>'+
-    '</div>';
-  });
-  el.innerHTML = html;
-  window._myReceipts = receipts;
-}
 
 function _openReceipt(i){
   var receipts = window._myReceipts || [];
@@ -584,28 +552,47 @@ function _openReceipt(i){
 /* ═══════════════════════════════════════════════════════════════
    RECEIPTS MODALS — קבלות דייר ומנהל
 ═══════════════════════════════════════════════════════════════ */
-function openReceiptsModal(){
+function openReceiptsModal(showHidden){
   var el = document.getElementById('receipts-modal-list');
   if(!el) return;
   var unit = DB.user ? DB.user.unit : 0;
-  var receipts = [];
-  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===Number(unit)) receipts.push(r); });
-  receipts.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
-  if(!receipts.length){ el.innerHTML='<div style="text-align:center;color:var(--slate);padding:40px 0;">אין קבלות עדיין</div>'; }
+  var all = [];
+  Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r&&Number(r.unit)===Number(unit)) all.push(r); });
+  all.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
+  var receipts = showHidden ? all : all.filter(function(r){ return !r.hidden_by_resident; });
+  var hiddenCount = all.filter(function(r){ return !!r.hidden_by_resident; }).length;
+  if(!receipts.length && !hiddenCount){ el.innerHTML='<div style="text-align:center;color:var(--slate);padding:40px 0;">אין קבלות עדיין</div>'; }
+  else if(!receipts.length){ el.innerHTML='<div style="text-align:center;color:var(--slate);padding:40px 0;">כל הקבלות מוסתרות</div>'; }
   else {
+    window._myReceipts = all;
     el.innerHTML = receipts.map(function(r,i){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F1F5F9;">'+
+      var globalIdx = all.indexOf(r);
+      var isHidden = !!r.hidden_by_resident;
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F1F5F9;opacity:'+(isHidden?'0.5':'1')+';">'+
         '<div><div style="font-size:14px;font-weight:800;color:var(--navy);">'+escHtml(r.monthLabel||'')+'</div>'+
         '<div style="font-size:11px;color:var(--slate);">'+(r.approvedDate||'')+(r.methodLabel?' · '+escHtml(r.methodLabel):'')+'</div></div>'+
-        '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
         '<span style="font-size:15px;font-weight:900;color:var(--green);">₪'+num(r.amount)+'</span>'+
-        '<button onclick="_openReceipt('+i+')" style="padding:5px 10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;">הדפס</button>'+
+        '<button onclick="_openReceipt('+globalIdx+')" style="padding:5px 10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;">הדפס</button>'+
+        '<button onclick="toggleHideReceipt(\''+String(r.id)+'\','+isHidden+')" style="padding:5px 8px;background:#F1F5F9;color:var(--slate);border:none;border-radius:8px;font-size:11px;cursor:pointer;">'+(isHidden?'הצג':'הסתר')+'</button>'+
         '</div></div>';
     }).join('');
-    window._myReceipts = receipts;
+  }
+  var toggleLink = document.getElementById('receipts-show-hidden-link');
+  if(toggleLink){
+    if(hiddenCount>0){ toggleLink.style.display='block'; toggleLink.textContent = showHidden ? 'הסתר קבלות מוסתרות' : 'הצג קבלות מוסתרות ('+hiddenCount+')'; toggleLink.onclick = function(){ openReceiptsModal(!showHidden); }; }
+    else { toggleLink.style.display='none'; }
   }
   var modal = document.getElementById('receipts-modal');
   if(modal) modal.style.display='block';
+}
+
+function toggleHideReceipt(id, currentlyHidden){
+  var newVal = !currentlyHidden;
+  sbClient.from('payments').update({ hidden_by_resident: newVal }).eq('id', id).then(function(res){
+    if(res.error){ showToast('שגיאה: '+res.error.message); return; }
+    loadPaymentsFromSupabase(function(){ openReceiptsModal(newVal ? false : true); });
+  });
 }
 
 function closeReceiptsModal(){
