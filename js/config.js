@@ -15,7 +15,7 @@ var DB_KEY   = 'sn22_db';
 
 /* ── Business Constants ────────────────────────────────────── */
 var LICENSE_EXPIRY = '2027-03-12';
-var FLAT_PRICE     = 7;
+var FLAT_PRICE     = 11;
 
 /* ── App State ─────────────────────────────────────────────── */
 var MONTH_OFFSET = 0;
