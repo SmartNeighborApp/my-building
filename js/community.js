@@ -294,7 +294,7 @@ function _runMediation(medId, textA, textB){
     '⚖️ ניתוח משפטי\n' +
     '🤝 המלצה לגישור';
 
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('https://sn-ai-proxy.shirit-coach.workers.dev', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
