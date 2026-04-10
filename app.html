@@ -2549,6 +2549,23 @@ a{text-decoration:none;color:inherit;}
   <script src="/my-building/js/settings.js"></script>
   <script src="/my-building/js/auth.js"></script>
   <script src="/my-building/js/boot.js"></script>
+  <script>
+function switchMedTab(tab){
+  var tabs = ['dispute','vaad','public'];
+  tabs.forEach(function(t){
+    var content = document.getElementById('med-content-'+t);
+    var btn = document.getElementById('med-tab-'+t);
+    if(content) content.style.display = t===tab ? 'block' : 'none';
+    if(btn){ btn.style.background = t===tab ? 'linear-gradient(135deg,#7C3AED,#A78BFA)' : '#F1F5F9'; btn.style.color = t===tab ? '#fff' : '#64748B'; }
+  });
+  if(tab==='vaad'){
+    var adminPending = document.getElementById('vaad-admin-pending');
+    if(adminPending) adminPending.style.display = ADMIN_ON ? 'block' : 'none';
+    loadVaadQuestions();
+  }
+  if(tab==='public') loadVaadQuestions();
+}
+  </script>
 
 <!-- FAULT QUOTES POPUP -->
 <div id="fault-quotes-popup" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:16px;">
@@ -2589,7 +2606,17 @@ a{text-decoration:none;color:inherit;}
     <div class="sheet-handle"></div>
     <div style="padding:0 16px 32px;">
       <div style="font-size:17px;font-weight:900;color:var(--navy);margin-bottom:4px;">⚖️ בוררות שכנותית</div>
-      <div style="font-size:12px;color:var(--slate);margin-bottom:16px;">כל צד כותב את עמדתו — AI יבחן ויפסוק לפי החוק הישראלי</div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:12px;">כל צד כותב את עמדתו — AI יבחן ויפסוק לפי החוק הישראלי</div>
+
+      <!-- טאבים -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;">
+        <button id="med-tab-dispute" onclick="switchMedTab('dispute')" style="flex:1;padding:8px 4px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);">⚖️ בוררות</button>
+        <button id="med-tab-vaad" onclick="switchMedTab('vaad')" style="flex:1;padding:8px 4px;background:#F1F5F9;color:#64748B;border:none;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);">❓ שאל ועד</button>
+        <button id="med-tab-public" onclick="switchMedTab('public')" style="flex:1;padding:8px 4px;background:#F1F5F9;color:#64748B;border:none;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);">📋 פסיקות</button>
+      </div>
+
+      <!-- תוכן טאב בוררות -->
+      <div id="med-content-dispute">
 
       <!-- שלב א — צד ראשון -->
       <div id="mediation-step1">
@@ -2620,7 +2647,31 @@ a{text-decoration:none;color:inherit;}
         <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚖️ פסיקת AI</div>
         <div id="mediation-result-text" style="font-size:13px;color:#1E293B;line-height:1.7;background:#F8FAFC;border-radius:14px;padding:16px;white-space:pre-wrap;"></div>
         <div style="font-size:11px;color:var(--slate);margin-top:10px;text-align:center;">⚠️ זהו ייעוץ כללי בלבד — לענייני משפט מורכבים פנה לעורך דין</div>
+        <button onclick="document.getElementById('mediation-result-wrap').style.display='none'" style="width:100%;margin-top:10px;padding:10px;background:#F1F5F9;color:#64748B;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">✕ סגור פסיקה</button>
       </div>
+
+      </div><!-- /med-content-dispute -->
+
+      <!-- תוכן טאב שאל ועד -->
+      <div id="med-content-vaad" style="display:none;">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">❓ שלח שאלה לוועד</div>
+        <div style="font-size:12px;color:var(--slate);margin-bottom:10px;">הוועד יבחן את השאלה וישלח לAI — התשובה תפורסם לכל הדיירים</div>
+        <textarea id="vaad-question-input" rows="4" placeholder="כתוב את שאלתך לוועד..." style="width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-family:var(--font);resize:none;box-sizing:border-box;margin-bottom:12px;"></textarea>
+        <button onclick="submitVaadQuestion()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font);">שלח שאלה לוועד ✅</button>
+        <!-- למנהל בלבד: שאלות ממתינות -->
+        <div id="vaad-admin-pending" style="display:none;margin-top:16px;">
+          <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">📥 שאלות ממתינות לאישור</div>
+          <div id="vaad-pending-wrap"></div>
+        </div>
+      </div>
+
+      <!-- תוכן טאב פסיקות ציבוריות -->
+      <div id="med-content-public" style="display:none;">
+        <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">📋 פסיקות ציבוריות</div>
+        <div style="font-size:12px;color:var(--slate);margin-bottom:12px;">תשובות AI שאושרו ופורסמו על ידי הוועד</div>
+        <div id="vaad-public-wrap"></div>
+      </div>
+
     </div>
   </div>
 </div>
