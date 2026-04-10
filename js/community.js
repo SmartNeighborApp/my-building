@@ -402,6 +402,35 @@ function rejectVaadQuestion(id){
   });
 }
 
+function sendMediationWA(sessionId){
+  var unitVal = (document.getElementById('med-wa-unit-input').value||'').trim();
+  if(!unitVal){ showToast('נא להזין מספר דירה'); return; }
+  var unit = parseInt(unitVal);
+  if(!unit){ showToast('מספר דירה לא תקין'); return; }
+  var slug = _getBuildingSlug();
+  sbClient.from('residents').select('phone,name').eq('building_slug', slug).eq('unit', unit).limit(1).then(function(res){
+    if(res.error || !res.data || !res.data.length){ showToast('לא נמצא דייר בדירה ' + unit); return; }
+    var phone = res.data[0].phone;
+    if(!phone){ showToast('אין טלפון רשום לדירה ' + unit); return; }
+    var cleanPhone = phone.replace(/\D/g,'');
+    if(cleanPhone.charAt(0)==='0') cleanPhone = '972' + cleanPhone.substring(1);
+    var senderName = (DB.user ? DB.user.name : 'שכן/ה') || 'שכן/ה';
+    var senderUnit = DB.user ? DB.user.unit : '';
+    var msg = encodeURIComponent(
+      'שלום! ' + senderName + ' מדירה ' + senderUnit + ' פתח/ה הליך בוררות שכנותית באפליקציית הבניין.\n\n' +
+      'קוד הסשן: *' + sessionId + '*\n\n' +
+      'כיצד להשתמש:\n' +
+      '1. פתח את אפליקציית הבניין\n' +
+      '2. לחץ על "קהילה" ואז "בוררות"\n' +
+      '3. לחץ "יש לי קוד מהצד השני"\n' +
+      '4. הזן את הקוד: ' + sessionId + '\n' +
+      '5. כתוב את עמדתך — ה-AI יפסוק\n\n' +
+      'תודה 🤝'
+    );
+    window.open('https://wa.me/' + cleanPhone + '?text=' + msg, '_blank');
+  });
+}
+
 /* ═══════════════════════════════════════════════════════════════
    PROFESSIONALS SUPABASE
 ═══════════════════════════════════════════════════════════════ */
