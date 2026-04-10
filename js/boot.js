@@ -12,6 +12,7 @@ function startApp(){
   _cleanOldVaadNotices();
   renderAll();
   checkDebtAlert();
+  checkMediationAlert();
 }
 
 function _cleanOldVaadNotices(){
@@ -139,6 +140,36 @@ function checkDebtAlert(){
     if(wrap){ wrap.innerHTML = debtMonths.map(function(m){ return '<span class="debt-month-tag">'+m+'</span>'; }).join(''); }
     setTimeout(function(){ var ov = document.getElementById('debt-overlay'); if(ov) ov.classList.add('open'); }, 1500);
   } catch(e){}
+}
+
+/* ── Mediation Alert ───────────────────────────────────────── */
+function checkMediationAlert(){
+  var slug = _getBuildingSlug();
+  var unit = DB.user ? DB.user.unit : 0;
+  if(!slug || !unit) return;
+  sbClient.from('mediations').select('id,result,session_id').eq('building_slug',slug).eq('unit_a',unit).eq('viewed_by_a',false).not('result','is',null).then(function(res){
+    if(res.error || !res.data || !res.data.length) return;
+    var med = res.data[0];
+    var dot = document.getElementById('nav-community-dot');
+    if(dot){ dot.style.display='flex'; dot.textContent='!'; }
+    var existing = document.getElementById('mediation-alert-banner');
+    if(existing) existing.remove();
+    var banner = document.createElement('div');
+    banner.id = 'mediation-alert-banner';
+    banner.style.cssText = 'position:fixed;bottom:80px;right:16px;left:16px;z-index:9000;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border-radius:16px;padding:14px 16px;font-family:var(--font);direction:rtl;box-shadow:0 8px 24px rgba(124,58,237,.4);cursor:pointer;';
+    banner.innerHTML = '<div style="font-size:14px;font-weight:900;margin-bottom:4px;">⚖️ פסיקת בוררות התקבלה!</div><div style="font-size:12px;opacity:.85;">לחץ לצפייה בפסיקה</div>';
+    banner.onclick = function(){
+      var wrap = document.getElementById('mediation-result-wrap');
+      var txt = document.getElementById('mediation-result-text');
+      if(txt) txt.textContent = med.result;
+      if(wrap) wrap.style.display='block';
+      openSheet('mediation');
+      sbClient.from('mediations').update({viewed_by_a:true}).eq('id',String(med.id)).then(function(){});
+      banner.remove();
+      if(dot) dot.style.display='none';
+    };
+    document.body.appendChild(banner);
+  });
 }
 
 /* ── Boot Sequence ─────────────────────────────────────────── */
