@@ -2631,6 +2631,11 @@ function switchMedTab(tab){
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">✅ הצד שלך נשמר!<br>שתף את הקוד עם הצד השני:</div>
         <div id="med-session-code" style="font-size:40px;font-weight:900;color:#7C3AED;letter-spacing:8px;background:#F5F3FF;border-radius:16px;padding:16px;margin-bottom:16px;"></div>
         <div style="font-size:11px;color:var(--slate);">הצד השני יזין קוד זה ויכתוב את עמדתו — ואז AI יפסוק</div>
+        <div style="margin-top:14px;text-align:right;">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;">📲 שלח וואטסאפ לצד השני</div>
+          <input id="med-wa-unit-input" type="tel" inputmode="numeric" placeholder="מספר דירה של הצד השני" style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:var(--font);box-sizing:border-box;margin-bottom:8px;">
+          <button onclick="sendMediationWA(document.getElementById('med-session-code').textContent)" style="width:100%;padding:11px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);">📲 שלח וואטסאפ לצד השני</button>
+        </div>
       </div>
 
       <!-- שלב ב — צד שני -->
