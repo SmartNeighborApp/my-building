@@ -294,7 +294,7 @@ function _runMediation(medId, textA, textB){
     '⚖️ ניתוח משפטי\n' +
     '🤝 המלצה לגישור';
 
-  fetch('https://sn-ai-proxy.shirit-coach.workers.dev', {
+  fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -309,6 +309,96 @@ function _runMediation(medId, textA, textB){
     sbClient.from('mediations').update({ result: txt }).eq('id', String(medId)).then(function(){});
   }).catch(function(e){
     if(resultEl) resultEl.textContent = 'שגיאה בתקשורת עם AI. נסה שוב.';
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VAAD QUESTIONS — שאלות לוועד
+═══════════════════════════════════════════════════════════════ */
+function submitVaadQuestion(){
+  var text = (document.getElementById('vaad-question-input').value||'').trim();
+  if(!text){ showToast('נא לכתוב שאלה'); return; }
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  var unit = DB.user ? DB.user.unit : 0;
+  showToast('שולח שאלה...');
+  sbClient.from('vaad_questions').insert([{ building_slug:slug, unit:unit, question:text, status:'pending' }]).then(function(res){
+    if(res.error){ showToast('שגיאה: '+res.error.message); return; }
+    document.getElementById('vaad-question-input').value='';
+    showToast('השאלה נשלחה לוועד ✅');
+    loadVaadQuestions();
+  });
+}
+
+function loadVaadQuestions(){
+  var slug = _getBuildingSlug();
+  if(!slug) return;
+  var pendingWrap = document.getElementById('vaad-pending-wrap');
+  var publicWrap  = document.getElementById('vaad-public-wrap');
+
+  // טען פסיקות ציבוריות לכולם
+  sbClient.from('vaad_questions').select('*').eq('building_slug',slug).eq('status','published').order('created_at',{ascending:false}).then(function(res){
+    if(res.error || !res.data){ if(publicWrap) publicWrap.innerHTML='<div style="font-size:12px;color:var(--slate);">אין פסיקות ציבוריות עדיין</div>'; return; }
+    if(!publicWrap) return;
+    if(!res.data.length){ publicWrap.innerHTML='<div style="font-size:12px;color:var(--slate);">אין פסיקות ציבוריות עדיין</div>'; return; }
+    publicWrap.innerHTML = res.data.map(function(q){
+      return '<div id="vq-'+q.id+'" style="background:#F8FAFC;border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid #E2E8F0;">' +
+        '<div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:6px;">❓ '+escHtml(q.question)+'</div>' +
+        '<div style="font-size:12px;color:#1E293B;line-height:1.6;white-space:pre-wrap;">'+escHtml(q.answer)+'</div>' +
+        '<button onclick="document.getElementById(\'vq-'+q.id+'\').style.display=\'none\'" style="margin-top:8px;padding:4px 12px;background:#F1F5F9;color:#64748B;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">הסתר</button>' +
+      '</div>';
+    }).join('');
+  });
+
+  // טען שאלות ממתינות — למנהל בלבד
+  if(!ADMIN_ON) return;
+  if(!pendingWrap) return;
+  sbClient.from('vaad_questions').select('*').eq('building_slug',slug).eq('status','pending').order('created_at',{ascending:false}).then(function(res){
+    if(res.error || !res.data || !res.data.length){ pendingWrap.innerHTML='<div style="font-size:12px;color:var(--slate);">אין שאלות ממתינות</div>'; return; }
+    pendingWrap.innerHTML = res.data.map(function(q){
+      return '<div style="background:#FFFBEB;border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid #FDE68A;">' +
+        '<div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px;">דירה '+q.unit+': '+escHtml(q.question)+'</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button onclick="approveVaadQuestion(\''+q.id+'\',\''+escHtml(q.question)+'\')" style="flex:1;padding:8px;background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);">✅ שלח ל-AI ופרסם</button>' +
+          '<button onclick="rejectVaadQuestion(\''+q.id+'\')" style="flex:1;padding:8px;background:#FEE2E2;color:#EF4444;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);">✕ דחה</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function approveVaadQuestion(id, question){
+  var slug = _getBuildingSlug();
+  showToast('שולח ל-AI...');
+  var prompt = 'אתה יועץ מומחה לדיני בתים משותפים בישראל.\n\n' +
+    'ענה על השאלה הבאה של דייר לפי החוק הישראלי בלבד:\n\n' +
+    'שאלה: ' + question + '\n\n' +
+    'הנחיות חובה:\n' +
+    '1. ענה לפי: חוק המקרקעין תשכ"ט-1969, חוק הבתים המשותפים, תקנות ניהול הבית המשותף, חוק החוזים תשל"ג-1973\n' +
+    '2. ציין סעיפים מדויקים בלבד — אל תמציא סעיפים\n' +
+    '3. אם אינך בטוח — אמור זאת במפורש\n' +
+    '4. כתוב בעברית בלבד, בשפה פשוטה וברורה\n' +
+    '5. הטון יהיה מכבד ומקצועי';
+  fetch('https://sn-ai-proxy.shirit-coach.workers.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{ role:'user', content:prompt }] })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var answer = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'לא התקבלה תשובה';
+    sbClient.from('vaad_questions').update({ answer:answer, status:'published' }).eq('id',String(id)).then(function(res){
+      if(res.error){ showToast('שגיאה בשמירה'); return; }
+      showToast('פורסם לכל הדיירים ✅');
+      loadVaadQuestions();
+    });
+  }).catch(function(){ showToast('שגיאה בתקשורת עם AI'); });
+}
+
+function rejectVaadQuestion(id){
+  if(!confirm('לדחות שאלה זו?')) return;
+  sbClient.from('vaad_questions').update({ status:'rejected' }).eq('id',String(id)).then(function(res){
+    if(res.error){ showToast('שגיאה'); return; }
+    showToast('השאלה נדחתה');
+    loadVaadQuestions();
   });
 }
 
