@@ -294,7 +294,7 @@ function _runMediation(medId, textA, textB){
     '⚖️ ניתוח משפטי\n' +
     '🤝 המלצה לגישור';
 
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('https://sn-ai-proxy.shirit-coach.workers.dev', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -427,7 +427,7 @@ function sendMediationWA(sessionId){
       '5. כתוב את עמדתך — ה-AI יפסוק\n\n' +
       'תודה 🤝'
     );
-    window.open('https://wa.me/' + cleanPhone + '?text=' + msg, '_blank');
+    window.location.href = 'https://wa.me/' + cleanPhone + '?text=' + msg;
   });
 }
 
