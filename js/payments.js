@@ -133,7 +133,7 @@ function _calcCoveredMonths(unit, totalAmount, fee){
     remaining -= covered;
   }
 
-  for(var i=12; i>=0; i--){
+  for(var i=0; i>=0; i--){
     _tryMonth(new Date(now.getFullYear(), now.getMonth()-i, 1));
   }
   for(var j=1; j<=12 && remaining>0; j++){
