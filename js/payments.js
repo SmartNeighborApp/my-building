@@ -133,7 +133,16 @@ function _calcCoveredMonths(unit, totalAmount, fee){
     remaining -= covered;
   }
 
-  for(var i=0; i>=0; i--){
+  // חישוב נקודת ההתחלה — start_month מהגדרות הבניין או החודש הנוכחי
+  var startMonthsBack = 0;
+  if(DB.building && DB.building.startMonth){
+    var sm = DB.building.startMonth.split('-');
+    var smYear = parseInt(sm[0])||now.getFullYear();
+    var smMonth = parseInt(sm[1])||now.getMonth()+1;
+    startMonthsBack = (now.getFullYear()-smYear)*12 + (now.getMonth()+1-smMonth);
+    if(startMonthsBack < 0) startMonthsBack = 0;
+  }
+  for(var i=startMonthsBack; i>=0; i--){
     _tryMonth(new Date(now.getFullYear(), now.getMonth()-i, 1));
   }
   for(var j=1; j<=12 && remaining>0; j++){
