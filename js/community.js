@@ -306,7 +306,7 @@ function _runMediation(medId, textA, textB){
     var txt = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'לא התקבלה תשובה';
     if(resultEl) resultEl.textContent = txt;
     // שמור תוצאה בסופרבייס
-    sbClient.from('mediations').update({ result: txt }).eq('id', String(medId)).then(function(){});
+    sbClient.from('mediations').update({ result: txt, viewed_by_a: false }).eq('id', String(medId)).then(function(){});
   }).catch(function(e){
     if(resultEl) resultEl.textContent = 'שגיאה בתקשורת עם AI. נסה שוב.';
   });
@@ -434,3 +434,34 @@ function sendMediationWA(sessionId){
 /* ═══════════════════════════════════════════════════════════════
    PROFESSIONALS SUPABASE
 ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   MY MEDIATIONS — היסטוריית בוררויות פרטית
+═══════════════════════════════════════════════════════════════ */
+function loadMyMediations(){
+  var wrap = document.getElementById('my-mediations-wrap');
+  if(!wrap) return;
+  var slug = _getBuildingSlug();
+  var unit = DB.user ? DB.user.unit : 0;
+  if(!slug || !unit){ wrap.innerHTML='<div style="font-size:15px;color:var(--slate);">לא זוהה משתמש</div>'; return; }
+  wrap.innerHTML='<div style="font-size:15px;color:var(--slate);">טוען...</div>';
+  sbClient.from('mediations').select('*').eq('building_slug', slug).not('result', 'is', null).or('unit_a.eq.'+unit+',unit_b.eq.'+unit).order('created_at', {ascending:false}).then(function(res){
+    if(res.error || !res.data){ wrap.innerHTML='<div style="font-size:15px;color:var(--slate);">שגיאה בטעינה</div>'; return; }
+    if(!res.data.length){ wrap.innerHTML='<div style="font-size:15px;color:var(--slate);">אין היסטוריית בוררויות עדיין</div>'; return; }
+    wrap.innerHTML = res.data.map(function(m){
+      var date = m.created_at ? m.created_at.substring(0,10) : '';
+      var myRole = (m.unit_a === unit) ? 'צד א' : 'צד ב';
+      return '<div style="background:#F8FAFC;border-radius:14px;padding:16px;margin-bottom:14px;border:1.5px solid #E2E8F0;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<span style="font-size:14px;font-weight:800;color:var(--navy);">⚖️ בוררות — '+date+'</span>' +
+          '<span style="font-size:13px;font-weight:700;color:#7C3AED;background:#F5F3FF;padding:3px 10px;border-radius:8px;">'+myRole+'</span>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--slate);margin-bottom:4px;">✍️ צד א:</div>' +
+        '<div style="font-size:15px;color:#1E293B;line-height:1.6;white-space:pre-wrap;background:#fff;border-radius:10px;padding:10px;margin-bottom:10px;">'+escHtml(m.text_a||'')+'</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--slate);margin-bottom:4px;">✍️ צד ב:</div>' +
+        '<div style="font-size:15px;color:#1E293B;line-height:1.6;white-space:pre-wrap;background:#fff;border-radius:10px;padding:10px;margin-bottom:10px;">'+escHtml(m.text_b||'')+'</div>' +
+        '<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:6px;">⚖️ פסיקת AI:</div>' +
+        '<div style="font-size:15px;color:#1E293B;line-height:1.7;white-space:pre-wrap;background:#EDE9FE;border-radius:10px;padding:12px;">'+escHtml(m.result||'')+'</div>' +
+      '</div>';
+    }).join('');
+  });
+}
