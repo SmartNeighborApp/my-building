@@ -179,7 +179,7 @@ function loadPaymentsFromSupabase(cb){
         if(r.status === 'pending'){
           DB.pendingPayments.push({ id:r.id, unit:unit, monthKey:mk, method:r.method||'', methodLabel:r.method_label||'', amount:r.amount||'', monthLabel:r.month_label||'', ref:r.ref||'', note:r.note||'', ts:new Date(r.created_at).getTime() });
         } else if(r.status === 'approved'){
-          DB.approvedReceipts[unit+'-'+mk] = { id:r.id, name:DB.unitNames[unit]||('דירה '+unit), unit:unit, amount:r.amount||'', method:r.method||'', methodLabel:r.method_label||'', monthLabel:r.month_label||'', approvedDate:r.approved_date||'', approvedBy:r.approved_by||'', building:DB.building?DB.building.name:'' };
+          DB.approvedReceipts[unit+'-'+mk] = { id:r.id, name:DB.unitNames[unit]||('דירה '+unit), unit:unit, monthKey:mk, amount:r.amount||'', method:r.method||'', methodLabel:r.method_label||'', monthLabel:r.month_label||'', approvedDate:r.approved_date||'', approvedBy:r.approved_by||'', building:DB.building?DB.building.name:'' };
         }
       });
     }
