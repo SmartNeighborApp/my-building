@@ -648,6 +648,8 @@ function renderCommunityPage(){
   var phtml = '';
   DB.posts.forEach(function(p){ phtml += renderPostCard(p, 'post'); });
   setHTML('comm-posts-feed', phtml||'<div class="empty-state">אין פוסטים</div>');
+  // טעינת תגובות לכל פוסט
+  DB.posts.forEach(function(p){ if(p.id) loadReplies(String(p.id)); });
 
   // (backward compatibility calls removed — full-notices and full-posts elements no longer in DOM)
 }
@@ -668,6 +670,16 @@ function renderPostCard(item, kind){
     : (ADMIN_ON || (DB.user && DB.user.unit && String(DB.user.unit) === String(item.unit)));
   var delFn  = isNotice ? 'deleteNotice' : 'deletePost';
   var delBtn = canDel ? '<button onclick="'+delFn+'(\''+item.id+'\','+item.unit+')" style="margin-top:8px;padding:4px 10px;background:none;border:1px solid #FCA5A5;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;color:#EF4444;font-family:var(--font);">🗑️ מחק</button>' : '';
+  var postId = String(item.id||'');
+  var repliesSection = !isNotice && postId ? (
+    '<div id="replies-wrap-'+postId+'" style="margin-top:10px;border-top:1px solid #F1F5F9;padding-top:10px;">'+
+      '<div id="replies-list-'+postId+'" style="margin-bottom:8px;"></div>'+
+      '<div style="display:flex;gap:6px;align-items:center;">'+
+        '<input id="reply-inp-'+postId+'" type="text" placeholder="כתוב תגובה..." style="flex:1;padding:7px 10px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:var(--font);outline:none;" onkeydown="if(event.key==='Enter')submitReply(''+postId+'')">'+
+        '<button onclick="submitReply(''+postId+'')" style="padding:7px 12px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);">שלח</button>'+
+      '</div>'+
+    '</div>'
+  ) : '';
   return '<div class="post-card">'+
     '<span class="comm-type-badge '+bCls+'">'+bLbl+'</span>'+
     '<div class="post-card-header">'+
@@ -678,6 +690,7 @@ function renderPostCard(item, kind){
     (item.title?'<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px;">'+escHtml(item.title)+'</div>':'') +
     '<div class="post-card-text">'+escHtml(item.text||item.desc||'')+'</div>'+
     delBtn+
+    repliesSection+
   '</div>';
 }
 
