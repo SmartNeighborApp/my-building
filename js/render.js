@@ -60,7 +60,7 @@ function _calcBalance(){
   (DB.finance.expenses||[]).forEach(function(e){
     var amt = parseFloat(e.amount)||0;
     if(e.expType==='קבועה'){
-      totalExpenses += amt * monthsActive;
+      totalExpenses += amt;
     } else {
       // חד פעמית — רק אם החודש שלה כבר עבר או החודש הנוכחי
       var eMonth = MONTHS_HE.indexOf(e.month);
