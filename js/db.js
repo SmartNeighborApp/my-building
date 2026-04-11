@@ -173,13 +173,21 @@ function loadPaymentsFromSupabase(cb){
     if(!res.error && res.data){
       DB.pendingPayments  = [];
       DB.approvedReceipts = {};
+      DB.allReceipts      = [];
       res.data.forEach(function(r){
         var mk   = r.month_key || '';
         var unit = r.unit != null ? Number(r.unit) : r.unit;
         if(r.status === 'pending'){
           DB.pendingPayments.push({ id:r.id, unit:unit, monthKey:mk, method:r.method||'', methodLabel:r.method_label||'', amount:r.amount||'', monthLabel:r.month_label||'', ref:r.ref||'', note:r.note||'', ts:new Date(r.created_at).getTime() });
         } else if(r.status === 'approved'){
-          DB.approvedReceipts[unit+'-'+mk] = { id:r.id, name:DB.unitNames[unit]||('דירה '+unit), unit:unit, monthKey:mk, amount:r.amount||'', method:r.method||'', methodLabel:r.method_label||'', monthLabel:r.month_label||'', approvedDate:r.approved_date||'', approvedBy:r.approved_by||'', building:DB.building?DB.building.name:'' };
+          var rec = { id:r.id, name:DB.unitNames[unit]||('דירה '+unit), unit:unit, monthKey:mk, amount:r.amount||'', method:r.method||'', methodLabel:r.method_label||'', monthLabel:r.month_label||'', approvedDate:r.approved_date||'', approvedBy:r.approved_by||'', building:DB.building?DB.building.name:'' };
+          DB.allReceipts.push(rec);
+          var key = unit+'-'+mk;
+          if(DB.approvedReceipts[key]){
+            DB.approvedReceipts[key].amount = String(parseFloat(DB.approvedReceipts[key].amount||0) + parseFloat(r.amount||0));
+          } else {
+            DB.approvedReceipts[key] = rec;
+          }
         }
       });
     }
