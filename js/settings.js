@@ -25,6 +25,8 @@ function submitPin(){
   ADMIN_ON = true;
   if(err) err.style.display='none';
   showToast('✅ כניסת מנהל הצליחה');
+  var smInp = document.getElementById('admin-start-month');
+  if(smInp && DB.building.startMonth) smInp.value = DB.building.startMonth;
   renderSettingsPage();
   renderCommunityPage();
   updateNavDot();
