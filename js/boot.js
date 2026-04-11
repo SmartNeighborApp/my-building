@@ -224,10 +224,14 @@ window.addEventListener('load', function(){
       // טעינת monthly_fee מ-Supabase
       var bSlug = _getBuildingSlug();
       if(bSlug){
-        sbClient.from('buildings').select('monthly_fee,units_count').eq('unique_slug',bSlug).single().then(function(res){
+        sbClient.from('buildings').select('monthly_fee,units_count,unit_names').eq('unique_slug',bSlug).single().then(function(res){
           if(!res.error && res.data){
             if(res.data.monthly_fee != null) DB.building.monthly_fee = parseInt(res.data.monthly_fee)||0;
             if(res.data.units_count && !DB.building.total_units) DB.building.total_units = parseInt(res.data.units_count)||0;
+            if(res.data.unit_names && typeof res.data.unit_names === 'object'){
+              Object.keys(res.data.unit_names).forEach(function(k){ DB.unitNames[k] = res.data.unit_names[k]; });
+              saveDB();
+            }
           }
           startApp();
         }).catch(function(){ startApp(); });
