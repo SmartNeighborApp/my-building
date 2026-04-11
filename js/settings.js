@@ -660,6 +660,7 @@ function saveResidentEntry(){
   if(name) DB.unitNames[unit] = name;
   if(phone) DB.residentPhones[unit] = phone;
   saveDB();
+  saveUnitNamesToSupabase();
   document.getElementById('res-inp-unit').value='';
   document.getElementById('res-inp-name').value='';
   document.getElementById('res-inp-phone').value='';
