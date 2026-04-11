@@ -675,8 +675,8 @@ function renderPostCard(item, kind){
     '<div id="replies-wrap-'+postId+'" style="margin-top:10px;border-top:1px solid #F1F5F9;padding-top:10px;">'+
       '<div id="replies-list-'+postId+'" style="margin-bottom:8px;"></div>'+
       '<div style="display:flex;gap:6px;align-items:center;">'+
-        '<input id="reply-inp-'+postId+'" type="text" placeholder="כתוב תגובה..." style="flex:1;padding:7px 10px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:var(--font);outline:none;" onkeydown="if(event.key==='Enter')submitReply(''+postId+'')">'+
-        '<button onclick="submitReply(''+postId+'')" style="padding:7px 12px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);">שלח</button>'+
+        '<input id="reply-inp-'+postId+'" type="text" placeholder="כתוב תגובה..." style="flex:1;padding:7px 10px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">'+
+        '<button onclick="submitReply(\''+postId+'\')" style="padding:7px 12px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);">שלח</button>'+
       '</div>'+
     '</div>'
   ) : '';
