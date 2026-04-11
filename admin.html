@@ -369,6 +369,7 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="settings-panel" style="margin-top:16px">
       <div class="settings-panel-title">🔐 שינוי סיסמת כניסה</div>
+      <div class="settings-row"><span class="settings-label">סיסמה נוכחית</span><input id="set-pw-current" class="settings-input" type="password" placeholder="הכנס סיסמה נוכחית"></div>
       <div class="settings-row"><span class="settings-label">סיסמה חדשה</span><input id="set-pw-new" class="settings-input" type="password" placeholder="הכנס סיסמה חדשה"></div>
       <div class="settings-row"><span class="settings-label">אישור סיסמה</span><input id="set-pw-confirm" class="settings-input" type="password" placeholder="הכנס שוב לאישור"><button class="settings-save-btn" onclick="changePassword()">💾 שמור</button></div>
     </div>
@@ -455,16 +456,23 @@ function doLogout(){
 }
 
 function changePassword(){
+  var curr=(document.getElementById('set-pw-current').value||'').trim();
   var p1=(document.getElementById('set-pw-new').value||'').trim();
   var p2=(document.getElementById('set-pw-confirm').value||'').trim();
+  if(!curr){ showToast('⚠️ הכנס סיסמה נוכחית'); return; }
   if(!p1){ showToast('⚠️ הכנס סיסמה חדשה'); return; }
   if(p1.length<6){ showToast('⚠️ סיסמה חייבת להיות לפחות 6 תווים'); return; }
   if(p1!==p2){ showToast('❌ הסיסמאות אינן תואמות'); return; }
-  sbClient.from('admin_settings').upsert({key:'admin_password',value:p1}).then(function(res){
-    if(res.error){ showToast('❌ שגיאה בשמירה'); return; }
-    document.getElementById('set-pw-new').value='';
-    document.getElementById('set-pw-confirm').value='';
-    showToast('✅ סיסמה עודכנה בהצלחה');
+  sbClient.from('admin_settings').select('value').eq('key','admin_password').then(function(res){
+    var stored=(res.data&&res.data.length)?res.data[0].value:ADMIN_PASSWORD;
+    if(curr!==stored){ showToast('❌ הסיסמה הנוכחית שגויה'); document.getElementById('set-pw-current').value=''; return; }
+    sbClient.from('admin_settings').upsert({key:'admin_password',value:p1}).then(function(r){
+      if(r.error){ showToast('❌ שגיאה בשמירה'); return; }
+      document.getElementById('set-pw-current').value='';
+      document.getElementById('set-pw-new').value='';
+      document.getElementById('set-pw-confirm').value='';
+      showToast('✅ סיסמה עודכנה בהצלחה');
+    });
   });
 }
 
