@@ -66,7 +66,9 @@ function saveBuildingConfig(){
   saveDB();
   // שמירת monthly_fee ב-Supabase
   var slug = _getBuildingSlug();
-  if(slug && fe > 0){ sbClient.from('buildings').update({monthly_fee:fe,units_count:un}).eq('unique_slug',slug).then(function(res){ if(res.error) showToast('⚠️ שגיאת Supabase: '+res.error.message); else showToast('✅ נשמר: ₪'+fe+' | '+un+' דירות'); }); } else { showToast('⚠️ slug='+slug+' fee='+fe); }
+  var sm = (document.getElementById('admin-start-month') ? document.getElementById('admin-start-month').value : '')||'';
+  if(sm) DB.building.startMonth = sm;
+  if(slug && fe > 0){ sbClient.from('buildings').update({monthly_fee:fe,units_count:un,start_month:sm||null}).eq('unique_slug',slug).then(function(res){ if(res.error) showToast('⚠️ שגיאת Supabase: '+res.error.message); else showToast('✅ נשמר: ₪'+fe+' | '+un+' דירות'); }); } else { showToast('⚠️ slug='+slug+' fee='+fe); }
   updateCfgLive();
   renderHeader();
   showToast('הגדרות בניין עודכנו ✅');
