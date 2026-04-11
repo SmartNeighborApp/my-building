@@ -367,8 +367,10 @@ a{text-decoration:none;color:inherit}
         <button class="settings-save-btn" onclick="saveSetting('admin_name','set-admin-name')">💾 שמור</button>
       </div>
     </div>
-    <div style="background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:12px;padding:14px 18px;font-size:13px;color:#92400E;font-weight:600;line-height:1.6">
-      ⚠️ <strong>שינוי סיסמה:</strong> הסיסמה מוגדרת בקוד הקובץ (משתנה ADMIN_PASSWORD). לשינויה — ערכי ישירות בקובץ admin.html.
+    <div class="settings-panel" style="margin-top:16px">
+      <div class="settings-panel-title">🔐 שינוי סיסמת כניסה</div>
+      <div class="settings-row"><span class="settings-label">סיסמה חדשה</span><input id="set-pw-new" class="settings-input" type="password" placeholder="הכנס סיסמה חדשה"></div>
+      <div class="settings-row"><span class="settings-label">אישור סיסמה</span><input id="set-pw-confirm" class="settings-input" type="password" placeholder="הכנס שוב לאישור"><button class="settings-save-btn" onclick="changePassword()">💾 שמור</button></div>
     </div>
   </div>
 
@@ -423,16 +425,26 @@ var _adminSettings = { wa_phone:'', paybox_link:'', admin_name:'שכנות טו�
 
 /* ══ כניסה / יציאה ════════════════════════════════════════ */
 function doLogin(){
-  var pw = document.getElementById('pw-input').value;
+  var pw = document.getElementById('pw-input').value.trim();
   var err = document.getElementById('login-err');
-  if(pw !== ADMIN_PASSWORD){ err.textContent='❌ סיסמה שגויה'; document.getElementById('pw-input').value=''; return; }
-  err.textContent='';
-  try{ sessionStorage.setItem('sn_admin_auth','1'); }catch(e){}
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('dashboard').style.display='block';
-  loadAdminSettings();
-  loadNotes();
-  loadBuildings();
+  if(!pw){ err.textContent='❌ הכנס סיסמה'; return; }
+  err.textContent='⏳ מתחבר...';
+  sbClient.from('admin_settings').select('value').eq('key','admin_password').then(function(res){
+    var stored = (res.data&&res.data.length) ? res.data[0].value : ADMIN_PASSWORD;
+    if(pw !== stored){ err.textContent='❌ סיסמה שגויה'; document.getElementById('pw-input').value=''; return; }
+    err.textContent='';
+    try{ sessionStorage.setItem('sn_admin_auth','1'); }catch(e){}
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadAdminSettings(); loadNotes(); loadBuildings();
+  }).catch(function(){
+    if(pw !== ADMIN_PASSWORD){ err.textContent='❌ סיסמה שגויה'; document.getElementById('pw-input').value=''; return; }
+    err.textContent='';
+    try{ sessionStorage.setItem('sn_admin_auth','1'); }catch(e){}
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadAdminSettings(); loadNotes(); loadBuildings();
+  });
 }
 
 function doLogout(){
@@ -440,6 +452,20 @@ function doLogout(){
   document.getElementById('dashboard').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('pw-input').value='';
+}
+
+function changePassword(){
+  var p1=(document.getElementById('set-pw-new').value||'').trim();
+  var p2=(document.getElementById('set-pw-confirm').value||'').trim();
+  if(!p1){ showToast('⚠️ הכנס סיסמה חדשה'); return; }
+  if(p1.length<6){ showToast('⚠️ סיסמה חייבת להיות לפחות 6 תווים'); return; }
+  if(p1!==p2){ showToast('❌ הסיסמאות אינן תואמות'); return; }
+  sbClient.from('admin_settings').upsert({key:'admin_password',value:p1}).then(function(res){
+    if(res.error){ showToast('❌ שגיאה בשמירה'); return; }
+    document.getElementById('set-pw-new').value='';
+    document.getElementById('set-pw-confirm').value='';
+    showToast('✅ סיסמה עודכנה בהצלחה');
+  });
 }
 
 /* ══ הגדרות מערכת ══════════════════════════════════════════ */
