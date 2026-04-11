@@ -274,3 +274,25 @@ function loadBuildingDocsFromSupabase(cb){
     if(cb) cb();
   });
 }
+
+function loadUnitNamesFromSupabase(cb){
+  var slug = _getBuildingSlug();
+  if(!slug){ if(cb) cb(); return; }
+  sbClient.from('buildings').select('unit_names').eq('unique_slug', slug).then(function(res){
+    if(!res.error && res.data && res.data[0] && res.data[0].unit_names){
+      var names = res.data[0].unit_names;
+      if(typeof names === 'string') try{ names = JSON.parse(names); }catch(e){}
+      if(names && typeof names === 'object'){
+        Object.keys(names).forEach(function(k){ DB.unitNames[k] = names[k]; });
+        saveDB();
+      }
+    }
+    if(cb) cb();
+  });
+}
+
+function saveUnitNamesToSupabase(){
+  var slug = _getBuildingSlug();
+  if(!slug) return;
+  sbClient.from('buildings').update({ unit_names: DB.unitNames }).eq('unique_slug', slug).then(function(){});
+}
