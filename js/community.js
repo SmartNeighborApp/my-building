@@ -465,3 +465,54 @@ function loadMyMediations(){
     }).join('');
   });
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   POST REPLIES — תגובות לפוסטים
+═══════════════════════════════════════════════════════════════ */
+function loadReplies(postId){
+  var listEl = document.getElementById('replies-list-'+postId);
+  if(!listEl) return;
+  var slug = _getBuildingSlug();
+  if(!slug) return;
+  sbClient.from('post_replies').select('*').eq('building_slug', slug).eq('post_id', postId).order('created_at', {ascending:true}).then(function(res){
+    if(res.error || !res.data || !res.data.length){ listEl.innerHTML=''; return; }
+    var myUnit = DB.user ? DB.user.unit : 0;
+    listEl.innerHTML = res.data.map(function(r){
+      var canDel = (myUnit && Number(myUnit) === Number(r.unit)) || ADMIN_ON;
+      var delBtn = canDel ? '<button onclick="deleteReply(\''+r.id+'\',\''+postId+'\')" style="background:none;border:none;color:#CBD5E1;font-size:11px;cursor:pointer;padding:0 4px;">\u2715</button>' : '';
+      return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:7px;">'+
+        '<div style="flex:1;background:#F8FAFC;border-radius:10px;padding:7px 10px;">'+
+          '<span style="font-size:12px;font-weight:800;color:var(--navy);">'+escHtml(r.author_name||('\u05d3\u05d9\u05e8\u05d4 '+r.unit))+'</span>'+
+          '<span style="font-size:11px;color:#CBD5E1;margin-right:6px;">\u00b7 \u05d3\u05d9\u05e8\u05d4 '+r.unit+'</span>'+
+          '<div style="font-size:13px;color:#374151;margin-top:2px;">'+escHtml(r.content||'')+'</div>'+
+        '</div>'+
+        delBtn+
+      '</div>';
+    }).join('');
+  });
+}
+
+function submitReply(postId){
+  var inp = document.getElementById('reply-inp-'+postId);
+  if(!inp) return;
+  var text = (inp.value||'').trim();
+  if(!text){ showToast('\u05e0\u05d0 \u05dc\u05db\u05ea\u05d5\u05d1 \u05ea\u05d2\u05d5\u05d1\u05d4'); return; }
+  if(!moderateText(text)){ showModToast(); return; }
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('\u05e9\u05d2\u05d9\u05d0\u05d4'); return; }
+  var unit = DB.user ? DB.user.unit : 0;
+  var name = DB.unitNames[unit] || DB.user.name || ('\u05d3\u05d9\u05e8\u05d4 '+unit);
+  sbClient.from('post_replies').insert([{ building_slug:slug, post_id:postId, unit:unit, author_name:name, content:text }]).then(function(res){
+    if(res.error){ showToast('\u05e9\u05d2\u05d9\u05d0\u05d4: '+res.error.message); return; }
+    inp.value='';
+    loadReplies(postId);
+  });
+}
+
+function deleteReply(replyId, postId){
+  if(!confirm('\u05dc\u05de\u05d7\u05d5\u05e7 \u05ea\u05d2\u05d5\u05d1\u05d4 \u05d6\u05d5?')) return;
+  sbClient.from('post_replies').delete().eq('id', replyId).then(function(res){
+    if(res.error){ showToast('\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05de\u05d7\u05d9\u05e7\u05d4'); return; }
+    loadReplies(postId);
+  });
+}
