@@ -380,18 +380,14 @@ function closeWATray(){
 ═══════════════════════════════════════════════════════════════ */
 function showMyReceipt(){
   var unit = DB.user.unit;
-  // מוצא את כל הקבלות של הדייר
-  var allRecs = [];
-  Object.keys(DB.approvedReceipts).forEach(function(k){
-    var r = DB.approvedReceipts[k];
-    if(Number(r.unit)===Number(unit)) allRecs.push(r);
-  });
+  // מוצא את כל הקבלות של הדייר מרשימת כל הקבלות
+  var allRecs = (DB.allReceipts||[]).filter(function(r){ return Number(r.unit)===Number(unit); });
   if(!allRecs.length){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
   // מיון לפי תאריך אישור — חדש ראשון
   allRecs.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
-  var rec = allRecs[0]; // הקבלה האחרונה בלבד
+  var rec = allRecs[0]; // הקבלה האחרונה לתצוגה
   var receiptNum = (new Date().getFullYear())+''+String(new Date().getMonth()+1).padStart(2,'0')+'-'+unit;
-  var totalAmount = parseFloat(rec.amount)||0; // סכום הקבלה הספציפית
+  var totalAmount = parseFloat(rec.amount)||0;
   var monthsList  = rec.monthLabel||fmtMonth(getTargetDate());
 
   setText('receipt-cat-name',    DB.building.name||'הבניין');
