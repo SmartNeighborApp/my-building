@@ -113,26 +113,33 @@ function approvePayment(idx){
 }
 
 function _calcCoveredMonths(unit, totalAmount, fee){
-  // מוצא חודשים שלא שולמו מהישן לחדש (עד 12 חודשים אחורה)
+  // מוצא חודשים שלא שולמו — קודם עד 12 חודשים אחורה, אחר כך עד 12 חודשים קדימה
   // תומך בתשלום חלקי — ממלא חודש אחד לגמרי לפני שעובר לבא אחריו
   var months = [];
   var remaining = totalAmount;
   var now = new Date();
-  for(var i=12; i>=0 && remaining>0; i--){
-    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+
+  function _tryMonth(d){
+    if(remaining <= 0) return;
     var mk = monthKey(d);
-    var unitKey = unit+'-'+mk;
-    // כמה כבר שולם לחודש זה (כולל תשלומים חלקיים)
     var alreadyPaidAmt = 0;
     Object.keys(DB.approvedReceipts||{}).forEach(function(k){ var r=DB.approvedReceipts[k]; if(r && r.unit==unit && r.monthKey===mk) alreadyPaidAmt += parseFloat(r.amount)||0; });
     var stillNeeded = fee - alreadyPaidAmt;
-    if(stillNeeded <= 0) continue; // חודש זה כבר שולם במלואו
+    if(stillNeeded <= 0) return;
     var isPending = DB.pendingPayments.some(function(pp){ return pp.unit===unit && pp.monthKey===mk; });
-    if(isPending) continue; // ממתין לאישור — לא נוגעים
+    if(isPending) return;
     var covered = Math.min(remaining, stillNeeded);
     months.push({ key:mk, label:fmtMonth(d), amount:covered, alreadyPaid:alreadyPaidAmt });
     remaining -= covered;
   }
+
+  for(var i=12; i>=0; i--){
+    _tryMonth(new Date(now.getFullYear(), now.getMonth()-i, 1));
+  }
+  for(var j=1; j<=12 && remaining>0; j++){
+    _tryMonth(new Date(now.getFullYear(), now.getMonth()+j, 1));
+  }
+
   if(!months.length){
     var d0 = new Date(now.getFullYear(), now.getMonth(), 1);
     months.push({ key:monthKey(d0), label:fmtMonth(d0), amount:totalAmount, alreadyPaid:0 });
@@ -273,7 +280,7 @@ function confirmPay(){
   if(_payMethod==='bit'||_payMethod==='paybox'){ var ae=document.getElementById('opf-amount-digital'); if(ae&&ae.value) amount=parseFloat(ae.value)||fee; }
   else if(_payMethod==='bank'){ var ab=document.getElementById('opf-amount-bank'); if(ab&&ab.value) amount=parseFloat(ab.value)||fee; }
   else { var ao=document.getElementById('opf-amount'); if(ao&&ao.value) amount=parseFloat(ao.value)||fee; }
-  var mk = monthKey(getTargetDate());
+  var mk = monthKey(new Date());
   var slug = _getBuildingSlug();
   if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
   var ref  = (_payMethod==='bank') ? (document.getElementById('opf-ref-bank')?document.getElementById('opf-ref-bank').value:'') : (document.getElementById('opf-ref')?document.getElementById('opf-ref').value:'');
@@ -287,7 +294,7 @@ function confirmPay(){
     amount:       String(amount),
     method:       _payMethod,
     method_label: mLbl,
-    month_label:  fmtMonth(getTargetDate()),
+    month_label:  fmtMonth(new Date()),
     ref:          ref,
     note:         note
   }]).then(function(res){
