@@ -717,11 +717,12 @@ function _doRenderCollectionCenter(mk, fee, tot){
     var phone = (DB.residentPhones&&DB.residentPhones[i])||'—';
     // סכום ששולם לחודש זה
     var paidAmt = 0;
-    var unitKey=i+'-'+mk; if(DB.approvedReceipts[unitKey]) paidAmt+=parseFloat(DB.approvedReceipts[unitKey].amount)||0;
+    var paidMethod = '';
+    var unitKey=i+'-'+mk; if(DB.approvedReceipts[unitKey]){ paidAmt+=parseFloat(DB.approvedReceipts[unitKey].amount)||0; paidMethod=DB.approvedReceipts[unitKey].method||''; }
     var isPending = DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; });
     var debt = Math.max(0, fee - paidAmt);
     var status = paidAmt>=fee ? 'paid' : (isPending ? 'pending' : (paidAmt>0 ? 'partial' : 'unpaid'));
-    rows.push({unit:i, name:name, phone:phone, paidAmt:paidAmt, debt:debt, status:status});
+    rows.push({unit:i, name:name, phone:phone, paidAmt:paidAmt, debt:debt, status:status, method:paidMethod});
   }
 
   // סיכום
@@ -743,7 +744,11 @@ function _doRenderCollectionCenter(mk, fee, tot){
       '<td style="padding:8px 6px;color:var(--green);font-weight:700;">₪'+num(r.paidAmt)+'</td>'+
       '<td style="padding:8px 6px;color:var(--rose);font-weight:700;">'+(r.debt>0?'₪'+num(r.debt):'—')+'</td>'+
       '<td style="padding:8px 6px;color:'+stCols[r.status]+';font-weight:800;">'+stLbls[r.status]+'</td>'+
-      '<td style="padding:4px 6px;display:flex;gap:4px;align-items:center;">'+(r.status==='paid'?'<button onclick="unapproveUnit('+r.unit+',\''+mk+'\')" style="padding:4px 8px;background:#FEE2E2;color:#E11D48;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">✕ בטל</button>':'')+(r.phone!=='—'?'<button onclick="sendReminderToUnit('+r.unit+')" style="padding:4px 8px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">📲</button>':'<span style="color:#CBD5E1;font-size:11px;">—</span>')+'</td></tr>';
+      '<td style="padding:4px 6px;display:flex;gap:4px;align-items:center;">'+
+        (r.status==='paid' && r.method==='admin' ? '<button onclick="unapproveUnit('+r.unit+',\''+mk+'\')" style="padding:4px 8px;background:#FEE2E2;color:#E11D48;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">✕ בטל</button>' : '')+
+        (r.status!=='paid' ? '<button onclick="quickApproveForMonth('+r.unit+',\''+mk+'\')" style="padding:4px 8px;background:#DCFCE7;color:#16A34A;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">✔</button>' : '')+
+        (r.phone!=='—'?'<button onclick="sendReminderToUnit('+r.unit+')" style="padding:4px 8px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">📲</button>':'<span style="color:#CBD5E1;font-size:11px;">—</span>')+
+      '</td></tr>';
   });
   thtml += '</table>';
   var tEl = document.getElementById('cc-table');
@@ -764,6 +769,30 @@ function _doRenderCollectionCenter(mk, fee, tot){
   if(btn) btn.style.display = debtorsWithPhone.length ? 'block' : 'none';
   window._ccDebtors = debtorsWithPhone;
   window._ccMonthKey = mk;
+}
+
+function quickApproveForMonth(unit, mk){
+  if(!ADMIN_ON){ showToast('⛔ נדרשת כניסת מנהל'); return; }
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+  var approvedBy = DB.unitNames[DB.user ? DB.user.unit : 0] || 'ועד בית';
+  var monthLbl = (function(){ var p=mk.split('-'); return (HE_MONTHS[parseInt(p[1])-1]||'')+' '+p[0]; })();
+  sbClient.from('payments').delete().eq('building_slug',slug).eq('unit',unit).eq('month_key',mk).eq('status','pending').then(function(){
+    sbClient.from('payments').insert([{
+      building_slug:slug, unit:unit, month_key:mk,
+      status:'approved', amount:String(DB.building.monthly_fee),
+      method:'admin', method_label:'אישור ידני',
+      month_label:monthLbl, approved_date:fmtDate(new Date()), approved_by:approvedBy
+    }]).then(function(res){
+      if(res.error){ showToast('שגיאה: '+res.error.message); return; }
+      showToast('✅ דירה '+unit+' אושרה ל'+monthLbl);
+      loadPaymentsFromSupabase(function(){
+        renderCollectionCenter();
+        renderFundPage();
+        renderHomePage();
+      });
+    });
+  });
 }
 
 function unapproveUnit(unit, mk){
