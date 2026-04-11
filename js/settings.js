@@ -718,7 +718,11 @@ function _doRenderCollectionCenter(mk, fee, tot){
     // סכום ששולם לחודש זה
     var paidAmt = 0;
     var paidMethod = '';
-    var unitKey=i+'-'+mk; if(DB.approvedReceipts[unitKey]){ paidAmt+=parseFloat(DB.approvedReceipts[unitKey].amount)||0; paidMethod=DB.approvedReceipts[unitKey].method||''; }
+    var unitKey=i+'-'+mk;
+    var covered = _calcCoveredMonths(i, fee);
+    var coveredMonth = covered.filter(function(c){ return c.key===mk; })[0];
+    if(coveredMonth) paidAmt = coveredMonth.alreadyPaid||0;
+    if(DB.approvedReceipts[unitKey]) paidMethod = DB.approvedReceipts[unitKey].method||'';
     var isPending = DB.pendingPayments.some(function(p){ return p.unit===i && p.monthKey===mk; });
     var debt = Math.max(0, fee - paidAmt);
     var status = paidAmt>=fee ? 'paid' : (isPending ? 'pending' : (paidAmt>0 ? 'partial' : 'unpaid'));
