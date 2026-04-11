@@ -27,6 +27,12 @@ function submitPin(){
   showToast('✅ כניסת מנהל הצליחה');
   var smInp = document.getElementById('admin-start-month');
   if(smInp && DB.building.startMonth) smInp.value = DB.building.startMonth;
+  var feeInp = document.getElementById('admin-fee');
+  if(feeInp && DB.building.monthly_fee) feeInp.value = DB.building.monthly_fee;
+  var unitsInp = document.getElementById('admin-units');
+  if(unitsInp && DB.building.total_units) unitsInp.value = DB.building.total_units;
+  var nameInp = document.getElementById('admin-bldg-name');
+  if(nameInp && DB.building.name) nameInp.value = DB.building.name;
   renderSettingsPage();
   renderCommunityPage();
   updateNavDot();
