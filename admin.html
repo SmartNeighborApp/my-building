@@ -315,15 +315,15 @@ a{text-decoration:none;color:inherit}
   <div id="tab-alerts" class="tab-content">
     <div style="margin-bottom:24px">
       <div class="alert-section-title">🚨 דחוף — פג עד יומיים</div>
-      <div id="alerts-urgent">
-        <div class="loading-row">טוען...</div>
-      </div>
+      <div id="alerts-urgent"><div class="loading-row">טוען...</div></div>
+    </div>
+    <div style="margin-bottom:24px">
+      <div class="alert-section-title">⚠️ השבוע — פג עד 7 ימים</div>
+      <div id="alerts-week"><div class="loading-row">טוען...</div></div>
     </div>
     <div>
-      <div class="alert-section-title">⚠️ השבוע — פג עד 7 ימים</div>
-      <div id="alerts-week">
-        <div class="loading-row">טוען...</div>
-      </div>
+      <div class="alert-section-title">🔄 חידושי מנוי — לקוחות פעילים</div>
+      <div id="alerts-renewal"><div class="loading-row">טוען...</div></div>
     </div>
   </div>
 
@@ -727,29 +727,51 @@ function markPaid(slug){
 }
 
 /* ══ טאב התראות ════════════════════════════════════════════ */
+function getPaidDaysLeft(b){ if(!b.paid_until) return null; return Math.floor((new Date(b.paid_until)-Date.now())/864e5); }
+
 function renderAlertsTab(){
-  var urgent=[], week=[];
+  var urgent=[], week=[], renewalExpired=[], renewalWeek=[];
   _allBuildings.forEach(function(b){
     var st=getBuildingStatus(b);
-    if(st==='archived'||st==='active') return;
-    var dl=getDaysLeft(b);
-    if(dl===null) return;
-    if(dl<=2)       urgent.push({b:b,dl:dl});
-    else if(dl<=7)  week.push({b:b,dl:dl});
+    if(st==='archived') return;
+    if(st!=='active'){
+      var dl=getDaysLeft(b);
+      if(dl===null) return;
+      if(dl<=2) urgent.push({b:b,dl:dl});
+      else if(dl<=7) week.push({b:b,dl:dl});
+    }
+    if(st==='active' && b.paid_until){
+      var pdl=getPaidDaysLeft(b);
+      if(pdl===null) return;
+      if(pdl<=0) renewalExpired.push({b:b,dl:pdl});
+      else if(pdl<=7) renewalWeek.push({b:b,dl:pdl});
+    }
   });
 
-  var renderAlert=function(item,cls){
-    var b=item.b, dl=item.dl, slug=b.unique_slug||'';
+  var renderAlert=function(item,cls,isRenewal){
+    var b=item.b, dl=item.dl;
     var phone=(b.contact_phone||b.admin_phone||'').replace(/\D/g,'').replace(/^0/,'972');
-    var msg=dl<=2?
-      'שלום! תזכורת אחרונה — בעוד '+Math.max(0,dl)+' ימים פג הניסיון של '+b.building_name+'. לחידוש השירות: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com 😊':
-      'שלום! כאן שכנות טובה 😊 נותרו לכם '+dl+' ימים בתקופת הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nאנחנו כאן לכל שאלה!';
-    var waBtn=phone?'<a href="https://wa.me/'+phone+'?text='+encodeURIComponent(msg)+'" target="_blank" class="wa-send-btn">💬 שלח וואטסאפ</a>':'<span style="font-size:12px;color:var(--rose);">אין טלפון</span>';
-    return '<div class="alert-card '+cls+'">'+'<div><div class="alert-name">'+escH(b.building_name||'—')+'</div><div class="alert-sub">'+(b.city||'')+(b.contact_phone?' · '+b.contact_phone:' · ⚠️ אין טלפון')+'</div></div>'+'<div style="display:flex;align-items:center;gap:10px;"><span class="alert-days '+cls+'">'+Math.max(0,dl)+' ימים</span>'+waBtn+'</div>'+'</div>';
+    var msg;
+    if(isRenewal){
+      msg=dl<=0?
+        'שלום! כאן שכנות טובה 😊 המנוי של '+b.building_name+' פג. לחידוש: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com':
+        'שלום! כאן שכנות טובה 😊 בעוד '+dl+' ימים מסתיים המנוי של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nתודה!';
+    } else {
+      msg=dl<=2?
+        'שלום! תזכורת אחרונה — בעוד '+Math.max(0,dl)+' ימים פג הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com 😊':
+        'שלום! כאן שכנות טובה 😊 נותרו לכם '+dl+' ימים בתקופת הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nאנחנו כאן לכל שאלה!';
+    }
+    var waBtn=phone?'<a href="https://wa.me/'+phone+'?text='+encodeURIComponent(msg)+'" target="_blank" class="wa-send-btn">💬 שלח וואטסאפ</a>":'<span style="font-size:12px;color:var(--rose);">אין טלפון</span>';
+    var dlLabel=isRenewal?(dl<=0?'פג לפני '+Math.abs(dl)+' יום':dl+' ימים לפקיעה'):Math.max(0,dl)+' ימים';
+    var paidStr=b.paid_until&&isRenewal?' · שולם עד '+new Date(b.paid_until).toLocaleDateString('he-IL'):'';
+    var sub=(b.city||'')+((b.contact_phone||'')?' · '+b.contact_phone:' · ⚠️ אין טלפון')+paidStr;
+    return '<div class="alert-card '+cls+'"><div><div class="alert-name">'+escH(b.building_name||'—')+'</div><div class="alert-sub">'+sub+'</div></div><div style="display:flex;align-items:center;gap:10px;"><span class="alert-days '+cls+'">'+dlLabel+'</span>'+waBtn+'</div></div>';
   };
 
-  document.getElementById('alerts-urgent').innerHTML = urgent.length ? urgent.map(function(i){return renderAlert(i,'urgent');}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים דחופים כרגע</div>';
-  document.getElementById('alerts-week').innerHTML   = week.length   ? week.map(function(i){return renderAlert(i,'warning');}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים שמסיימים ניסיון השבוע</div>';
+  document.getElementById('alerts-urgent').innerHTML = urgent.length ? urgent.map(function(i){return renderAlert(i,'urgent',false);}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים דחופים כרגע</div>';
+  document.getElementById('alerts-week').innerHTML   = week.length   ? week.map(function(i){return renderAlert(i,'warning',false);}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים שמסיימים ניסיון השבוע</div>';
+  var renewalAll=renewalExpired.map(function(i){return renderAlert(i,'urgent',true);}).join('')+renewalWeek.map(function(i){return renderAlert(i,'warning',true);}).join('');
+  document.getElementById('alerts-renewal').innerHTML = renewalAll || '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין חידושי מנוי דחופים כרגע</div>';
 }
 
 /* ══ ספקים ════════════════════════════════════════════════ */
