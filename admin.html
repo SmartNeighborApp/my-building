@@ -761,7 +761,7 @@ function renderAlertsTab(){
         'שלום! תזכורת אחרונה — בעוד '+Math.max(0,dl)+' ימים פג הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com 😊':
         'שלום! כאן שכנות טובה 😊 נותרו לכם '+dl+' ימים בתקופת הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nאנחנו כאן לכל שאלה!';
     }
-    var waBtn=phone?'<a href="https://wa.me/'+phone+'?text='+encodeURIComponent(msg)+'" target="_blank" class="wa-send-btn">💬 שלח וואטסאפ</a>":'<span style="font-size:12px;color:var(--rose);">אין טלפון</span>';
+    var waBtn=phone?'<a href="https://wa.me/'+phone+'?text='+encodeURIComponent(msg)+'" target="_blank" class="wa-send-btn">💬 שלח וואטסאפ</a>':'<span style="font-size:12px;color:var(--rose);">אין טלפון</span>';
     var dlLabel=isRenewal?(dl<=0?'פג לפני '+Math.abs(dl)+' יום':dl+' ימים לפקיעה'):Math.max(0,dl)+' ימים';
     var paidStr=b.paid_until&&isRenewal?' · שולם עד '+new Date(b.paid_until).toLocaleDateString('he-IL'):'';
     var sub=(b.city||'')+((b.contact_phone||'')?' · '+b.contact_phone:' · ⚠️ אין טלפון')+paidStr;
