@@ -47,7 +47,8 @@ function savePin(){
   DB.adminPin = v;
   saveDB();
   document.getElementById('new-pin-inp').value='';
-  showToast('קוד מנהל עודכן ✅');
+  var slug = _getBuildingSlug();
+  if(slug){ sbClient.from('buildings').update({ admin_pin: v }).eq('unique_slug', slug).then(function(res){ if(res.error) showToast('⚠️ שגיאה בשמירת הקוד בענן'); else showToast('קוד מנהל עודכן ✅'); }); } else { showToast('קוד מנהל עודכן ✅'); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
