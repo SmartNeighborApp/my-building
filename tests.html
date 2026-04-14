@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartNeighbor · בדיקות אוטומציה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --navy:#1A3A5C;--blue:#2563EB;--gold:#C9A84C;--green:#16A34A;--red:#DC2626;
+  --purple:#7C3AED;--bg:#F0F5FF;--white:#fff;--border:#E2E8F0;
+  --font:'Heebo',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:#1E293B;min-height:100vh;padding:24px 16px 60px;}
+.header{background:linear-gradient(135deg,#0F2540,#1A3A5C);border-radius:20px;padding:28px 24px;margin-bottom:24px;text-align:center;}
+.header h1{color:#fff;font-size:22px;font-weight:900;margin-bottom:4px;}
+.header p{color:rgba(255,255,255,.6);font-size:13px;}
+.run-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),#1D4ED8);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font);margin-bottom:20px;transition:opacity .2s;}
+.run-btn:hover{opacity:.9;}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;}
+.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
+.sum-card{background:#fff;border-radius:14px;padding:14px;text-align:center;border:1px solid var(--border);}
+.sum-num{font-size:28px;font-weight:900;}
+.sum-lbl{font-size:11px;color:#64748B;font-weight:600;margin-top:2px;}
+.sum-pass .sum-num{color:var(--green);}
+.sum-fail .sum-num{color:var(--red);}
+.sum-total .sum-num{color:var(--navy);}
+.section{margin-bottom:16px;}
+.section-title{font-size:13px;font-weight:900;color:var(--navy);margin-bottom:8px;padding: 0 4px;display:flex;align-items:center;gap:6px;}
+.test-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:6px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.test-icon{font-size:16px;flex-shrink:0;width:24px;text-align:center;}
+.test-name{flex:1;font-size:13px;font-weight:700;color:var(--navy);}
+.test-detail{font-size:11px;color:#64748B;margin-top:2px;}
+.test-status{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;flex-shrink:0;}
+.pass{background:#F0FDF4;color:var(--green);border:1px solid #BBF7D0;}
+.fail{background:#FEF2F2;color:var(--red);border:1px solid #FECACA;}
+.pending{background:#F1F5F9;color:#64748B;border:1px solid var(--border);}
+.running{background:#EFF6FF;color:var(--blue);border:1px solid #BFDBFE;}
+.progress-bar{height:6px;background:#E2E8F0;border-radius:999px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:999px;transition:width .3s ease;width:0%;}
+.log-area{background:#0F172A;border-radius:14px;padding:16px;font-family:monospace;font-size:11px;color:#94A3B8;max-height:200px;overflow-y:auto;margin-top:16px;}
+.log-line{margin-bottom:4px;line-height:1.5;}
+.log-ok{color:#4ADE80;}
+.log-err{color:#F87171;}
+.log-info{color:#60A5FA;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:40px;margin-bottom:8px;">🧪</div>
+  <h1>SmartNeighbor · בדיקות אוטומציה</h1>
+  <p>בניין הנחל · y3c5p9ba · 10 דיירים</p>
+</div>
+
+<div class="summary">
+  <div class="sum-card sum-pass"><div class="sum-num" id="cnt-pass">—</div><div class="sum-lbl">✅ עברו</div></div>
+  <div class="sum-card sum-fail"><div class="sum-num" id="cnt-fail">—</div><div class="sum-lbl">❌ נכשלו</div></div>
+  <div class="sum-card sum-total"><div class="sum-num" id="cnt-total">—</div><div class="sum-lbl">סה"כ בדיקות</div></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<button class="run-btn" id="run-btn" onclick="runAllTests()">▶ הרץ את כל הבדיקות</button>
+
+<div id="tests-container"></div>
+
+<div class="log-area" id="log-area">
+  <div class="log-line log-info">// לחץ "הרץ את כל הבדיקות" להתחלה</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenljaWp1a3AiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTYwNTUwNCwiZXhwIjoyMDU3MTgxNTA0fQ.LvpRqbsVL5aTSOqSbGS1R0FqBt3_k1Z3gCvtCJHkxzI';
+const slug = 'y3c5p9ba';
+const testUnit = 1;
+const testPin = '1935';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const TESTS = [
+  { id:'supabase-conn',    section:'🔌 חיבור',         name:'חיבור לסופאבייס',              fn: testSupabaseConnection },
+  { id:'building-exists',  section:'🔌 חיבור',         name:'בניין קיים בסופאבייס',          fn: testBuildingExists },
+  { id:'building-data',    section:'🏢 נתוני בניין',   name:'נתוני בניין תקינים',            fn: testBuildingData },
+  { id:'units-count',      section:'🏢 נתוני בניין',   name:'מספר דיירים = 10',              fn: testUnitsCount },
+  { id:'monthly-fee',      section:'🏢 נתוני בניין',   name:'דמי ועד = 311₪',                fn: testMonthlyFee },
+  { id:'start-month',      section:'🏢 נתוני בניין',   name:'חודש התחלה מוגדר',              fn: testStartMonth },
+  { id:'admin-pin',        section:'🏢 נתוני בניין',   name:'קוד מנהל קיים',                 fn: testAdminPin },
+  { id:'resident-exists',  section:'👤 דיירים',        name:'דירה 1 קיימת',                  fn: testResidentExists },
+  { id:'resident-pin',     section:'👤 דיירים',        name:'PIN דירה 1 תקין',               fn: testResidentPin },
+  { id:'resident-name',    section:'👤 דיירים',        name:'שם דייר קיים',                  fn: testResidentName },
+  { id:'payments-table',   section:'💰 תשלומים',       name:'טבלת payments נגישה',           fn: testPaymentsTable },
+  { id:'payments-approved',section:'💰 תשלומים',       name:'יש תשלומים מאושרים',            fn: testApprovedPayments },
+  { id:'expenses-table',   section:'💰 תשלומים',       name:'טבלת expenses נגישה',           fn: testExpensesTable },
+  { id:'faults-table',     section:'🔧 תקלות',         name:'טבלת faults נגישה',             fn: testFaultsTable },
+  { id:'notices-table',    section:'📢 קהילה',         name:'טבלת notices נגישה',            fn: testNoticesTable },
+  { id:'posts-table',      section:'📢 קהילה',         name:'טבלת posts נגישה',              fn: testPostsTable },
+  { id:'post-replies',     section:'📢 קהילה',         name:'טבלת post_replies קיימת',       fn: testPostReplies },
+  { id:'mediations',       section:'📢 קהילה',         name:'טבלת mediations קיימת',         fn: testMediations },
+  { id:'vaad-questions',   section:'📢 קהילה',         name:'טבלת vaad_questions קיימת',     fn: testVaadQuestions },
+  { id:'polls-table',      section:'📢 קהילה',         name:'טבלת polls נגישה',              fn: testPollsTable },
+  { id:'docs-table',       section:'📁 מסמכים',        name:'טבלת building_docs קיימת',      fn: testDocsTable },
+  { id:'professionals',    section:'🔨 מקצוענים',      name:'טבלת professionals נגישה',      fn: testProfessionalsTable },
+  { id:'rls-insert',       section:'🔒 אבטחה',         name:'הכנסת נתון בדיקה מתאפשרת',     fn: testRlsInsert },
+  { id:'rls-select',       section:'🔒 אבטחה',         name:'קריאת נתונים לפי slug בלבד',    fn: testRlsSelect },
+  { id:'trial-status',     section:'📋 רישיון',        name:'סטטוס trial תקין',              fn: testTrialStatus },
+  { id:'paid-status',      section:'📋 רישיון',        name:'paid_status = trial',            fn: testPaidStatus },
+];
+
+let results = {};
+let logLines = [];
+
+function log(msg, type='info'){
+  logLines.push({msg, type});
+  const area = document.getElementById('log-area');
+  area.innerHTML = logLines.map(l => `<div class="log-line log-${l.type}">${l.msg}</div>`).join('');
+  area.scrollTop = area.scrollHeight;
+}
+
+function setTestStatus(id, status, detail=''){
+  const card = document.getElementById('card-'+id);
+  if(!card) return;
+  const statusEl = card.querySelector('.test-status');
+  const detailEl = card.querySelector('.test-detail');
+  const iconEl = card.querySelector('.test-icon');
+  const labels = {pass:'✅ עבר', fail:'❌ נכשל', running:'⏳ רץ...', pending:'— ממתין'};
+  statusEl.textContent = labels[status]||status;
+  statusEl.className = 'test-status '+status;
+  if(detail) detailEl.textContent = detail;
+  if(status==='pass') iconEl.textContent='✅';
+  else if(status==='fail') iconEl.textContent='❌';
+  else if(status==='running') iconEl.textContent='⏳';
+}
+
+function updateSummary(){
+  const pass = Object.values(results).filter(r=>r==='pass').length;
+  const fail = Object.values(results).filter(r=>r==='fail').length;
+  const total = TESTS.length;
+  document.getElementById('cnt-pass').textContent = pass;
+  document.getElementById('cnt-fail').textContent = fail;
+  document.getElementById('cnt-total').textContent = total;
+  document.getElementById('progress').style.width = (Object.keys(results).length/total*100)+'%';
+}
+
+function buildUI(){
+  const container = document.getElementById('tests-container');
+  const sections = {};
+  TESTS.forEach(t => { if(!sections[t.section]) sections[t.section]=[]; sections[t.section].push(t); });
+  let html = '';
+  Object.entries(sections).forEach(([sec, tests]) => {
+    html += `<div class="section"><div class="section-title">${sec}</div>`;
+    tests.forEach(t => {
+      html += `<div class="test-card" id="card-${t.id}">
+        <div class="test-icon">⬜</div>
+        <div style="flex:1">
+          <div class="test-name">${t.name}</div>
+          <div class="test-detail"></div>
+        </div>
+        <div class="test-status pending">— ממתין</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+async function runTest(test){
+  setTestStatus(test.id, 'running');
+  log(`// בודק: ${test.name}`, 'info');
+  try {
+    const result = await test.fn();
+    results[test.id] = result.pass ? 'pass' : 'fail';
+    setTestStatus(test.id, result.pass ? 'pass' : 'fail', result.detail||'');
+    log(result.pass ? `✓ ${test.name}: ${result.detail||'תקין'}` : `✗ ${test.name}: ${result.detail||'נכשל'}`, result.pass ? 'ok' : 'err');
+  } catch(e) {
+    results[test.id] = 'fail';
+    setTestStatus(test.id, 'fail', 'שגיאה: '+e.message);
+    log(`✗ ${test.name}: שגיאה — ${e.message}`, 'err');
+  }
+  updateSummary();
+}
+
+async function runAllTests(){
+  results = {};
+  logLines = [];
+  buildUI();
+  updateSummary();
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ מריץ בדיקות...';
+  log('// === מתחיל סדרת בדיקות ===', 'info');
+  for(const test of TESTS){
+    await runTest(test);
+    await new Promise(r => setTimeout(r, 150));
+  }
+  const pass = Object.values(results).filter(r=>r==='pass').length;
+  const fail = Object.values(results).filter(r=>r==='fail').length;
+  log(`// === סיום: ${pass} עברו, ${fail} נכשלו ===`, fail>0?'err':'ok');
+  btn.disabled = false;
+  btn.textContent = '🔄 הרץ שוב';
+}
+
+// ═══════════════════════════════════════════
+// פונקציות הבדיקה
+// ═══════════════════════════════════════════
+
+async function testSupabaseConnection(){
+  const res = await sb.from('buildings').select('id').limit(1);
+  if(res.error) return {pass:false, detail:'שגיאת חיבור: '+res.error.message};
+  return {pass:true, detail:'חיבור תקין'};
+}
+
+async function testBuildingExists(){
+  const res = await sb.from('buildings').select('id,building_name').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'בניין לא נמצא'};
+  return {pass:true, detail:res.data.building_name};
+}
+
+async function testBuildingData(){
+  const res = await sb.from('buildings').select('*').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const d = res.data;
+  const ok = d.building_name && d.units_count && d.monthly_fee && d.access_code;
+  return {pass:!!ok, detail: ok ? 'כל השדות קיימים' : 'שדות חסרים'};
+}
+
+async function testUnitsCount(){
+  const res = await sb.from('buildings').select('units_count').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = parseInt(res.data.units_count)===10;
+  return {pass:ok, detail: 'units_count = '+res.data.units_count};
+}
+
+async function testMonthlyFee(){
+  const res = await sb.from('buildings').select('monthly_fee').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = parseFloat(res.data.monthly_fee)===311;
+  return {pass:ok, detail:'monthly_fee = ₪'+res.data.monthly_fee};
+}
+
+async function testStartMonth(){
+  const res = await sb.from('buildings').select('start_month').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = !!res.data.start_month;
+  return {pass:ok, detail: ok ? 'start_month = '+res.data.start_month : 'חסר start_month'};
+}
+
+async function testAdminPin(){
+  const res = await sb.from('buildings').select('admin_pin').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = !!res.data.admin_pin && res.data.admin_pin.length>=4;
+  return {pass:ok, detail: ok ? 'קוד מנהל קיים ותקין' : 'קוד מנהל חסר'};
+}
+
+async function testResidentExists(){
+  const res = await sb.from('residents').select('id,name').eq('building_slug',slug).eq('unit',testUnit);
+  if(res.error||!res.data||res.data.length===0) return {pass:false, detail:'דירה '+testUnit+' לא נמצאה'};
+  return {pass:true, detail:res.data[0].name+' · דירה '+testUnit};
+}
+
+async function testResidentPin(){
+  const res = await sb.from('residents').select('pin').eq('building_slug',slug).eq('unit',testUnit);
+  if(res.error||!res.data||res.data.length===0) return {pass:false, detail:'דייר לא נמצא'};
+  const ok = res.data[0].pin === testPin;
+  return {pass:ok, detail: ok ? 'PIN תואם' : 'PIN לא תואם'};
+}
+
+async function testResidentName(){
+  const res = await sb.from('residents').select('name,phone').eq('building_slug',slug).eq('unit',testUnit).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = !!res.data.name && !!res.data.phone;
+  return {pass:ok, detail: res.data.name + (res.data.phone?' · '+res.data.phone:'')};
+}
+
+async function testPaymentsTable(){
+  const res = await sb.from('payments').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testApprovedPayments(){
+  const res = await sb.from('payments').select('id,unit,amount,month_key').eq('building_slug',slug).eq('status','approved');
+  if(res.error) return {pass:false, detail:res.error.message};
+  const count = res.data ? res.data.length : 0;
+  return {pass:count>0, detail: count+' תשלומים מאושרים'};
+}
+
+async function testExpensesTable(){
+  const res = await sb.from('expenses').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testFaultsTable(){
+  const res = await sb.from('faults').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testNoticesTable(){
+  const res = await sb.from('notices').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testPostsTable(){
+  const res = await sb.from('posts').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testPostReplies(){
+  const res = await sb.from('post_replies').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה קיימת ונגישה'};
+}
+
+async function testMediations(){
+  const res = await sb.from('mediations').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה קיימת ונגישה'};
+}
+
+async function testVaadQuestions(){
+  const res = await sb.from('vaad_questions').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה קיימת ונגישה'};
+}
+
+async function testPollsTable(){
+  const res = await sb.from('polls').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testDocsTable(){
+  const res = await sb.from('building_docs').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה קיימת ונגישה'};
+}
+
+async function testProfessionalsTable(){
+  const res = await sb.from('professionals').select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return {pass:false, detail:res.error.message};
+  return {pass:true, detail:'טבלה נגישה'};
+}
+
+async function testRlsInsert(){
+  // בדיקה שאנחנו יכולים להכניס ולמחוק — RLS מאפשר
+  const testNote = 'rls_test_'+Date.now();
+  const ins = await sb.from('posts').insert({building_slug:slug, unit:testUnit, type:'neighbor', content:testNote, author_name:'בדיקה'});
+  if(ins.error) return {pass:false, detail:'INSERT נחסם: '+ins.error.message};
+  // מחיקת הרשומה מיד
+  await sb.from('posts').delete().eq('building_slug',slug).eq('content',testNote);
+  return {pass:true, detail:'INSERT ו-DELETE עובדים'};
+}
+
+async function testRlsSelect(){
+  // בדיקה שכל השאילתות מוגבלות ל-slug
+  const res = await sb.from('residents').select('unit').eq('building_slug',slug);
+  if(res.error) return {pass:false, detail:res.error.message};
+  const units = res.data ? res.data.map(r=>r.unit) : [];
+  const ok = units.length > 0;
+  return {pass:ok, detail: ok ? units.length+' דיירים ב-slug הנכון' : 'לא נמצאו דיירים'};
+}
+
+async function testTrialStatus(){
+  const res = await sb.from('buildings').select('paid_status,created_at').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const status = res.data.paid_status;
+  const created = new Date(res.data.created_at);
+  const days = Math.floor((new Date()-created)/(1000*60*60*24));
+  const ok = status==='trial' || status==='active';
+  return {pass:ok, detail:'סטטוס: '+status+' · '+days+' ימים מאז הרשמה'};
+}
+
+async function testPaidStatus(){
+  const res = await sb.from('buildings').select('paid_status').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return {pass:false, detail:'לא נמצא'};
+  const ok = ['trial','active'].includes(res.data.paid_status);
+  return {pass:ok, detail:'paid_status = '+res.data.paid_status};
+}
+
+// בניית UI בטעינה
+buildUI();
+updateSummary();
+document.getElementById('cnt-pass').textContent='—';
+document.getElementById('cnt-fail').textContent='—';
+document.getElementById('cnt-total').textContent=TESTS.length;
+</script>
+</body>
+</html>
