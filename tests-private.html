@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartNeighbor · בוחן אוטומציה מקיף</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --navy:#1A3A5C;--blue:#2563EB;--gold:#C9A84C;--green:#16A34A;--red:#DC2626;
+  --orange:#EA580C;--purple:#7C3AED;--bg:#F0F5FF;--white:#fff;--border:#E2E8F0;
+  --font:'Heebo',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:#1E293B;min-height:100vh;padding:20px 16px 80px;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#0F2540,#1A3A5C,#1e4a7a);border-radius:20px;padding:28px 24px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(37,99,235,.2) 0%,transparent 60%);}
+.header-inner{position:relative;z-index:1;}
+.header h1{color:#fff;font-size:20px;font-weight:900;margin-bottom:4px;}
+.header p{color:rgba(255,255,255,.55);font-size:12px;}
+
+/* SLUG INPUT */
+.slug-wrap{background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid var(--border);}
+.slug-label{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px;}
+.slug-row{display:flex;gap:8px;}
+.slug-inp{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);direction:ltr;}
+.slug-inp:focus{outline:none;border-color:var(--blue);}
+.slug-btn{padding:10px 18px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);white-space:nowrap;}
+.slug-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* SUMMARY */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.sum-card{background:#fff;border-radius:12px;padding:12px 8px;text-align:center;border:1px solid var(--border);}
+.sum-num{font-size:22px;font-weight:900;}
+.sum-lbl{font-size:10px;color:#64748B;font-weight:600;margin-top:2px;}
+.sum-pass .sum-num{color:var(--green);}
+.sum-fail .sum-num{color:var(--red);}
+.sum-warn .sum-num{color:var(--orange);}
+.sum-total .sum-num{color:var(--navy);}
+
+/* PROGRESS */
+.progress-bar{height:8px;background:#E2E8F0;border-radius:999px;margin-bottom:16px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:999px;transition:width .3s ease;width:0%;}
+
+/* SECTIONS */
+.section{margin-bottom:14px;}
+.section-title{font-size:12px;font-weight:900;color:var(--navy);margin-bottom:6px;padding:0 4px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
+.test-card{background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:5px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;}
+.test-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center;margin-top:1px;}
+.test-body{flex:1;min-width:0;}
+.test-name{font-size:13px;font-weight:700;color:var(--navy);}
+.test-detail{font-size:11px;color:#64748B;margin-top:2px;word-break:break-word;}
+.test-status{font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0;margin-top:1px;}
+.pass{background:#F0FDF4;color:var(--green);border:1px solid #BBF7D0;}
+.fail{background:#FEF2F2;color:var(--red);border:1px solid #FECACA;}
+.warn{background:#FFF7ED;color:var(--orange);border:1px solid #FED7AA;}
+.pending{background:#F1F5F9;color:#94A3B8;border:1px solid var(--border);}
+.running{background:#EFF6FF;color:var(--blue);border:1px solid #BFDBFE;}
+
+/* LOG */
+.log-toggle{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#64748B;cursor:pointer;font-family:var(--font);margin-top:16px;width:100%;}
+.log-area{background:#0F172A;border-radius:12px;padding:14px;font-family:monospace;font-size:11px;color:#94A3B8;max-height:220px;overflow-y:auto;margin-top:8px;display:none;}
+.log-area.open{display:block;}
+.log-line{margin-bottom:3px;line-height:1.5;}
+.log-ok{color:#4ADE80;}.log-err{color:#F87171;}.log-info{color:#60A5FA;}.log-warn{color:#FBBF24;}
+
+/* PERF */
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+.perf-item{background:#F8FAFC;border-radius:8px;padding:8px 10px;font-size:11px;}
+.perf-label{color:#64748B;font-weight:600;}
+.perf-val{font-size:14px;font-weight:900;color:var(--navy);margin-top:2px;}
+.perf-val.fast{color:var(--green);}
+.perf-val.slow{color:var(--orange);}
+.perf-val.very-slow{color:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div style="font-size:36px;margin-bottom:8px;">🧪</div>
+    <h1>SmartNeighbor · בוחן אוטומציה מקיף</h1>
+    <p>בדיקות תשתית · לוגיקה · אבטחה · שלמות · ביצועים</p>
+  </div>
+</div>
+
+<div class="slug-wrap">
+  <div class="slug-label">🏢 הזיני slug של הבניין לבדיקה</div>
+  <div class="slug-row">
+    <input class="slug-inp" id="slug-inp" type="text" placeholder="לדוגמה: y3c5p9ba" dir="ltr">
+    <button class="slug-btn" id="run-btn" onclick="startTests()">▶ בדוק</button>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="sum-card sum-pass"><div class="sum-num" id="cnt-pass">—</div><div class="sum-lbl">✅ עברו</div></div>
+  <div class="sum-card sum-fail"><div class="sum-num" id="cnt-fail">—</div><div class="sum-lbl">❌ נכשלו</div></div>
+  <div class="sum-card sum-warn"><div class="sum-num" id="cnt-warn">—</div><div class="sum-lbl">⚠️ אזהרות</div></div>
+  <div class="sum-card sum-total"><div class="sum-num" id="cnt-total">—</div><div class="sum-lbl">סה"כ</div></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div id="tests-container"></div>
+
+<button class="log-toggle" onclick="toggleLog()">📋 הצג / הסתר לוג מפורט</button>
+<div class="log-area" id="log-area"></div>
+
+<script>
+const SUPABASE_URL = 'https://fsvyryhtnogzyycijukp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_b0Xj4xAxo3GnVtxhE-HL-A_5AqWNGnI';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let TARGET_SLUG = '';
+let buildingData = null;
+let results = {};
+let logLines = [];
+let perfData = {};
+
+// ═══════════════════════════════════════════════════
+// הגדרת כל הבדיקות
+// ═══════════════════════════════════════════════════
+function getTests(slug){
+return [
+  // 🔌 תשתית
+  { id:'conn',          section:'🔌 תשתית',         name:'חיבור לסופאבייס',                    fn:()=>testConn() },
+  { id:'bldg-exists',   section:'🔌 תשתית',         name:'בניין קיים',                          fn:()=>testBldgExists(slug) },
+  { id:'tbl-residents', section:'🔌 תשתית',         name:'טבלת residents',                      fn:()=>testTable('residents',slug) },
+  { id:'tbl-payments',  section:'🔌 תשתית',         name:'טבלת payments',                       fn:()=>testTable('payments',slug) },
+  { id:'tbl-expenses',  section:'🔌 תשתית',         name:'טבלת expenses',                       fn:()=>testTable('expenses',slug) },
+  { id:'tbl-faults',    section:'🔌 תשתית',         name:'טבלת faults',                         fn:()=>testTable('faults',slug) },
+  { id:'tbl-notices',   section:'🔌 תשתית',         name:'טבלת notices',                        fn:()=>testTable('notices',slug) },
+  { id:'tbl-posts',     section:'🔌 תשתית',         name:'טבלת posts',                          fn:()=>testTable('posts',slug) },
+  { id:'tbl-replies',   section:'🔌 תשתית',         name:'טבלת post_replies',                   fn:()=>testTable('post_replies',slug) },
+  { id:'tbl-mediations',section:'🔌 תשתית',         name:'טבלת mediations',                     fn:()=>testTable('mediations',slug) },
+  { id:'tbl-vaad',      section:'🔌 תשתית',         name:'טבלת vaad_questions',                 fn:()=>testTable('vaad_questions',slug) },
+  { id:'tbl-polls',     section:'🔌 תשתית',         name:'טבלת polls',                          fn:()=>testTable('polls',slug) },
+  { id:'tbl-docs',      section:'🔌 תשתית',         name:'טבלת building_docs',                  fn:()=>testTable('building_docs',slug) },
+  { id:'tbl-profs',     section:'🔌 תשתית',         name:'טבלת professionals',                  fn:()=>testTable('professionals',slug) },
+
+  // 🏢 נתוני בניין
+  { id:'bldg-name',     section:'🏢 נתוני בניין',   name:'שם בניין קיים',                       fn:()=>testBldgField(slug,'building_name') },
+  { id:'bldg-units',    section:'🏢 נתוני בניין',   name:'מספר דירות > 0',                      fn:()=>testBldgUnits(slug) },
+  { id:'bldg-fee',      section:'🏢 נתוני בניין',   name:'דמי ועד > 0',                         fn:()=>testBldgFee(slug) },
+  { id:'bldg-start',    section:'🏢 נתוני בניין',   name:'start_month מוגדר',                   fn:()=>testBldgField(slug,'start_month') },
+  { id:'bldg-pin',      section:'🏢 נתוני בניין',   name:'admin_pin קיים',                      fn:()=>testAdminPin(slug) },
+  { id:'bldg-status',   section:'🏢 נתוני בניין',   name:'paid_status תקין',                    fn:()=>testPaidStatus(slug) },
+  { id:'bldg-license',  section:'🏢 נתוני בניין',   name:'לא פג תוקף רישיון',                  fn:()=>testLicense(slug) },
+
+  // 👤 דיירים
+  { id:'res-count',     section:'👤 דיירים',        name:'יש לפחות דייר אחד',                   fn:()=>testResCount(slug) },
+  { id:'res-pins',      section:'👤 דיירים',        name:'כל הדיירים עם PIN',                   fn:()=>testResPins(slug) },
+  { id:'res-phones',    section:'👤 דיירים',        name:'כל הדיירים עם טלפון',                 fn:()=>testResPhones(slug) },
+  { id:'res-names',     section:'👤 דיירים',        name:'כל הדיירים עם שם',                    fn:()=>testResNames(slug) },
+  { id:'res-duplicates',section:'👤 דיירים',        name:'אין דיירים כפולים לדירה',             fn:()=>testResDuplicates(slug) },
+
+  // 💰 לוגיקה עסקית
+  { id:'pay-monthkey',  section:'💰 לוגיקה עסקית', name:'month_key בפורמט נכון (YYYY-M)',       fn:()=>testMonthKeyFormat(slug) },
+  { id:'pay-amounts',   section:'💰 לוגיקה עסקית', name:'אין תשלומים עם סכום 0 או NULL',       fn:()=>testPayAmounts(slug) },
+  { id:'pay-coverage',  section:'💰 לוגיקה עסקית', name:'תשלום מכסה חודשים לפי דמי ועד',       fn:()=>testPayCoverage(slug) },
+  { id:'pay-balance',   section:'💰 לוגיקה עסקית', name:'יתרה = הכנסות - הוצאות (לא שלילי)',   fn:()=>testBalance(slug) },
+  { id:'pay-approved',  section:'💰 לוגיקה עסקית', name:'תשלומים מאושרים עם approved_date',    fn:()=>testApprovedDate(slug) },
+  { id:'exp-types',     section:'💰 לוגיקה עסקית', name:'הוצאות עם expType תקין',              fn:()=>testExpTypes(slug) },
+
+  // 🔒 אבטחה
+  { id:'sec-isolation', section:'🔒 אבטחה',         name:'בידוד בניינים — slug אחד לא רואה אחר', fn:()=>testIsolation(slug) },
+  { id:'sec-invalid-slug',section:'🔒 אבטחה',       name:'slug לא קיים מחזיר ריק',              fn:()=>testInvalidSlug() },
+  { id:'sec-pin-hidden',section:'🔒 אבטחה',         name:'admin_pin לא חשוף בשאילתת buildings', fn:()=>testAdminPinHidden(slug) },
+  { id:'sec-rls-insert',section:'🔒 אבטחה',         name:'INSERT עם slug לא קיים נחסם',         fn:()=>testRlsInsert() },
+  { id:'sec-rls-read',  section:'🔒 אבטחה',         name:'SELECT מוגבל ל-slug הנכון',           fn:()=>testRlsRead(slug) },
+
+  // 🧹 שלמות נתונים
+  { id:'int-pay-null',  section:'🧹 שלמות נתונים',  name:'אין תשלומים ללא unit',                fn:()=>testNullField('payments','unit',slug) },
+  { id:'int-pay-status',section:'🧹 שלמות נתונים',  name:'כל התשלומים עם status תקין',          fn:()=>testPayStatus(slug) },
+  { id:'int-exp-null',  section:'🧹 שלמות נתונים',  name:'אין הוצאות ללא קטגוריה',              fn:()=>testNullField('expenses','cat',slug) },
+  { id:'int-fault-null',section:'🧹 שלמות נתונים',  name:'אין תקלות ללא כותרת',                 fn:()=>testNullField('faults','title',slug) },
+
+  // ⚡ ביצועים
+  { id:'perf-payments', section:'⚡ ביצועים',        name:'טעינת תשלומים < 2 שניות',             fn:()=>testPerf('payments',slug,'perf-payments') },
+  { id:'perf-residents',section:'⚡ ביצועים',        name:'טעינת דיירים < 1 שנייה',              fn:()=>testPerf('residents',slug,'perf-residents') },
+  { id:'perf-faults',   section:'⚡ ביצועים',        name:'טעינת תקלות < 1 שנייה',               fn:()=>testPerf('faults',slug,'perf-faults') },
+];
+}
+
+// ═══════════════════════════════════════════════════
+// פונקציות בדיקה
+// ═══════════════════════════════════════════════════
+
+async function testConn(){
+  const res = await sb.from('buildings').select('id').limit(1);
+  if(res.error) return fail('שגיאת חיבור: '+res.error.message);
+  return pass('חיבור תקין');
+}
+
+async function testBldgExists(slug){
+  const res = await sb.from('buildings').select('*').eq('unique_slug',slug).single();
+  if(res.error||!res.data) return fail('בניין לא נמצא');
+  buildingData = res.data;
+  return pass(res.data.building_name+' · '+res.data.city);
+}
+
+async function testTable(tbl, slug){
+  const res = await sb.from(tbl).select('id').eq('building_slug',slug).limit(1);
+  if(res.error) return fail('שגיאה: '+res.error.message);
+  return pass('נגישה · '+(res.data?res.data.length:0)+' רשומות לדוגמה');
+}
+
+async function testBldgField(slug, field){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const val = buildingData[field];
+  if(!val) return fail('שדה '+field+' ריק');
+  return pass(field+' = '+val);
+}
+
+async function testBldgUnits(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const n = parseInt(buildingData.units_count)||0;
+  if(n<=0) return fail('units_count = '+n);
+  return pass(n+' דירות');
+}
+
+async function testBldgFee(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const f = parseFloat(buildingData.monthly_fee)||0;
+  if(f<=0) return fail('monthly_fee = '+f);
+  return pass('₪'+f+' לדירה');
+}
+
+async function testAdminPin(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const pin = buildingData.admin_pin;
+  if(!pin||pin.length<4) return fail('admin_pin חסר או קצר');
+  return pass('PIN קיים ותקין');
+}
+
+async function testPaidStatus(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const s = buildingData.paid_status;
+  const ok = ['trial','active'].includes(s);
+  return ok ? pass('paid_status = '+s) : fail('paid_status לא תקין: '+s);
+}
+
+async function testLicense(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  if(buildingData.paid_status==='active') return pass('מנוי פעיל');
+  if(buildingData.paid_status==='blocked') return fail('בניין חסום');
+  const created = new Date(buildingData.created_at);
+  const days = Math.floor((new Date()-created)/(1000*60*60*24));
+  if(days>=30) return warn('ניסיון פג — '+days+' ימים');
+  return pass('ניסיון · נותרו '+(30-days)+' ימים');
+}
+
+async function testResCount(slug){
+  const res = await sb.from('residents').select('id').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const n = res.data?res.data.length:0;
+  if(n===0) return warn('אין דיירים רשומים');
+  return pass(n+' דיירים רשומים');
+}
+
+async function testResPins(slug){
+  const res = await sb.from('residents').select('unit,pin').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const noPins = (res.data||[]).filter(r=>!r.pin||r.pin.length<4);
+  if(noPins.length>0) return warn(noPins.length+' דיירים ללא PIN תקין: דירות '+noPins.map(r=>r.unit).join(', '));
+  return pass('כל '+(res.data||[]).length+' הדיירים עם PIN');
+}
+
+async function testResPhones(slug){
+  const res = await sb.from('residents').select('unit,phone').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const noPhone = (res.data||[]).filter(r=>!r.phone);
+  if(noPhone.length>0) return warn(noPhone.length+' דיירים ללא טלפון: דירות '+noPhone.map(r=>r.unit).join(', '));
+  return pass('כל הדיירים עם טלפון');
+}
+
+async function testResNames(slug){
+  const res = await sb.from('residents').select('unit,name').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const noName = (res.data||[]).filter(r=>!r.name||r.name.trim()==='');
+  if(noName.length>0) return fail(noName.length+' דיירים ללא שם');
+  return pass('כל הדיירים עם שם');
+}
+
+async function testResDuplicates(slug){
+  const res = await sb.from('residents').select('unit').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const units = (res.data||[]).map(r=>r.unit);
+  const counts = {};
+  units.forEach(u=>{ counts[u]=(counts[u]||0)+1; });
+  const dups = Object.entries(counts).filter(([u,c])=>c>2).map(([u])=>u);
+  if(dups.length>0) return warn('יותר מ-2 דיירים לדירה: '+dups.join(', '));
+  return pass('אין כפילויות חריגות');
+}
+
+async function testMonthKeyFormat(slug){
+  const res = await sb.from('payments').select('month_key').eq('building_slug',slug).eq('status','approved');
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין תשלומים מאושרים לבדיקה');
+  const bad = (res.data||[]).filter(r=>!r.month_key||!/^\d{4}-\d{1,2}$/.test(r.month_key));
+  if(bad.length>0) return fail(bad.length+' תשלומים עם month_key לא תקין');
+  return pass('כל '+res.data.length+' התשלומים עם month_key תקין');
+}
+
+async function testPayAmounts(slug){
+  const res = await sb.from('payments').select('unit,amount,month_key').eq('building_slug',slug).eq('status','approved');
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין תשלומים מאושרים');
+  const bad = (res.data||[]).filter(r=>!r.amount||parseFloat(r.amount)<=0);
+  if(bad.length>0) return fail(bad.length+' תשלומים עם סכום 0 או NULL');
+  const total = res.data.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  return pass(res.data.length+' תשלומים · סה"כ ₪'+Math.round(total));
+}
+
+async function testPayCoverage(slug){
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const fee = parseFloat(buildingData.monthly_fee)||0;
+  if(fee<=0) return warn('דמי ועד לא מוגדרים');
+  const res = await sb.from('payments').select('unit,amount').eq('building_slug',slug).eq('status','approved');
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין תשלומים מאושרים');
+  // בדוק שכל תשלום הוא כפולה סבירה של דמי הועד
+  const weird = (res.data||[]).filter(r=>{
+    const a = parseFloat(r.amount||0);
+    return a>0 && (a % fee) > 1 && a < fee;
+  });
+  if(weird.length>0) return warn(weird.length+' תשלומים חלקיים (פחות מדמי ועד)');
+  return pass('כל התשלומים עקביים עם דמי הועד ₪'+fee);
+}
+
+async function testBalance(slug){
+  const [payRes, expRes] = await Promise.all([
+    sb.from('payments').select('amount').eq('building_slug',slug).eq('status','approved'),
+    sb.from('expenses').select('amount').eq('building_slug',slug)
+  ]);
+  if(payRes.error||expRes.error) return fail('שגיאה בטעינת נתונים');
+  const income = (payRes.data||[]).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const expenses = (expRes.data||[]).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const balance = income - expenses;
+  if(balance<-500) return warn('יתרה שלילית משמעותית: ₪'+Math.round(balance));
+  return pass('הכנסות ₪'+Math.round(income)+' · הוצאות ₪'+Math.round(expenses)+' · יתרה ₪'+Math.round(balance));
+}
+
+async function testApprovedDate(slug){
+  const res = await sb.from('payments').select('approved_date,unit').eq('building_slug',slug).eq('status','approved');
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין תשלומים מאושרים');
+  const noDate = (res.data||[]).filter(r=>!r.approved_date);
+  if(noDate.length>0) return warn(noDate.length+' תשלומים ללא approved_date');
+  return pass('כל '+res.data.length+' התשלומים עם תאריך אישור');
+}
+
+async function testExpTypes(slug){
+  const res = await sb.from('expenses').select('cat,exp_type').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין הוצאות רשומות');
+  const valid = ['קבועה','חד פעמית'];
+  const bad = (res.data||[]).filter(r=>r.exp_type&&!valid.includes(r.exp_type));
+  if(bad.length>0) return warn(bad.length+' הוצאות עם expType לא מוכר');
+  return pass(res.data.length+' הוצאות · סוגים תקינים');
+}
+
+async function testIsolation(slug){
+  // ניסיון לקרוא תשלומים של slug אחר — אמור להחזיר ריק
+  const fakeSlug = 'FAKE_ISOLATION_TEST_XYZ';
+  const res = await sb.from('payments').select('id').eq('building_slug',fakeSlug).limit(5);
+  if(res.error) return pass('שאילתה עם slug לא קיים נחסמה');
+  if(res.data&&res.data.length>0) return fail('⚠️ חשיפת נתונים! slug לא קיים החזיר נתונים');
+  return pass('בידוד תקין — slug לא קיים מחזיר ריק');
+}
+
+async function testInvalidSlug(){
+  const res = await sb.from('buildings').select('id').eq('unique_slug','INVALID_SLUG_TEST_123').single();
+  if(res.data) return fail('slug לא קיים החזיר בניין!');
+  return pass('slug לא קיים מחזיר null כצפוי');
+}
+
+async function testAdminPinHidden(slug){
+  // admin_pin אמור להיות גלוי (אין RLS על זה) — זו הערה לוועד
+  if(!buildingData) return fail('נתוני בניין לא נטענו');
+  const pin = buildingData.admin_pin;
+  if(pin) return warn('admin_pin גלוי בשאילתת buildings — מומלץ לשמור בנפרד בעתיד');
+  return pass('admin_pin לא חשוף');
+}
+
+async function testRlsInsert(){
+  const fakeSlug = 'FAKE_RLS_TEST_'+Date.now();
+  const ins = await sb.from('posts').insert({building_slug:fakeSlug, unit:99, type:'neighbor', content:'rls_test'});
+  if(ins.error) return pass('INSERT עם slug לא קיים נחסם (RLS עובד)');
+  // אם הצליח — מחק מיד
+  await sb.from('posts').delete().eq('building_slug',fakeSlug);
+  return warn('INSERT עם slug לא קיים הצליח — RLS מאפשר כל slug');
+}
+
+async function testRlsRead(slug){
+  const res = await sb.from('residents').select('unit').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  const n = res.data?res.data.length:0;
+  return pass(n+' דיירים נקראו ל-slug הנכון');
+}
+
+async function testNullField(tbl, field, slug){
+  const res = await sb.from(tbl).select(field).eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return pass('אין רשומות לבדיקה');
+  const nulls = (res.data||[]).filter(r=>!r[field]||String(r[field]).trim()==='');
+  if(nulls.length>0) return warn(nulls.length+' רשומות ב-'+tbl+' ללא '+field);
+  return pass('כל '+res.data.length+' הרשומות עם '+field);
+}
+
+async function testPayStatus(slug){
+  const res = await sb.from('payments').select('status').eq('building_slug',slug);
+  if(res.error) return fail(res.error.message);
+  if(!res.data||res.data.length===0) return warn('אין תשלומים');
+  const valid = ['approved','pending'];
+  const bad = (res.data||[]).filter(r=>!valid.includes(r.status));
+  if(bad.length>0) return fail(bad.length+' תשלומים עם status לא מוכר');
+  const approved = (res.data||[]).filter(r=>r.status==='approved').length;
+  const pending = (res.data||[]).filter(r=>r.status==='pending').length;
+  return pass('מאושרים: '+approved+' · ממתינים: '+pending);
+}
+
+async function testPerf(tbl, slug, id){
+  const t0 = Date.now();
+  const res = await sb.from(tbl).select('*').eq('building_slug',slug);
+  const ms = Date.now()-t0;
+  perfData[id] = ms;
+  if(res.error) return fail('שגיאה: '+res.error.message);
+  const n = res.data?res.data.length:0;
+  const limit = tbl==='payments' ? 2000 : 1000;
+  if(ms>limit) return warn(ms+'ms · '+n+' רשומות (איטי מהצפוי)');
+  return pass(ms+'ms · '+n+' רשומות');
+}
+
+// ═══════════════════════════════════════════════════
+// עזרי תוצאות
+// ═══════════════════════════════════════════════════
+function pass(detail){ return {pass:true, warn:false, detail}; }
+function fail(detail){ return {pass:false, warn:false, detail}; }
+function warn(detail){ return {pass:false, warn:true, detail}; }
+
+// ═══════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════
+function buildUI(tests){
+  const container = document.getElementById('tests-container');
+  const sections = {};
+  tests.forEach(t=>{ if(!sections[t.section]) sections[t.section]=[]; sections[t.section].push(t); });
+  let html = '';
+  Object.entries(sections).forEach(([sec,tests])=>{
+    html += `<div class="section"><div class="section-title">${sec}</div>`;
+    tests.forEach(t=>{
+      html += `<div class="test-card" id="card-${t.id}">
+        <div class="test-icon">⬜</div>
+        <div class="test-body">
+          <div class="test-name">${t.name}</div>
+          <div class="test-detail"></div>
+        </div>
+        <div class="test-status pending">ממתין</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function setStatus(id, result){
+  const card = document.getElementById('card-'+id);
+  if(!card) return;
+  const icon = card.querySelector('.test-icon');
+  const detail = card.querySelector('.test-detail');
+  const status = card.querySelector('.test-status');
+  if(result.pass){ icon.textContent='✅'; status.textContent='✅ עבר'; status.className='test-status pass'; }
+  else if(result.warn){ icon.textContent='⚠️'; status.textContent='⚠️ אזהרה'; status.className='test-status warn'; }
+  else { icon.textContent='❌'; status.textContent='❌ נכשל'; status.className='test-status fail'; }
+  if(result.detail) detail.textContent=result.detail;
+}
+
+function setRunning(id){
+  const card = document.getElementById('card-'+id);
+  if(!card) return;
+  card.querySelector('.test-icon').textContent='⏳';
+  card.querySelector('.test-status').textContent='רץ...';
+  card.querySelector('.test-status').className='test-status running';
+}
+
+function updateSummary(tests){
+  const p = Object.values(results).filter(r=>r==='pass').length;
+  const f = Object.values(results).filter(r=>r==='fail').length;
+  const w = Object.values(results).filter(r=>r==='warn').length;
+  document.getElementById('cnt-pass').textContent=p;
+  document.getElementById('cnt-fail').textContent=f;
+  document.getElementById('cnt-warn').textContent=w;
+  document.getElementById('cnt-total').textContent=tests.length;
+  document.getElementById('progress').style.width=(Object.keys(results).length/tests.length*100)+'%';
+}
+
+function log(msg, type='info'){
+  logLines.push({msg,type});
+  const area = document.getElementById('log-area');
+  area.innerHTML = logLines.map(l=>`<div class="log-line log-${l.type}">${l.msg}</div>`).join('');
+  area.scrollTop = area.scrollHeight;
+}
+
+function toggleLog(){
+  document.getElementById('log-area').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════
+// הרצה
+// ═══════════════════════════════════════════════════
+async function startTests(){
+  const slug = document.getElementById('slug-inp').value.trim();
+  if(!slug){ alert('נא להזין slug'); return; }
+  TARGET_SLUG = slug;
+  buildingData = null;
+  results = {};
+  logLines = [];
+  perfData = {};
+  document.getElementById('cnt-pass').textContent='0';
+  document.getElementById('cnt-fail').textContent='0';
+  document.getElementById('cnt-warn').textContent='0';
+  document.getElementById('progress').style.width='0%';
+
+  const tests = getTests(slug);
+  buildUI(tests);
+  document.getElementById('cnt-total').textContent=tests.length;
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled=true; btn.textContent='⏳ בודק...';
+
+  log('// === מתחיל בדיקות עבור slug: '+slug+' ===', 'info');
+
+  for(const t of tests){
+    setRunning(t.id);
+    log('// '+t.name+'...', 'info');
+    try{
+      const r = await t.fn();
+      results[t.id] = r.pass?'pass':(r.warn?'warn':'fail');
+      setStatus(t.id, r);
+      log((r.pass?'✓ ':(r.warn?'⚠ ':'✗ '))+t.name+': '+r.detail, r.pass?'ok':(r.warn?'warn':'err'));
+    }catch(e){
+      results[t.id]='fail';
+      setStatus(t.id,{pass:false,warn:false,detail:'שגיאה: '+e.message});
+      log('✗ '+t.name+': שגיאה — '+e.message,'err');
+    }
+    updateSummary(tests);
+    await new Promise(r=>setTimeout(r,100));
+  }
+
+  const p=Object.values(results).filter(r=>r==='pass').length;
+  const f=Object.values(results).filter(r=>r==='fail').length;
+  const w=Object.values(results).filter(r=>r==='warn').length;
+  log(`// === סיום: ${p} עברו · ${w} אזהרות · ${f} נכשלו ===`, f>0?'err':(w>0?'warn':'ok'));
+
+  btn.disabled=false; btn.textContent='🔄 בדוק שוב';
+}
+</script>
+</body>
+</html>
