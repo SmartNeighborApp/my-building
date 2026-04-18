@@ -378,32 +378,7 @@ function closeWATray(){
 /* ═══════════════════════════════════════════════════════════════
    RECEIPT MODAL
 ═══════════════════════════════════════════════════════════════ */
-function showMyReceipt(){
-  var unit = DB.user.unit;
-  // מוצא את כל הקבלות של הדייר מרשימת כל הקבלות
-  var allRecs = (DB.allReceipts||[]).filter(function(r){ return Number(r.unit)===Number(unit); });
-  if(!allRecs.length){ showToast('קבלה זמינה לאחר אישור הוועד'); return; }
-  // מיון לפי תאריך אישור — חדש ראשון
-  allRecs.sort(function(a,b){ return (b.approvedDate||'').localeCompare(a.approvedDate||''); });
-  var rec = allRecs[0]; // הקבלה האחרונה לתצוגה
-  var receiptNum = (new Date().getFullYear())+''+String(new Date().getMonth()+1).padStart(2,'0')+'-'+unit;
-  var totalAmount = parseFloat(rec.amount)||0;
-  var monthsList  = rec.monthLabel||fmtMonth(getTargetDate());
-
-  setText('receipt-cat-name',    DB.building.name||'הבניין');
-  setText('receipt-num-ph',      receiptNum);
-  setText('receipt-date-ph',     fmtDate(new Date()));
-  setText('receipt-supplier-ph', DB.unitNames[unit]||('דירה '+unit));
-  setText('receipt-unit-ph',    'דירה '+unit);
-  setText('receipt-month-ph',    monthsList||mk);
-  setText('receipt-method-ph',   rec.methodLabel||'—');
-  setText('receipt-amount-ph',   '₪'+num(totalAmount));
-  setText('receipt-bldg-ph',     DB.building.name||'—');
-  setText('receipt-addr-ph',     (DB.building.address||'')+' '+(DB.building.city||''));
-
-  var ov = document.getElementById('receipt-modal');
-  if(ov) ov.style.display='flex';
-}
+function showMyReceipt(){ openReceiptsModal(false); }
 
 function printReceipt(){
   var num    = document.getElementById('receipt-num-ph')   ? document.getElementById('receipt-num-ph').textContent   : '';
