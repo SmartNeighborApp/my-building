@@ -152,11 +152,11 @@ function checkAccess(){
   err.style.display='none';
   boxes.forEach(function(b){ b.classList.remove('otp-error'); });
   loading.style.display='block';
-  sbClient.from('buildings').select('*').eq('access_code', Number(code)).then(function(res){
+  sbClient.from('buildings').select('building_name,city,units_count,monthly_fee,unit_names,unique_slug,paid_status,paid_until,vaad_unit,start_month,created_at,access_code').eq('access_code', Number(code)).then(function(res){
     loading.style.display='none';
     if(res.error || !res.data || res.data.length===0){
       loading.style.display='block';
-      sbClient.from('buildings').select('*').eq('access_code', code).then(function(res2){
+      sbClient.from('buildings').select('building_name,city,units_count,monthly_fee,unit_names,unique_slug,paid_status,paid_until,vaad_unit,start_month,created_at,access_code').eq('access_code', code).then(function(res2){
         loading.style.display='none';
         if(res2.error || !res2.data || res2.data.length===0){ var locked=_recordFailedAttempt(); if(locked){ _startLockoutCountdown(); } else { err.textContent='קוד בניין לא נמצא במערכת'; err.style.display='block'; boxes.forEach(function(b){ b.classList.add('otp-error'); }); } return; }
         _resetFailedAttempts(); _applyBuildingAndOpen(res2.data[0]);
@@ -176,7 +176,7 @@ function checkSlugFromUrl(){
   var err=document.getElementById('sb-access-err');
   if(loading) loading.style.display='block';
   if(err) err.style.display='none';
-  sbClient.from('buildings').select('*').eq('unique_slug', String(slug)).then(function(res){
+  sbClient.from('buildings').select('building_name,city,units_count,monthly_fee,unit_names,unique_slug,paid_status,paid_until,vaad_unit,start_month,created_at,access_code').eq('unique_slug', String(slug)).then(function(res){
     if(loading) loading.style.display='none';
     if(res.error){ return; }
     if(!res.data || res.data.length===0){ if(err){ err.textContent='הקישור אינו תקין — נא להזין קוד גישה ידנית'; err.style.display='block'; } return; }
