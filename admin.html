@@ -1,934 +1,236 @@
-<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>שכנות טובה · לוח בקרה</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
-<style>
-:root{
-  --navy:#1A3A5C;--blue:#2563EB;--gold:#C9A84C;--gold2:#E2C05A;
-  --rose:#EF4444;--green:#22C55E;--orange:#F97316;--slate:#64748B;
-  --font:'Heebo',sans-serif;
-  --bg:#F8FAFC;--card:#fff;--border:#E2E8F0;--text:#1A3A5C;
-}
-*,::after,::before{box-sizing:border-box;margin:0;padding:0}
-body,html{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);direction:rtl}
-button{font-family:var(--font);cursor:pointer;border:none}
-a{text-decoration:none;color:inherit}
+/* professionals.js — שכנות טובה · SmartNeighbor */
+var _profEditId = null;
+var _profFilterCat = 'הכל';
+var _profSearchTerm = '';
+var _vaadOrderProfId = null;
 
-/* ── LOGIN ─────────────────────────────────────────────── */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#0a1520 0,#1a3a5c 60%,#0d2640 100%)}
-.login-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:48px 40px;width:min(90vw,400px);backdrop-filter:blur(20px);box-shadow:0 32px 80px rgba(0,0,0,.5)}
-.login-logo{text-align:center;margin-bottom:36px}
-.login-logo-icon{font-size:52px;display:block;margin-bottom:10px}
-.login-logo-name{font-size:24px;font-weight:900;color:#fff}
-.login-logo-sub{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
-.login-label{font-size:13px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:8px;display:block}
-.login-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:14px;font-size:18px;font-weight:800;color:#fff;text-align:center;letter-spacing:8px;outline:0;font-family:var(--font);transition:border-color .2s}
-.login-input:focus{border-color:var(--gold)}
-.login-btn{width:100%;margin-top:16px;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border-radius:14px;font-size:16px;font-weight:900;box-shadow:0 8px 24px rgba(201,168,76,.4);transition:transform .13s}
-.login-btn:active{transform:scale(.97)}
-.login-err{color:#fca5a5;font-size:12px;font-weight:700;text-align:center;margin-top:10px;min-height:18px}
+function setProfSearch(q){ _profSearchTerm=(q||'').trim().toLowerCase(); renderProfessionalsPage(); }
 
-/* ── DASHBOARD ─────────────────────────────────────────── */
-#dashboard{display:none;min-height:100vh;background:var(--bg)}
-.dash-header{background:linear-gradient(135deg,#0a1520 0,#1a3a5c 100%);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.15)}
-.dash-brand{display:flex;align-items:center;gap:12px}
-.dash-brand-name{font-size:18px;font-weight:900;color:#fff}
-.dash-brand-sub{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase}
-.dash-logout-btn{padding:8px 18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;color:rgba(255,255,255,.8);font-size:13px;font-weight:700;transition:background .15s}
-.dash-logout-btn:hover{background:rgba(255,255,255,.18)}
+function renderProfessionalsPage(){
+  // כפתור הוספה — לכולם
+  var addBtn = document.getElementById('prof-add-btn-wrap');
+  if(addBtn) addBtn.style.display = 'block';
 
-/* ── TABS ──────────────────────────────────────────────── */
-.main-tabs{display:flex;gap:4px;padding:20px 32px 0;border-bottom:2px solid var(--border);background:var(--card)}
-.tab-btn{padding:10px 20px;border-radius:10px 10px 0 0;font-size:13px;font-weight:800;color:var(--slate);background:transparent;border:none;cursor:pointer;transition:all .15s;border-bottom:3px solid transparent;margin-bottom:-2px}
-.tab-btn.active{color:var(--navy);border-bottom-color:var(--blue);background:#EFF6FF}
-.tab-btn:hover:not(.active){background:#F1F5F9;color:var(--navy)}
-.tab-content{display:none;padding:24px 32px}
-.tab-content.active{display:block}
-
-/* ── STATS ─────────────────────────────────────────────── */
-.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
-.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:0 1px 8px rgba(26,58,92,.06)}
-.stat-icon{font-size:20px;margin-bottom:6px}
-.stat-val{font-size:28px;font-weight:900;line-height:1;color:var(--navy)}
-.stat-lbl{font-size:11px;color:var(--slate);font-weight:600;margin-top:4px}
-.stat-card.active .stat-val{color:#16A34A}
-.stat-card.trial .stat-val{color:#D97706}
-.stat-card.blocked .stat-val{color:var(--rose)}
-.stat-card.revenue .stat-val{color:var(--gold)}
-.stat-card.archived .stat-val{color:var(--slate)}
-
-/* ── SETTINGS PANEL ────────────────────────────────────── */
-.settings-panel{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:24px;box-shadow:0 1px 8px rgba(26,58,92,.06)}
-.settings-panel-title{font-size:13px;font-weight:800;color:var(--slate);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.settings-row:last-child{margin-bottom:0}
-.settings-label{font-size:13px;font-weight:700;color:var(--navy);min-width:130px}
-.settings-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);color:var(--navy);outline:none;transition:border-color .2s;direction:ltr;text-align:right}
-.settings-input:focus{border-color:var(--blue)}
-.settings-save-btn{padding:8px 16px;background:var(--navy);color:#fff;border-radius:10px;font-size:12px;font-weight:800;transition:opacity .15s}
-.settings-save-btn:hover{opacity:.85}
-
-/* ── TOOLBAR ────────────────────────────────────────────── */
-.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
-.toolbar-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.toolbar-right{display:flex;gap:8px;align-items:center}
-.filter-btn{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);border:1.5px solid var(--border);background:var(--card);color:var(--slate);transition:all .15s}
-.filter-btn.active{background:#EFF6FF;border-color:var(--blue);color:var(--blue)}
-.filter-btn:hover:not(.active){background:#F1F5F9;color:var(--navy)}
-.search-input{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;font-family:var(--font);border:1.5px solid var(--border);background:var(--card);color:var(--navy);outline:0;width:200px;transition:border-color .2s}
-.search-input::placeholder{color:var(--slate)}
-.search-input:focus{border-color:var(--blue)}
-.icon-btn{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;font-family:var(--font);transition:all .15s;border:1.5px solid var(--border)}
-.icon-btn.navy{background:var(--navy);color:#fff;border-color:var(--navy)}
-.icon-btn.navy:hover{opacity:.88}
-.icon-btn.light{background:var(--card);color:var(--navy)}
-.icon-btn.light:hover{background:#F1F5F9}
-
-/* ── TABLE ──────────────────────────────────────────────── */
-.table-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 1px 8px rgba(26,58,92,.06)}
-.tbl-header{display:grid;grid-template-columns:2fr 1fr 0.7fr 0.7fr 0.9fr 1fr 1.8fr;padding:12px 20px;border-bottom:2px solid var(--border);font-size:11px;font-weight:800;color:var(--slate);letter-spacing:.7px;text-transform:uppercase;background:#F8FAFC}
-.bldg-row{display:grid;grid-template-columns:2fr 1fr 0.7fr 0.7fr 0.9fr 1fr 1.8fr;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s}
-.bldg-row:last-child{border-bottom:none}
-.bldg-row:hover{background:#F8FAFC}
-.bldg-name-main{font-size:13px;font-weight:800;color:var(--navy)}
-.bldg-sub{font-size:10px;color:var(--slate);margin-top:2px}
-.bldg-date{font-size:12px;color:var(--slate);font-weight:600}
-.note-preview{font-size:10px;color:var(--slate);margin-top:3px;font-style:italic;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ── BADGES ─────────────────────────────────────────────── */
-.status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}
-.status-badge.active{background:#DCFCE7;color:#166534;border:1px solid #86EFAC}
-.status-badge.trial{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
-.status-badge.expired{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
-.status-badge.blocked{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
-.status-badge.archived{background:#F1F5F9;color:var(--slate);border:1px solid var(--border)}
-.days-pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;margin-top:3px;display:inline-block}
-.days-pill.ok{background:#DCFCE7;color:#166534}
-.days-pill.warning{background:#FEF3C7;color:#92400E}
-.days-pill.danger{background:#FEE2E2;color:#DC2626}
-
-/* ── ACTION BUTTONS ─────────────────────────────────────── */
-.action-wrap{display:flex;gap:4px;flex-wrap:wrap}
-.act-btn{padding:5px 9px;border-radius:7px;font-size:11px;font-weight:800;font-family:var(--font);transition:all .15s;white-space:nowrap;border:1px solid transparent}
-.act-btn.activate{background:#DCFCE7;color:#166534;border-color:#86EFAC}
-.act-btn.block{background:#FEE2E2;color:#DC2626;border-color:#FECACA}
-.act-btn.trial-r{background:#FEF3C7;color:#92400E;border-color:#FDE68A}
-.act-btn.wa{background:#D1FAE5;color:#065F46;border-color:#6EE7B7}
-.act-btn.copy{background:#F1F5F9;color:var(--slate);border-color:var(--border)}
-.act-btn.info{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
-.act-btn.del{background:#FEE2E2;color:#DC2626;border-color:#FECACA}
-.act-btn:hover{opacity:.8}
-
-/* ── FINANCE TAB ─────────────────────────────────────────── */
-.fin-row{display:grid;grid-template-columns:2fr 0.8fr 0.8fr 1fr 1fr 1.2fr;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;font-size:13px;transition:background .15s}
-.fin-row:last-child{border-bottom:none}
-.fin-row:hover{background:#F8FAFC}
-.fin-header{display:grid;grid-template-columns:2fr 0.8fr 0.8fr 1fr 1fr 1.2fr;padding:12px 20px;border-bottom:2px solid var(--border);font-size:11px;font-weight:800;color:var(--slate);letter-spacing:.7px;text-transform:uppercase;background:#F8FAFC}
-.paid-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#DCFCE7;color:#166534;border:1px solid #86EFAC}
-.unpaid-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
-.mark-paid-btn{padding:6px 12px;background:var(--navy);color:#fff;border-radius:8px;font-size:12px;font-weight:800;transition:opacity .15s}
-.mark-paid-btn:hover{opacity:.85}
-.fin-note-inp{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);color:var(--navy);outline:none;width:100%;transition:border-color .2s}
-.fin-note-inp:focus{border-color:var(--blue)}
-
-/* ── ALERTS TAB ─────────────────────────────────────────── */
-.alert-section-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
-.alert-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 1px 6px rgba(26,58,92,.05)}
-.alert-card.urgent{border-color:#FECACA;background:#FFF5F5}
-.alert-card.warning{border-color:#FDE68A;background:#FFFBEB}
-.alert-name{font-size:14px;font-weight:800;color:var(--navy)}
-.alert-sub{font-size:12px;color:var(--slate);margin-top:2px}
-.alert-days{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
-.alert-days.urgent{background:#FEE2E2;color:#DC2626}
-.alert-days.warning{background:#FEF3C7;color:#92400E}
-.wa-send-btn{padding:8px 16px;background:#25D366;color:#fff;border-radius:10px;font-size:12px;font-weight:800;white-space:nowrap;transition:opacity .15s}
-.wa-send-btn:hover{opacity:.85}
-
-/* ── SUPPLIERS ───────────────────────────────────────────── */
-.sup-row{display:grid;grid-template-columns:1fr 80px 100px 90px 90px 200px;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;color:var(--navy);transition:background .15s}
-.sup-row:hover{background:#F8FAFC}
-.sup-name{font-weight:800;color:var(--navy);font-size:14px}
-.sup-sub{font-size:11px;color:var(--slate);margin-top:2px}
-.sup-badge-v{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#DCFCE7;color:#166534;border:1px solid #86EFAC}
-.sup-badge-p{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
-.sup-badge-s{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
-.sup-act-btn{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);border:1px solid var(--border);background:#F1F5F9;color:var(--navy);transition:opacity .15s}
-.sup-act-btn:hover{opacity:.8}
-
-/* ── MODAL ───────────────────────────────────────────────── */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(15,39,68,.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--card);border:1.5px solid var(--border);border-radius:24px;width:min(92vw,520px);max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(26,58,92,.2)}
-.modal-hd{background:linear-gradient(135deg,var(--navy),var(--blue));padding:22px 24px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between}
-.modal-hd-title{font-size:16px;font-weight:900;color:#fff}
-.modal-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
-.modal-close:hover{background:rgba(255,255,255,.25)}
-.modal-bd{padding:24px;display:flex;flex-direction:column;gap:14px}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.info-row:last-child{border-bottom:none}
-.info-lbl{font-size:12px;color:var(--slate);font-weight:600}
-.info-val{font-size:13px;font-weight:700;color:var(--navy)}
-.modal-textarea{width:100%;padding:12px 14px;background:#F8FAFC;border:1.5px solid var(--border);border-radius:12px;color:var(--navy);font-size:13px;font-family:var(--font);resize:vertical;min-height:90px;outline:0;transition:border-color .2s;direction:rtl}
-.modal-textarea:focus{border-color:var(--blue)}
-.modal-save-btn{padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:12px;font-size:14px;font-weight:900;transition:transform .13s}
-.modal-save-btn:active{transform:scale(.97)}
-.modal-section-title{font-size:12px;font-weight:800;color:var(--slate);letter-spacing:.8px;text-transform:uppercase}
-
-/* ── LOADING ─────────────────────────────────────────────── */
-.loading-row{padding:60px 20px;text-align:center;color:var(--slate);font-size:14px;font-weight:600}
-.loading-spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── TOAST ───────────────────────────────────────────────── */
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(26,58,92,.95);color:#fff;padding:12px 24px;border-radius:20px;font-size:13px;font-weight:700;font-family:var(--font);opacity:0;transition:opacity .25s,transform .25s;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(26,58,92,.3)}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ── RESPONSIVE ──────────────────────────────────────────── */
-@media(max-width:1100px){
-  .stats-row{grid-template-columns:repeat(3,1fr)}
-  .bldg-row,.tbl-header{grid-template-columns:2fr 1fr 0.9fr 1.4fr}
-  .bldg-row>:nth-child(3),.bldg-row>:nth-child(4),.tbl-header>:nth-child(3),.tbl-header>:nth-child(4){display:none}
-}
-@media(max-width:700px){
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .tab-content,.main-tabs{padding-left:16px;padding-right:16px}
-  .dash-header{padding:14px 16px}
-}
-</style>
-</head>
-<body>
-
-<!-- ══ מסך כניסה ══════════════════════════════════════════ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <span class="login-logo-icon">🏢</span>
-      <div class="login-logo-name">שכנות <span style="color:var(--gold)">טובה</span></div>
-      <div class="login-logo-sub">לוח בקרה · ניהול</div>
-    </div>
-    <label class="login-label">סיסמת מנהל</label>
-    <input id="pw-input" class="login-input" type="password" placeholder="· · · · · ·" onkeydown='"Enter"===event.key&&doLogin()'>
-    <button class="login-btn" onclick="doLogin()">כניסה ←</button>
-    <div id="login-err" class="login-err"></div>
-  </div>
-</div>
-
-<!-- ══ לוח בקרה ════════════════════════════════════════════ -->
-<div id="dashboard">
-
-  <!-- כותרת -->
-  <header class="dash-header">
-    <div class="dash-brand">
-      <span style="font-size:26px">🏢</span>
-      <div>
-        <div class="dash-brand-name">שכנות טובה · לוח בקרה</div>
-        <div class="dash-brand-sub">ממשק ניהול</div>
-      </div>
-    </div>
-    <button class="dash-logout-btn" onclick="doLogout()">יציאה 🔒</button>
-  </header>
-
-  <!-- טאבים -->
-  <div class="main-tabs">
-    <button class="tab-btn active" onclick="switchTab('buildings')">🏗️ בניינים</button>
-    <button class="tab-btn" onclick="switchTab('finance')">💰 כספים</button>
-    <button class="tab-btn" onclick="switchTab('alerts')">🔔 התראות</button>
-    <button class="tab-btn" onclick="switchTab('suppliers')">🔨 ספקים</button>
-    <button class="tab-btn" onclick="switchTab('settings')">⚙️ הגדרות</button>
-  </div>
-
-  <!-- ══ טאב: בניינים ════════════════════════════════════ -->
-  <div id="tab-buildings" class="tab-content active">
-
-    <!-- סטטיסטיקות -->
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon">🏗️</div><div class="stat-val" id="stat-total">—</div><div class="stat-lbl">בניינים רשומים</div></div>
-      <div class="stat-card active"><div class="stat-icon">✅</div><div class="stat-val" id="stat-active">—</div><div class="stat-lbl">פעילים</div></div>
-      <div class="stat-card trial"><div class="stat-icon">⏳</div><div class="stat-val" id="stat-trial">—</div><div class="stat-lbl">בניסיון</div></div>
-      <div class="stat-card blocked"><div class="stat-icon">🔒</div><div class="stat-val" id="stat-blocked">—</div><div class="stat-lbl">חסומים</div></div>
-      <div class="stat-card archived"><div class="stat-icon">📦</div><div class="stat-val" id="stat-archived">—</div><div class="stat-lbl">ארכיון</div></div>
-      <div class="stat-card revenue"><div class="stat-icon">💰</div><div class="stat-val" id="stat-revenue">—</div><div class="stat-lbl">הכנסה חודשית</div></div>
-    </div>
-
-    <!-- סרגל כלים -->
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <button class="filter-btn active" id="filter-all" onclick='setFilter("all")'>הכל</button>
-        <button class="filter-btn" id="filter-active" onclick='setFilter("active")'>פעילים</button>
-        <button class="filter-btn" id="filter-trial" onclick='setFilter("trial")'>ניסיון</button>
-        <button class="filter-btn" id="filter-blocked" onclick='setFilter("blocked")'>חסומים</button>
-        <button class="filter-btn" id="filter-archived" onclick='setFilter("archived")'>📦 ארכיון</button>
-      </div>
-      <div class="toolbar-right">
-        <input id="search-input" class="search-input" placeholder="🔍 חיפוש בניין / עיר..." oninput="renderTable()">
-        <button class="icon-btn light" onclick="loadBuildings()">🔄 רענן</button>
-        <button class="icon-btn navy" onclick="exportCSV()">📥 ייצוא CSV</button>
-      </div>
-    </div>
-
-    <!-- טבלה -->
-    <div class="table-card">
-      <div class="tbl-header">
-        <div class="sort-btn" onclick='sortBy("name")'>בניין ↕</div>
-        <div class="sort-btn" onclick='sortBy("date")'>תאריך ↕</div>
-        <div>דירות</div>
-        <div>דיירים</div>
-        <div class="sort-btn" onclick='sortBy("status")'>סטטוס ↕</div>
-        <div class="sort-btn" onclick='sortBy("days")'>ימים ↕</div>
-        <div>פעולות</div>
-      </div>
-      <div id="tbl-body">
-        <div class="loading-row"><div class="loading-spinner"></div><br>טוען נתונים...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ טאב: כספים ══════════════════════════════════════ -->
-  <div id="tab-finance" class="tab-content">
-    <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-      <div class="stat-card active"><div class="stat-icon">✅</div><div class="stat-val" id="fin-paid-count">—</div><div class="stat-lbl">שילמו החודש</div></div>
-      <div class="stat-card blocked"><div class="stat-icon">⏳</div><div class="stat-val" id="fin-unpaid-count">—</div><div class="stat-lbl">טרם שילמו</div></div>
-      <div class="stat-card revenue"><div class="stat-icon">💰</div><div class="stat-val" id="fin-total-rev">—</div><div class="stat-lbl">הכנסה צפויה</div></div>
-    </div>
-    <div class="table-card">
-      <div class="fin-header">
-        <div>בניין</div>
-        <div>דיירים</div>
-        <div>לתשלום</div>
-        <div>שולם עד</div>
-        <div>סטטוס</div>
-        <div>פעולות</div>
-      </div>
-      <div id="fin-body">
-        <div class="loading-row">טוען...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ טאב: התראות ═════════════════════════════════════ -->
-  <div id="tab-alerts" class="tab-content">
-    <div style="margin-bottom:24px">
-      <div class="alert-section-title">🚨 דחוף — פג עד יומיים</div>
-      <div id="alerts-urgent"><div class="loading-row">טוען...</div></div>
-    </div>
-    <div style="margin-bottom:24px">
-      <div class="alert-section-title">⚠️ השבוע — פג עד 7 ימים</div>
-      <div id="alerts-week"><div class="loading-row">טוען...</div></div>
-    </div>
-    <div>
-      <div class="alert-section-title">🔄 חידושי מנוי — לקוחות פעילים</div>
-      <div id="alerts-renewal"><div class="loading-row">טוען...</div></div>
-    </div>
-  </div>
-
-  <!-- ══ טאב: ספקים ══════════════════════════════════════ -->
-  <div id="tab-suppliers" class="tab-content">
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <button class="filter-btn active" id="sf-all" onclick='filterSuppliers("all")'>הכל</button>
-        <button class="filter-btn" id="sf-pending" onclick='filterSuppliers("pending")'>⏳ ממתינים</button>
-        <button class="filter-btn" id="sf-verified" onclick='filterSuppliers("verified")'>✅ מאומתים</button>
-        <button class="filter-btn" id="sf-suspended" onclick='filterSuppliers("suspended")'>⏸ מושהים</button>
-      </div>
-      <div class="toolbar-right">
-        <button class="icon-btn light" onclick="loadAllSuppliers()">🔄 רענן</button>
-      </div>
-    </div>
-    <div class="table-card">
-      <div id="suppliers-table-body">
-        <div class="loading-row">טוען ספקים...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ טאב: הגדרות ═════════════════════════════════════ -->
-  <div id="tab-settings" class="tab-content">
-    <div class="settings-panel">
-      <div class="settings-panel-title">⚙️ הגדרות מערכת</div>
-      <div class="settings-row">
-        <span class="settings-label">📱 טלפון וואטסאפ</span>
-        <input id="set-wa-phone" class="settings-input" type="tel" placeholder="972501234567">
-        <button class="settings-save-btn" onclick="saveSetting('wa_phone','set-wa-phone')">💾 שמור</button>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">🟢 לינק פייבוקס</span>
-        <input id="set-paybox" class="settings-input" type="url" placeholder="https://links.payboxapp.com/...">
-        <button class="settings-save-btn" onclick="saveSetting('paybox_link','set-paybox')">💾 שמור</button>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">🏢 שם המערכת</span>
-        <input id="set-admin-name" class="settings-input" type="text" placeholder="שכנות טובה">
-        <button class="settings-save-btn" onclick="saveSetting('admin_name','set-admin-name')">💾 שמור</button>
-      </div>
-    </div>
-    <div class="settings-panel" style="margin-top:16px">
-      <div class="settings-panel-title">🔐 שינוי סיסמת כניסה</div>
-      <div class="settings-row"><span class="settings-label">סיסמה נוכחית</span><input id="set-pw-current" class="settings-input" type="password" placeholder="הכנס סיסמה נוכחית"></div>
-      <div class="settings-row"><span class="settings-label">סיסמה חדשה</span><input id="set-pw-new" class="settings-input" type="password" placeholder="הכנס סיסמה חדשה"></div>
-      <div class="settings-row"><span class="settings-label">אישור סיסמה</span><input id="set-pw-confirm" class="settings-input" type="password" placeholder="הכנס שוב לאישור"><button class="settings-save-btn" onclick="changePassword()">💾 שמור</button></div>
-    </div>
-  </div>
-
-</div><!-- /dashboard -->
-
-<!-- ══ מודל פרטי בניין ═════════════════════════════════════ -->
-<div id="modal-details" class="modal-overlay" onclick="event.target===this&&closeModal()">
-  <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-hd-title" id="modal-title">פרטי בניין</div>
-      <div class="modal-close" onclick="closeModal()">✕</div>
-    </div>
-    <div class="modal-bd">
-      <div class="modal-section-title">פרטי קשר</div>
-      <div id="modal-info-rows"></div>
-      <div class="modal-section-title" style="margin-top:4px">📝 הערה פנימית</div>
-      <textarea id="modal-note" class="modal-textarea" placeholder="לדוגמה: שילמה ב-Bit, חייבת מפברואר..."></textarea>
-      <button class="modal-save-btn" onclick="saveNote()">💾 שמור הערה</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ מודל ספק מלא ════════════════════════════════════════ -->
-<div id="sup-modal" style="display:none;position:fixed;inset:0;background:rgba(15,39,68,.6);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;max-width:580px;width:100%;margin:0 auto;box-shadow:0 24px 60px rgba(26,58,92,.2);overflow:hidden">
-    <div style="background:linear-gradient(135deg,var(--navy),var(--blue));padding:18px 22px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:15px;font-weight:900;color:#fff">📋 הסכם ספק — פרטים מלאים</span>
-      <button onclick="closeSupModal()" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;cursor:pointer">✕</button>
-    </div>
-    <div id="sup-modal-body" style="padding:20px;max-height:70vh;overflow-y:auto"></div>
-    <div style="padding:14px 20px;display:flex;gap:10px;border-top:1px solid var(--border)">
-      <button id="sup-modal-verify-btn" style="display:none;flex:1;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer">✅ אמת ספק</button>
-      <button onclick="closeSupModal()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--navy);font-size:14px;font-weight:800;font-family:inherit;cursor:pointer">סגור</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-/* ══ קבועים ════════════════════════════════════════════════ */
-var SUPABASE_URL  = 'https://fsvyryhtnogzyycijukp.supabase.co';
-var SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzdnlyeWh0bm9nenl5Y2lqdWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzA3MjQsImV4cCI6MjA4ODc0NjcyNH0.l2JD0pJ6CgCveN1aZUoWxN16eRoWl19ZWNx8GVXJZqk';
-var ADMIN_PASSWORD = 'changeme';
-var FLAT_PRICE = 11; // ₪ לדייר לחודש כולל מעמ
-var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-var _allBuildings = [], _residentCounts = {}, _notes = {};
-var _sortField = 'date', _sortAsc = false, _currentFilter = 'all';
-var _modalSlug = null, _allSuppliers = [], _supplierFilter = 'all';
-var _adminSettings = { wa_phone:'', paybox_link:'', admin_name:'שכנות טובה' };
-
-/* ══ כניסה / יציאה ════════════════════════════════════════ */
-function doLogin(){
-  var pw = document.getElementById('pw-input').value.trim();
-  var err = document.getElementById('login-err');
-  if(!pw){ err.textContent='❌ הכנס סיסמה'; return; }
-  err.textContent='⏳ מתחבר...';
-  sbClient.from('admin_settings').select('value').eq('key','admin_password').then(function(res){
-    var stored = (res.data&&res.data.length) ? res.data[0].value : ADMIN_PASSWORD;
-    if(pw !== stored){ err.textContent='❌ סיסמה שגויה'; document.getElementById('pw-input').value=''; return; }
-    err.textContent='';
-    try{ sessionStorage.setItem('sn_admin_auth','1'); }catch(e){}
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    loadAdminSettings(); loadNotes(); loadBuildings();
-  }).catch(function(){
-    if(pw !== ADMIN_PASSWORD){ err.textContent='❌ סיסמה שגויה'; document.getElementById('pw-input').value=''; return; }
-    err.textContent='';
-    try{ sessionStorage.setItem('sn_admin_auth','1'); }catch(e){}
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    loadAdminSettings(); loadNotes(); loadBuildings();
-  });
-}
-
-function doLogout(){
-  try{ sessionStorage.removeItem('sn_admin_auth'); }catch(e){}
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('pw-input').value='';
-}
-
-function changePassword(){
-  var curr=(document.getElementById('set-pw-current').value||'').trim();
-  var p1=(document.getElementById('set-pw-new').value||'').trim();
-  var p2=(document.getElementById('set-pw-confirm').value||'').trim();
-  if(!curr){ showToast('⚠️ הכנס סיסמה נוכחית'); return; }
-  if(!p1){ showToast('⚠️ הכנס סיסמה חדשה'); return; }
-  if(p1.length<6){ showToast('⚠️ סיסמה חייבת להיות לפחות 6 תווים'); return; }
-  if(p1!==p2){ showToast('❌ הסיסמאות אינן תואמות'); return; }
-  sbClient.from('admin_settings').select('value').eq('key','admin_password').then(function(res){
-    var stored=(res.data&&res.data.length)?res.data[0].value:ADMIN_PASSWORD;
-    if(curr!==stored){ showToast('❌ הסיסמה הנוכחית שגויה'); document.getElementById('set-pw-current').value=''; return; }
-    sbClient.from('admin_settings').upsert({key:'admin_password',value:p1}).then(function(r){
-      if(r.error){ showToast('❌ שגיאה בשמירה'); return; }
-      document.getElementById('set-pw-current').value='';
-      document.getElementById('set-pw-new').value='';
-      document.getElementById('set-pw-confirm').value='';
-      showToast('✅ סיסמה עודכנה בהצלחה');
-    });
-  });
-}
-
-/* ══ הגדרות מערכת ══════════════════════════════════════════ */
-function loadAdminSettings(){
-  sbClient.from('admin_settings').select('*').then(function(res){
-    if(res.error || !res.data) return;
-    res.data.forEach(function(row){ _adminSettings[row.key] = row.value; });
-    var wp = document.getElementById('set-wa-phone');
-    var pb = document.getElementById('set-paybox');
-    var an = document.getElementById('set-admin-name');
-    if(wp) wp.value = _adminSettings.wa_phone || '';
-    if(pb) pb.value = _adminSettings.paybox_link || '';
-    if(an) an.value = _adminSettings.admin_name || 'שכנות טובה';
-  });
-}
-
-function saveSetting(key, inputId){
-  var val = (document.getElementById(inputId).value || '').trim();
-  sbClient.from('admin_settings').upsert({ key: key, value: val }).then(function(res){
-    if(res.error){ showToast('❌ שגיאה בשמירה'); return; }
-    _adminSettings[key] = val;
-    showToast('✅ נשמר בהצלחה');
-  });
-}
-
-/* ══ הערות ════════════════════════════════════════════════ */
-function loadNotes(){
-  try{ var e=localStorage.getItem('sn_admin_notes'); _notes=e?JSON.parse(e):{}; }catch(e){ _notes={}; }
-}
-function saveNoteLocal(slug, text){ _notes[slug]=text; try{ localStorage.setItem('sn_admin_notes',JSON.stringify(_notes)); }catch(e){} }
-
-/* ══ טאבים ════════════════════════════════════════════════ */
-function switchTab(name){
-  document.querySelectorAll('.tab-btn').forEach(function(b,i){
-    var tabs=['buildings','finance','alerts','suppliers','settings'];
-    b.classList.toggle('active', tabs[i]===name);
-  });
-  document.querySelectorAll('.tab-content').forEach(function(c){
-    c.classList.remove('active');
-  });
-  var el = document.getElementById('tab-'+name);
-  if(el) el.classList.add('active');
-  if(name==='finance') renderFinanceTab();
-  if(name==='alerts')  renderAlertsTab();
-  if(name==='suppliers') loadAllSuppliers();
-}
-
-/* ══ טעינת בניינים ════════════════════════════════════════ */
-function loadBuildings(){
-  document.getElementById('tbl-body').innerHTML = '<div class="loading-row"><div class="loading-spinner"></div><br>טוען נתונים...</div>';
-  sbClient.from('buildings').select('*').order('created_at',{ascending:false}).then(function(res){
-    if(res.error){ showTblErr('שגיאה: '+res.error.message); return; }
-    _allBuildings = res.data||[];
-    loadResidentCounts(function(){ updateStats(); renderTable(); });
-  }).catch(function(){ showTblErr('שגיאת חיבור'); });
-}
-
-function loadResidentCounts(cb){
-  if(!_allBuildings.length){ cb(); return; }
-  sbClient.from('residents').select('building_slug').then(function(res){
-    _residentCounts = {};
-    if(!res.error && res.data) res.data.forEach(function(r){ var s=r.building_slug||''; _residentCounts[s]=(_residentCounts[s]||0)+1; });
-    cb();
-  }).catch(function(){ cb(); });
-}
-
-/* ══ סטטוס ═════════════════════════════════════════════════ */
-function getBuildingStatus(b){
-  var s = (b.paid_status||'trial').toLowerCase();
-  if(s==='active') return 'active';
-  if(s==='blocked') return 'blocked';
-  if(s==='archived') return 'archived';
-  if(b.created_at && Math.floor((Date.now()-new Date(b.created_at))/864e5)>=30) return 'expired';
-  return 'trial';
-}
-function getDaysLeft(b){ return b.created_at ? 30-Math.floor((Date.now()-new Date(b.created_at))/864e5) : null; }
-
-/* ══ סטטיסטיקות ════════════════════════════════════════════ */
-function updateStats(){
-  var counts={total:0,active:0,trial:0,blocked:0,archived:0}, rev=0;
-  _allBuildings.forEach(function(b){
-    var st=getBuildingStatus(b);
-    if(st!=='archived'){ counts.total++; if(st==='active'){ counts.active++; rev+=(_residentCounts[b.unique_slug]||0)*FLAT_PRICE; } else if(st==='trial') counts.trial++; else counts.blocked++; } else counts.archived++;
-  });
-  document.getElementById('stat-total').textContent   = counts.total;
-  document.getElementById('stat-active').textContent  = counts.active;
-  document.getElementById('stat-trial').textContent   = counts.trial;
-  document.getElementById('stat-blocked').textContent = counts.blocked;
-  document.getElementById('stat-archived').textContent= counts.archived;
-  document.getElementById('stat-revenue').textContent = '₪'+num(rev);
-}
-
-/* ══ פילטר ═════════════════════════════════════════════════ */
-function setFilter(f){
-  _currentFilter=f;
-  ['all','active','trial','blocked','archived'].forEach(function(t){
-    var b=document.getElementById('filter-'+t);
-    if(b) b.classList.toggle('active',t===f);
-  });
-  renderTable();
-}
-
-function sortBy(f){ _sortField===f?_sortAsc=!_sortAsc:(_sortField=f,_sortAsc=f==='name'); renderTable(); }
-
-function getFilteredSorted(){
-  var q=(document.getElementById('search-input').value||'').trim().toLowerCase();
-  var list=_allBuildings.filter(function(b){
-    var st=getBuildingStatus(b);
-    var match = _currentFilter==='all'?st!=='archived':_currentFilter==='blocked'?(st==='blocked'||st==='expired'):_currentFilter==='archived'?st==='archived':st===_currentFilter;
-    if(!match) return false;
-    return !q||((b.building_name||'').toLowerCase().includes(q)||(b.city||'').toLowerCase().includes(q)||(b.contact_phone||'').includes(q));
-  });
-  list.sort(function(a,b){
-    if(_sortField==='name'){ var na=a.building_name||'',nb=b.building_name||''; return _sortAsc?na.localeCompare(nb,'he'):nb.localeCompare(na,'he'); }
-    if(_sortField==='date'){ var da=new Date(a.created_at||0),db=new Date(b.created_at||0); return _sortAsc?da-db:db-da; }
-    if(_sortField==='status'){ var m={active:0,trial:1,expired:2,blocked:3}; return _sortAsc?(m[getBuildingStatus(a)]||9)-(m[getBuildingStatus(b)]||9):(m[getBuildingStatus(b)]||9)-(m[getBuildingStatus(a)]||9); }
-    if(_sortField==='days'){ var la=getDaysLeft(a)||0,lb=getDaysLeft(b)||0; return _sortAsc?la-lb:lb-la; }
-    return 0;
-  });
-  return list;
-}
-
-/* ══ רינדור טבלה ═══════════════════════════════════════════ */
-function renderTable(){
-  var list=getFilteredSorted();
-  document.getElementById('tbl-body').innerHTML = list.length ? list.map(renderRow).join('') : '<div class="loading-row">אין בניינים בקטגוריה זו</div>';
-}
-
-function renderRow(b){
-  var st=getBuildingStatus(b), dl=getDaysLeft(b), slug=b.unique_slug||'';
-  var residents=_residentCounts[slug]||0, note=_notes[slug]||'';
-  var dateStr=b.created_at?new Date(b.created_at).toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
-  var badges={active:'<span class="status-badge active">✅ פעיל</span>',trial:'<span class="status-badge trial">⏳ ניסיון</span>',expired:'<span class="status-badge expired">⚠️ פג</span>',blocked:'<span class="status-badge blocked">🔒 חסום</span>',archived:'<span class="status-badge archived">📦 ארכיון</span>'};
-  var daysPill='';
-  if(st==='trial'&&dl!==null) daysPill='<div class="days-pill '+(dl>10?'ok':dl>3?'warning':'danger')+'">נותרו '+Math.max(0,dl)+' יום</div>';
-  else if(st==='expired') daysPill='<div class="days-pill danger">פג לפני '+Math.abs(dl||0)+' יום</div>';
-  else if(st==='active') daysPill='<div class="days-pill ok">∞ פעיל</div>';
-  else if(st==='blocked') daysPill='<div class="days-pill danger">חסום</div>';
-
-  var acts='<div class="action-wrap">';
-  if(st==='archived'){
-    acts+='<button class="act-btn activate" onclick="setStatus(\''+slug+'\',\'trial\')">♻️ שחזר</button>';
-    acts+='<button class="act-btn del" onclick="deleteBuilding(\''+slug+'\')">🗑️ מחק</button>';
-  } else {
-    if(st!=='active') acts+='<button class="act-btn activate" onclick="setStatus(\''+slug+'\',\'active\')">✅ הפעל</button>';
-    if(st!=='trial')  acts+='<button class="act-btn trial-r"  onclick="setStatus(\''+slug+'\',\'trial\')">⏳ ניסיון</button>';
-    if(st!=='blocked')acts+='<button class="act-btn block"    onclick="setStatus(\''+slug+'\',\'blocked\')">🔒 חסום</button>';
-    acts+='<button class="act-btn wa"   onclick="openWA(\''+slug+'\')">💬 וואטסאפ</button>';
-    acts+='<button class="act-btn copy" onclick="copyLink(\''+slug+'\')">🔗 לינק</button>';
-    acts+='<button class="act-btn info" onclick="openDetails(\''+slug+'\')">📋 פרטים</button>';
-    acts+='<button class="act-btn del"  onclick="archiveBuilding(\''+slug+'\')">📦 ארכב</button>';
+  // סרגל סינון
+  var filterBar = document.getElementById('prof-filter-bar');
+  if(filterBar){
+    filterBar.innerHTML = PROF_CATS.map(function(c){
+      var active = c===_profFilterCat;
+      return '<button onclick="setProfFilter(\''+c+'\')" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:800;font-family:var(--font);cursor:pointer;background:'+(active?'var(--navy)':'#F1F5F9')+';color:'+(active?'#fff':'var(--slate)')+';">'+c+'</button>';
+    }).join('');
   }
-  acts+='</div>';
 
-  var rCol=residents>0?'color:#16A34A;font-weight:800':'color:var(--slate)';
-  return '<div class="bldg-row">'+
-    '<div><div class="bldg-name-main">'+escH(b.building_name||'—')+'</div>'+(b.city?'<div class="bldg-sub">'+escH(b.city)+(b.address?' · '+escH(b.address):'')+' </div>':'')+( note?'<div class="note-preview">📝 '+escH(note)+'</div>':'')+'</div>'+
-    '<div class="bldg-date">'+dateStr+'</div>'+
-    '<div style="font-size:13px;font-weight:700;color:var(--slate);">'+(b.units_count||'—')+'</div>'+
-    '<div style="font-size:13px;'+rCol+'">'+residents+'</div>'+
-    '<div>'+(badges[st]||badges.trial)+'</div>'+
-    '<div>'+daysPill+'</div>'+
-    acts+
-  '</div>';
-}
-
-/* ══ פעולות על בניין ═══════════════════════════════════════ */
-function setStatus(slug,status){
-  var lbls={active:'פעיל ✅',trial:'ניסיון ⏳',blocked:'חסום 🔒'};
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  if(!confirm('לשנות סטטוס של "'+( b&&b.building_name||slug)+'" ל'+lbls[status]+'?')) return;
-  sbClient.from('buildings').update({paid_status:status}).eq('unique_slug',slug).then(function(res){
-    if(res.error){ showToast('❌ '+res.error.message); return; }
-    if(b) b.paid_status=status;
-    updateStats(); renderTable();
-    showToast('✅ סטטוס עודכן ל'+lbls[status]);
+  // רשימה
+  var list = document.getElementById('prof-list');
+  if(!list) return;
+  var profs = DB.professionals || [];
+  if(_profFilterCat !== 'הכל'){
+    profs = profs.filter(function(p){ return p.cat === _profFilterCat; });
+  }
+  if(_profSearchTerm){ profs = profs.filter(function(p){ return [p.name,p.cat,p.notes,p.area].join(' ').toLowerCase().indexOf(_profSearchTerm)!==-1; }); }
+  if(!profs.length){
+    list.innerHTML = '<div class="empty-state" style="margin-top:40px;">אין בעלי מקצוע עדיין 🔨<br><span style="font-size:12px;color:var(--slate);">לחץ על הכפתור למטה להוספה</span></div>';
+    return;
+  }
+  // מיון: מאומתים ראשונים, אחר כך לפי דירוג
+  profs = profs.slice().sort(function(a,b){
+    if(a.is_verified && !b.is_verified) return -1;
+    if(!a.is_verified && b.is_verified) return 1;
+    return (b.rating||0) - (a.rating||0);
   });
-}
-
-function archiveBuilding(slug){
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  if(!confirm('להעביר את "'+(b&&b.building_name||slug)+'" לארכיון?')) return;
-  sbClient.from('buildings').update({paid_status:'archived'}).eq('unique_slug',slug).then(function(res){
-    if(res.error){ showToast('❌ '+res.error.message); return; }
-    if(b) b.paid_status='archived';
-    updateStats(); renderTable();
-    showToast('📦 הועבר לארכיון');
-  });
-}
-
-function deleteBuilding(slug){
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  if(!confirm('⚠️ מחיקה לצמיתות של "'+(b&&b.building_name||slug)+'"?')) return;
-  if(!confirm('אישור סופי — למחוק לצמיתות?')) return;
-  var tables=['residents','faults','notices','posts','payments','mediations','vaad_questions','polls'];
-  var del=function(i){
-    if(i>=tables.length){ sbClient.from('buildings').delete().eq('unique_slug',slug).then(function(r){ if(r.error){ showToast('❌ שגיאה: '+r.error.message); return; } _allBuildings=_allBuildings.filter(function(x){return x.unique_slug!==slug;}); updateStats(); renderTable(); showToast('🗑️ נמחק לצמיתות'); }); return; }
-    sbClient.from(tables[i]).delete().eq('building_slug',slug).then(function(){ del(i+1); });
-  };
-  del(0);
-}
-
-function openWA(slug){
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  if(!b) return;
-  var phone=(b.contact_phone||b.admin_phone||'').replace(/\D/g,'').replace(/^0/,'972');
-  if(!phone){ showToast('⚠️ אין מספר טלפון'); return; }
-  var st=getBuildingStatus(b), dl=getDaysLeft(b), name=b.building_name||slug;
-  var msg=st==='active'?'שלום! כאן שכנות טובה. רצינו לבדוק שהכל תקין עם האפליקציה ב'+name+' 😊':
-    st==='trial'?'שלום! כאן שכנות טובה. נותרו לכם '+Math.max(0,dl||0)+' ימי ניסיון ב'+name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'  😊':
-    'שלום! כאן שכנות טובה. נשמח לחדש את הגישה ל'+name+'. לתשלום: '+(_adminSettings.paybox_link||'')+' לפרטים: ssmartneighbor@gmail.com 😊';
-  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
-}
-
-function copyLink(slug){
-  var url='https://smartneighborapp.github.io/my-building/app.html?b='+slug;
-  try{ navigator.clipboard.writeText(url).then(function(){ showToast('📋 קישור הועתק ✅'); }); }catch(e){ showToast(url); }
-}
-
-function openDetails(slug){
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  if(!b) return;
-  _modalSlug=slug;
-  document.getElementById('modal-title').textContent=b.building_name||slug;
-  document.getElementById('modal-note').value=_notes[slug]||'';
-  var rows=[['שם הבניין',b.building_name||'—'],['כתובת',(b.address||'—')+(b.city?' · '+b.city:'')],['דירות',b.units_count||'—'],['דיירים רשומים',(_residentCounts[slug]||0)+' דיירים'],['טלפון ועד',b.contact_phone||b.admin_phone||'—'],['אימייל',b.email||b.admin_email||'—'],['קוד גישה',b.access_code||'—'],['סלאג',b.unique_slug||'—'],['תאריך רישום',b.created_at?new Date(b.created_at).toLocaleDateString('he-IL'):'—'],['מסלול',b.plan_type||'—'],['סטטוס',getBuildingStatus(b)],['שולם עד',b.paid_until||'לא הוגדר']];
-  document.getElementById('modal-info-rows').innerHTML=rows.map(function(r){ return '<div class="info-row"><span class="info-lbl">'+escH(r[0])+'</span><span class="info-val">'+escH(String(r[1]))+'</span></div>'; }).join('');
-  document.getElementById('modal-details').classList.add('open');
-}
-
-function closeModal(){ document.getElementById('modal-details').classList.remove('open'); _modalSlug=null; }
-
-function saveNote(){
-  if(!_modalSlug) return;
-  var txt=document.getElementById('modal-note').value.trim();
-  saveNoteLocal(_modalSlug,txt);
-  renderTable(); closeModal(); showToast('📝 הערה נשמרה ✅');
-}
-
-/* ══ טאב כספים ════════════════════════════════════════════ */
-function renderFinanceTab(){
-  var list=_allBuildings.filter(function(b){ return getBuildingStatus(b)!=='archived'; });
-  var paidCount=0, totalRev=0;
-  var html=list.map(function(b){
-    var slug=b.unique_slug||'';
-    var residents=_residentCounts[slug]||0;
-    var monthly=residents*FLAT_PRICE;
-    var paidUntil=b.paid_until||'';
-    var isPaid=paidUntil&&new Date(paidUntil)>new Date();
-    if(isPaid) paidCount++;
-    totalRev+=monthly;
-    var paidUntilDisplay=paidUntil?new Date(paidUntil).toLocaleDateString('he-IL'):'לא שולם';
-    var badge=isPaid?'<span class="paid-badge">✅ שולם</span>':'<span class="unpaid-badge">⏳ טרם שולם</span>';
-    var actions='<div style="display:flex;gap:6px;align-items:center;">';
-    if(!isPaid) actions+='<button class="mark-paid-btn" onclick="markPaid(\''+slug+'\')">✅ סמן כשולם</button>';
-    else        actions+='<button class="mark-paid-btn" style="background:var(--slate);" onclick="markPaid(\''+slug+'\')">🔄 חדש תשלום</button>';
-    actions+='<button class="act-btn wa" onclick="openWA(\''+slug+'\')">💬 וואטסאפ</button></div>';
-    return '<div class="fin-row">'+
-      '<div><div style="font-size:13px;font-weight:800;color:var(--navy);">'+escH(b.building_name||'—')+'</div><div style="font-size:11px;color:var(--slate);">'+(b.city||'')+'</div></div>'+
-      '<div style="font-size:13px;font-weight:700;">'+residents+'</div>'+
-      '<div style="font-size:13px;font-weight:800;color:var(--navy);">₪'+num(monthly)+'</div>'+
-      '<div style="font-size:12px;color:var(--slate);">'+paidUntilDisplay+'</div>'+
-      '<div>'+badge+'</div>'+
-      '<div>'+actions+'</div>'+
-    '</div>';
-  }).join('');
-  document.getElementById('fin-body').innerHTML = html || '<div class="loading-row">אין בניינים</div>';
-  document.getElementById('fin-paid-count').textContent   = paidCount;
-  document.getElementById('fin-unpaid-count').textContent = list.length-paidCount;
-  document.getElementById('fin-total-rev').textContent    = '₪'+num(totalRev);
-}
-
-function markPaid(slug){
-  var b=_allBuildings.find(function(x){return x.unique_slug===slug;});
-  var name=b?b.building_name:slug;
-  if(!confirm('לסמן "'+name+'" כשולם לחודש הנוכחי?')) return;
-  var until=new Date(); until.setMonth(until.getMonth()+1);
-  var untilStr=until.toISOString().slice(0,10);
-  sbClient.from('buildings').update({paid_status:'active',paid_until:untilStr}).eq('unique_slug',slug).then(function(res){
-    if(res.error){ showToast('❌ שגיאה: '+res.error.message); return; }
-    if(b){ b.paid_status='active'; b.paid_until=untilStr; }
-    showToast('✅ '+name+' — שולם עד '+new Date(untilStr).toLocaleDateString('he-IL'));
-    updateStats(); renderFinanceTab();
-  });
-}
-
-/* ══ טאב התראות ════════════════════════════════════════════ */
-function getPaidDaysLeft(b){ if(!b.paid_until) return null; return Math.floor((new Date(b.paid_until)-Date.now())/864e5); }
-
-function renderAlertsTab(){
-  var urgent=[], week=[], renewalExpired=[], renewalWeek=[];
-  _allBuildings.forEach(function(b){
-    var st=getBuildingStatus(b);
-    if(st==='archived') return;
-    if(st!=='active'){
-      var dl=getDaysLeft(b);
-      if(dl===null) return;
-      if(dl<=2) urgent.push({b:b,dl:dl});
-      else if(dl<=7) week.push({b:b,dl:dl});
+  list.innerHTML = profs.map(function(p){
+    var stars = '';
+    for(var i=1;i<=5;i++){
+      stars += '<span onclick="rateProfessional('+p.id+','+i+')" style="cursor:pointer;font-size:18px;color:'+(i<=(p.rating||0)?'#F59E0B':'#CBD5E1')+';">★</span>';
     }
-    if(st==='active' && b.paid_until){
-      var pdl=getPaidDaysLeft(b);
-      if(pdl===null) return;
-      if(pdl<=0) renewalExpired.push({b:b,dl:pdl});
-      else if(pdl<=7) renewalWeek.push({b:b,dl:pdl});
+    var avgRating = p.rating ? p.rating.toFixed(1) : '—';
+    var isAdmin = ADMIN_ON;
+    var phoneClean = (p.phone||'').replace(/^0/,'').replace(/-/g,'');
+    var bldgName   = (DB.building && DB.building.name) ? DB.building.name : 'הבניין';
+    var userName   = (DB.user && DB.user.name)         ? DB.user.name     : 'דייר';
+    var userUnit   = (DB.user && DB.user.unit)         ? DB.user.unit     : '';
+    var waBase     = 'https://wa.me/972' + phoneClean;
+    var msgVaad    = encodeURIComponent('שלום ' + p.name + ', אני וועד הבית מבניין ' + bldgName + '. נשמח לתיאום עבודה בתחום ' + p.cat + '. מתי תוכל להגיע?');
+    var msgPersonal= encodeURIComponent('שלום ' + p.name + ', אני ' + userName + (userUnit ? ' מדירה ' + userUnit : '') + ' בבניין ' + bldgName + '. אשמח לקבל הצעת מחיר פרטית עבור ' + p.cat + '. מתי נוח לך?');
+
+    // ביקורות דיירים
+    var reviews = p.reviews || [];
+    var reviewsHtml = '';
+    if(reviews.length){
+      reviewsHtml = '<div style="margin-top:10px;border-top:1px solid #F1F5F9;padding-top:8px;">';
+      reviews.slice(-2).forEach(function(rv){
+        var rvStars = '';
+        for(var s=1;s<=5;s++) rvStars += '<span style="font-size:12px;color:'+(s<=rv.rating?'#F59E0B':'#CBD5E1')+';">★</span>';
+        reviewsHtml +=
+          '<div style="margin-bottom:6px;">'+
+            '<div style="display:flex;align-items:center;gap:6px;">'+rvStars+
+              '<span style="font-size:11px;color:var(--slate);">דירה '+rv.unit+'</span>'+
+              '<span style="font-size:10px;color:#CBD5E1;margin-right:auto;">'+rv.date+'</span>'+
+            '</div>'+
+            (rv.text ? '<div style="font-size:12px;color:#374151;margin-top:2px;">'+escHtml(rv.text)+'</div>' : '')+
+          '</div>';
+      });
+      reviewsHtml += '</div>';
     }
-  });
 
-  var renderAlert=function(item,cls,isRenewal){
-    var b=item.b, dl=item.dl;
-    var phone=(b.contact_phone||b.admin_phone||'').replace(/\D/g,'').replace(/^0/,'972');
-    var msg;
-    if(isRenewal){
-      msg=dl<=0?
-        'שלום! כאן שכנות טובה 😊 המנוי של '+b.building_name+' פג. לחידוש: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com':
-        'שלום! כאן שכנות טובה 😊 בעוד '+dl+' ימים מסתיים המנוי של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nתודה!';
-    } else {
-      msg=dl<=2?
-        'שלום! תזכורת אחרונה — בעוד '+Math.max(0,dl)+' ימים פג הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nלשאלות: ssmartneighbor@gmail.com 😊':
-        'שלום! כאן שכנות טובה 😊 נותרו לכם '+dl+' ימים בתקופת הניסיון של '+b.building_name+'. לחידוש: '+(_adminSettings.paybox_link||'')+'\nאנחנו כאן לכל שאלה!';
-    }
-    var waBtn=phone?'<a href="https://wa.me/'+phone+'?text='+encodeURIComponent(msg)+'" target="_blank" class="wa-send-btn">💬 שלח וואטסאפ</a>':'<span style="font-size:12px;color:var(--rose);">אין טלפון</span>';
-    var dlLabel=isRenewal?(dl<=0?'פג לפני '+Math.abs(dl)+' יום':dl+' ימים לפקיעה'):Math.max(0,dl)+' ימים';
-    var paidStr=b.paid_until&&isRenewal?' · שולם עד '+new Date(b.paid_until).toLocaleDateString('he-IL'):'';
-    var sub=(b.city||'')+((b.contact_phone||'')?' · '+b.contact_phone:' · ⚠️ אין טלפון')+paidStr;
-    return '<div class="alert-card '+cls+'"><div><div class="alert-name">'+escH(b.building_name||'—')+'</div><div class="alert-sub">'+sub+'</div></div><div style="display:flex;align-items:center;gap:10px;"><span class="alert-days '+cls+'">'+dlLabel+'</span>'+waBtn+'</div></div>';
-  };
-
-  document.getElementById('alerts-urgent').innerHTML = urgent.length ? urgent.map(function(i){return renderAlert(i,'urgent',false);}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים דחופים כרגע</div>';
-  document.getElementById('alerts-week').innerHTML   = week.length   ? week.map(function(i){return renderAlert(i,'warning',false);}).join('') : '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין בניינים שמסיימים ניסיון השבוע</div>';
-  var renewalAll=renewalExpired.map(function(i){return renderAlert(i,'urgent',true);}).join('')+renewalWeek.map(function(i){return renderAlert(i,'warning',true);}).join('');
-  document.getElementById('alerts-renewal').innerHTML = renewalAll || '<div style="padding:20px;text-align:center;color:var(--slate);font-size:13px;">✅ אין חידושי מנוי דחופים כרגע</div>';
-}
-
-/* ══ ספקים ════════════════════════════════════════════════ */
-function loadAllSuppliers(){
-  var el=document.getElementById('suppliers-table-body');
-  if(el) el.innerHTML='<div class="loading-row"><div class="loading-spinner"></div><br>טוען...</div>';
-  sbClient.from('professionals').select('*').order('created_at',{ascending:false}).then(function(res){
-    if(res.error){ if(el) el.innerHTML='<div style="color:var(--rose);padding:20px;">שגיאה בטעינה</div>'; return; }
-    _allSuppliers=res.data||[];
-    renderSuppliersTable();
-  });
-}
-
-function filterSuppliers(f){
-  _supplierFilter=f;
-  ['all','pending','verified','suspended'].forEach(function(t){ var b=document.getElementById('sf-'+t); if(b) b.classList.toggle('active',t===f); });
-  renderSuppliersTable();
-}
-
-function renderSuppliersTable(){
-  var el=document.getElementById('suppliers-table-body');
-  if(!el) return;
-  var list=_allSuppliers;
-  if(_supplierFilter==='pending')   list=list.filter(function(s){return !s.is_verified&&!s.is_suspended;});
-  if(_supplierFilter==='verified')  list=list.filter(function(s){return s.is_verified&&!s.is_suspended;});
-  if(_supplierFilter==='suspended') list=list.filter(function(s){return s.is_suspended;});
-  if(!list.length){ el.innerHTML='<div class="loading-row">אין ספקים להצגה</div>'; return; }
-  el.innerHTML=list.map(function(s){
-    var id=escH(String(s.id));
-    var badge=s.is_suspended?'<span class="sup-badge-s">⏸ מושהה</span>':s.is_verified?'<span class="sup-badge-v">✅ מאומת</span>':'<span class="sup-badge-p">⏳ ממתין</span>';
-    var stars='';for(var i=1;i<=5;i++) stars+='<span style="color:'+(i<=(s.rating||0)?'#F59E0B':'#CBD5E1')+';font-size:13px;">★</span>';
-    return '<div class="sup-row">'+
-      '<div><div class="sup-name">'+escH(s.name||'')+'</div><div class="sup-sub">'+(s.cat||'')+(s.area?' · '+escH(s.area):'')+(!s.agreement_data?'<span style="color:var(--rose);font-size:10px;"> · ⚠️ אין הסכם</span>':'')+'</div></div>'+
-      '<div>'+badge+'</div>'+
-      '<div>'+stars+'<span style="font-size:11px;color:var(--slate);margin-right:4px;">'+(s.rating_count||0)+'</span></div>'+
-      '<div style="font-size:12px;color:var(--slate);">'+(s.phone||'—')+'</div>'+
-      '<div style="font-size:12px;color:var(--slate);">'+(s.created_at?new Date(s.created_at).toLocaleDateString('he-IL'):'—')+'</div>'+
-      '<div style="display:flex;gap:5px;flex-wrap:wrap;">'+
-        '<button class="sup-act-btn" data-id="'+id+'" data-action="view">👁 פרטים</button>'+
-        (!s.is_verified&&!s.is_suspended?'<button class="sup-act-btn" style="color:#166534;" data-id="'+id+'" data-action="verify">✅ אמת</button>':'')+
-        (s.is_suspended?'<button class="sup-act-btn" style="color:#166534;" data-id="'+id+'" data-action="unsuspend">▶ החזר</button>':'<button class="sup-act-btn" style="color:var(--rose);" data-id="'+id+'" data-action="suspend">⏸ השהה</button>')+
-        '<button class="sup-act-btn" style="color:var(--rose);" data-id="'+id+'" data-action="delete">🗑️ מחק</button>'+
+    return '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.07);">'+
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;">'+
+        '<div style="display:flex;align-items:center;gap:10px;">'+
+          '<div style="width:44px;height:44px;border-radius:12px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:22px;">'+
+            (PROF_ICONS[p.cat]||'📋')+
+          '</div>'+
+          '<div>'+
+            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+
+              '<span style="font-size:14px;font-weight:900;color:var(--navy);">'+escHtml(p.name)+'</span>'+
+              (p.is_verified && !p.is_suspended
+                ? '<span style="background:#DCFCE7;color:#16A34A;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #BBF7D0;">✅ מאומת שכנות טובה</span>'
+                : p.is_suspended
+                  ? '<span style="background:#FEE2E2;color:#DC2626;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #FECACA;">⏸ מושהה</span>'
+                  : p.agreement_data
+                    ? '<span style="background:#FEF3C7;color:#D97706;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #FDE68A;">⏳ ממתין לאישור</span>'
+                    : '')+
+              (p.is_network
+                ? '<span style="background:#EFF6FF;color:#2563EB;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #BFDBFE;">🌐 רשת שכנות טובה</span>'
+                : '')+
+            '</div>'+
+            '<div style="font-size:12px;color:var(--slate);margin-top:1px;">'+escHtml(p.cat)+(p.area ? ' · 📍 '+escHtml(p.area) : '')+'</div>'+
+          '</div>'+
+        '</div>'+
+        (isAdmin ? '<button onclick="openProfSheet('+p.id+')" style="padding:5px 10px;background:#F1F5F9;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);color:var(--slate);">✏️ עריכה</button>' : '')+
+        (isAdmin && !p.is_verified ? '<button data-pid="'+escAttr(String(p.id))+'" onclick="verifyProf(this.getAttribute(\'data-pid\'))" style="padding:5px 10px;background:#DCFCE7;border:1px solid #BBF7D0;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);color:#16A34A;margin-right:4px;">✅ אמת</button>' : '')+
       '</div>'+
+      (p.notes ? '<div style="margin-top:8px;font-size:12px;color:var(--slate);background:#F8FAFC;border-radius:8px;padding:7px 10px;">'+escHtml(p.notes)+'</div>' : '')+
+      '<div style="display:flex;gap:8px;margin-top:12px;">'+
+        '<button data-pid="'+escAttr(String(p.id))+'" onclick="openVaadOrderSheet(this.getAttribute(\'data-pid\'))" style="flex:1;padding:10px;background:linear-gradient(135deg,#1A3A5C,#2563EB);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">🏢 הזמנת ועד</button>'+
+        '<button data-pid="'+escAttr(String(p.id))+'" onclick="openPersonalOrderSheet(this.getAttribute(\'data-pid\'))" style="flex:1;padding:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">💬 הזמנה אישית</button>'+
+        '<button data-pid="'+escAttr(String(p.id))+'" onclick="openReviewSheet(this.getAttribute(\'data-pid\'))" style="flex:1;padding:10px;background:#F1F5F9;color:var(--navy);border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);">📝 משוב</button>'+
+      '</div>'+
+      '<div style="margin-top:8px;text-align:left;">'+
+        '<button data-pid="'+escAttr(String(p.id))+'" data-pname="'+escAttr(p.name)+'" onclick="submitComplaint(this.getAttribute(\'data-pid\'),this.getAttribute(\'data-pname\'))" style="padding:4px 10px;background:none;border:1px solid #FCA5A5;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;color:#EF4444;font-family:var(--font);">🚨 הגשת תלונה</button>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:6px;margin-top:10px;">'+
+        stars+
+        '<span style="font-size:12px;color:var(--slate);margin-right:4px;">'+avgRating+'</span>'+
+        '<span style="font-size:11px;color:#CBD5E1;">('+p.rating_count+' דירוגים)</span>'+
+        (isAdmin ? '<button onclick="deleteProf('+p.id+')" style="margin-right:auto;padding:4px 10px;background:none;border:1px solid #FCA5A5;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;color:#EF4444;font-family:var(--font);">🗑️ מחק</button>' : '')+
+      '</div>'+
+      reviewsHtml+
     '</div>';
   }).join('');
-  el.onclick=function(e){
-    var t=e.target.closest('[data-action]');
-    if(!t) return;
-    var id=t.getAttribute('data-id'), action=t.getAttribute('data-action');
-    if(action==='view')      adminViewSupplier(id);
-    if(action==='verify')    adminVerifySupplier(id);
-    if(action==='suspend')   adminSuspendSupplier(id);
-    if(action==='unsuspend') adminUnsuspendSupplier(id);
-    if(action==='delete')    adminDeleteSupplier(id);
-  };
 }
 
-function adminVerifySupplier(id){ sbClient.from('professionals').update({is_verified:true,is_suspended:false}).eq('id',id).then(function(r){ if(r.error){showToast('שגיאה');return;} showToast('✅ ספק אומת'); loadAllSuppliers(); }); }
-function adminSuspendSupplier(id){ if(!confirm('להשהות את הספק?')) return; sbClient.from('professionals').update({is_suspended:true,is_verified:false}).eq('id',id).then(function(r){ if(r.error){showToast('שגיאה');return;} showToast('⏸ ספק הושהה'); loadAllSuppliers(); }); }
-function adminUnsuspendSupplier(id){ sbClient.from('professionals').update({is_suspended:false}).eq('id',id).then(function(r){ if(r.error){showToast('שגיאה');return;} showToast('▶ ספק הוחזר'); loadAllSuppliers(); }); }
-function adminDeleteSupplier(id){ if(!confirm('למחוק ספק לצמיתות?')) return; sbClient.from('professionals').delete().eq('id',id).then(function(r){ if(r.error){showToast('שגיאה');return;} showToast('🗑️ ספק נמחק'); loadAllSuppliers(); }); }
-
-function adminViewSupplier(id){
-  var s=(_allSuppliers||[]).find(function(x){return String(x.id)===String(id);});
-  if(!s){ showToast('לא נמצא ספק'); return; }
-  var n={};
-  try{ n=typeof s.agreement_data==='string'?JSON.parse(s.agreement_data):s.agreement_data||{}; }catch(e){}
-  var r=!!n.signature;
-  var statusColor=s.is_suspended?'var(--rose)':s.is_verified?'#166534':'#92400E';
-  var statusLabel=s.is_suspended?'⏸ מושהה':s.is_verified?'✅ מאומת':'⏳ ממתין לאימות';
-  var html='<div style="background:#F8FAFC;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">'+
-    '<div style="font-size:28px;">🏢</div>'+
-    '<div><div style="font-size:16px;font-weight:900;color:var(--navy);">'+(n.biz_name||escH(s.name||''))+'</div><div style="font-size:12px;color:'+statusColor+';font-weight:700;margin-top:2px;">'+statusLabel+'</div></div></div>'+
-    (r?'<div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:8px;padding:8px 12px;font-size:12px;color:#166534;margin:6px 0;">✅ ההסכם נחתם דיגיטלית על ידי: '+escH(n.signature||'')+'</div>':'<div style="background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--rose);margin:6px 0;">🚨 הספק טרם מילא את טופס ההסכם</div>')+
-    _supSection('👤 פרטים אישיים')+_supRow('שם מלא',n.name||s.name)+_supRow('טלפון',n.phone||s.phone)+_supRow('ת.ז',n.id_num)+_supRow('אימייל',n.email)+
-    _supSection('🏪 פרטי עסק')+_supRow('שם עסק',n.biz_name)+_supRow('ח.פ',n.vat_reg)+_supRow('שנות ניסיון',n.years?n.years+' שנים':null)+_supRow('אזור',n.area||s.area)+
-    _supSection('🔧 תחום ורישיון')+_supRow('תחומים',Array.isArray(n.all_cats)?n.all_cats.join(', '):n.all_cats||s.cat)+_supRow('רישיון',n.license)+
-    _supSection('🛡️ ביטוח')+(n.ins_co?_supRow('חברת ביטוח',n.ins_co)+_supRow('פוליסה',n.ins_num)+_supRow('תוקף',n.ins_exp):'<div style="color:var(--orange);font-size:12px;padding:4px 0;">⚠️ לא הוזן ביטוח</div>')+
-    _supSection('✍️ חתימה')+_supRow('חתם',n.signature)+_supRow('תאריך',n.submitted_at?new Date(n.submitted_at).toLocaleString('he-IL'):null);
-  document.getElementById('sup-modal-body').innerHTML=html;
-  var vBtn=document.getElementById('sup-modal-verify-btn');
-  if(s.is_verified||s.is_suspended||!r){ vBtn.style.display='none'; }
-  else{ vBtn.style.display='flex'; vBtn.onclick=function(){ adminVerifySupplier(id); closeSupModal(); }; }
-  document.getElementById('sup-modal').style.display='flex';
-  document.body.style.overflow='hidden';
+function setProfFilter(cat){
+  _profFilterCat = cat;
+  renderProfessionalsPage();
 }
 
-function _supSection(t){ return '<div style="font-size:12px;font-weight:800;color:var(--blue);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid #BFDBFE;">'+t+'</div>'; }
-function _supRow(label,val){ if(!val) return ''; return '<div style="display:flex;gap:8px;margin-bottom:5px;font-size:13px;"><span style="font-weight:700;color:var(--slate);min-width:120px;flex-shrink:0;">'+label+'</span><span style="color:var(--navy);">'+escH(String(val))+'</span></div>'; }
-function closeSupModal(){ document.getElementById('sup-modal').style.display='none'; document.body.style.overflow=''; }
+function openProfSheet(id){
+  _profEditId = id || null;
+  var title = document.getElementById('prof-sheet-title');
+  if(title) title.textContent = id ? '✏️ עריכת בעל מקצוע' : '🔨 הוסף בעל מקצוע';
+  var errEl = document.getElementById('prof-sheet-err');
+  if(errEl){ errEl.style.display='none'; errEl.textContent=''; }
 
-/* ══ ייצוא CSV ══════════════════════════════════════════════ */
-function exportCSV(){
-  var rows=[['שם בניין','עיר','כתובת','דירות','דיירים רשומים','סטטוס','תאריך רישום','ימים שנותרו','טלפון ועד','אימייל','קוד גישה','שולם עד','הערה']];
-  getFilteredSorted().forEach(function(b){
-    var slug=b.unique_slug||'', st=getBuildingStatus(b), dl=getDaysLeft(b);
-    rows.push([b.building_name||'',b.city||'',b.address||'',b.units_count||'',_residentCounts[slug]||0,st,b.created_at?new Date(b.created_at).toLocaleDateString('he-IL'):'',st==='active'?'∞':dl!==null?Math.max(0,dl):'',b.contact_phone||b.admin_phone||'',b.email||b.admin_email||'',b.access_code||'',b.paid_until||'',_notes[slug]||'']);
-  });
-  var csv='\ufeff'+rows.map(function(r){return r.map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='shchnut-tova-'+(new Date).toISOString().slice(0,10)+'.csv';
-  a.click();
-  showToast('📥 קובץ יוצא ✅');
-}
-
-/* ══ כלי עזר ════════════════════════════════════════════════ */
-function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
-function showTblErr(msg){ document.getElementById('tbl-body').innerHTML='<div class="loading-row" style="color:var(--rose);">❌ '+escH(msg)+'</div>'; }
-function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function num(n){ return(+(n||0)).toLocaleString('he-IL'); }
-
-/* ══ אתחול ══════════════════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded',function(){
-  var auth='';
-  try{ auth=sessionStorage.getItem('sn_admin_auth')||''; }catch(e){}
-  if(auth==='1'){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    loadAdminSettings(); loadNotes(); loadBuildings();
+  if(id){
+    var p = (DB.professionals||[]).find(function(x){ return x.id===id; });
+    if(p){
+      document.getElementById('prof-inp-name').value  = p.name  || '';
+      document.getElementById('prof-inp-phone').value = p.phone || '';
+      document.getElementById('prof-inp-cat').value   = p.cat   || 'אחר';
+      document.getElementById('prof-inp-notes').value = p.notes || '';
+      var areaEl = document.getElementById('prof-inp-area'); if(areaEl) areaEl.value = p.area || '';
+    }
+  } else {
+    document.getElementById('prof-inp-name').value  = '';
+    document.getElementById('prof-inp-phone').value = '';
+    document.getElementById('prof-inp-cat').value   = 'אינסטלטור';
+    document.getElementById('prof-inp-notes').value = '';
+    var areaElNew = document.getElementById('prof-inp-area'); if(areaElNew) areaElNew.value = '';
   }
-  document.getElementById('pw-input').focus();
-});
-</script>
-</body>
-</html>
+  // (agreement wrap הוסר — הכפתור תמיד מוצג)
+  openSheet('prof');
+}
+
+function submitProf(){
+  var name  = (document.getElementById('prof-inp-name').value||'').trim();
+  var phone = (document.getElementById('prof-inp-phone').value||'').trim();
+  var cat   = (document.getElementById('prof-inp-cat').value||'אחר').trim();
+  var notes = (document.getElementById('prof-inp-notes').value||'').trim();
+  var errEl = document.getElementById('prof-sheet-err');
+
+  if(!name){ errEl.textContent='נא להזין שם'; errEl.style.display='block'; return; }
+  if(!phone){ errEl.textContent='נא להזין טלפון'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  var slug = _getBuildingSlug();
+  if(!slug){ showToast('שגיאה: לא זוהה בניין'); return; }
+
+  var isEdit = !!_profEditId;
+  var editId = _profEditId;
+  _profEditId = null;
+  closeSheet('prof');
+
+  if(isEdit){
+    // עדכון רשומה קיימת
+    var areaUpd = (document.getElementById('prof-inp-area') ? document.getElementById('prof-inp-area').value : '').trim();
+    sbClient.from('professionals').update({
+      name: name, phone: phone, cat: cat, notes: notes, area: areaUpd
+    }).eq('id', editId).then(function(res){
+      if(res.error){ showToast('שגיאה בעדכון: '+res.error.message); return; }
+      loadProfessionalsFromSupabase(function(){ renderProfessionalsPage(); });
+      showToast('בעל המקצוע עודכן ✅');
+    });
+  } else {
+    // הוספת רשומה חדשה
+    var area = (document.getElementById('prof-inp-area') ? document.getElementById('prof-inp-area').value : '').trim();
+    sbClient.from('professionals').insert([{
+      building_slug: slug,
+      name:         name,
+      phone:        phone,
+      cat:          cat,
+      notes:        notes,
+      area:         area,
+      is_verified:  false,
+      rating:       0,
+      rating_count: 0
+    }]).then(function(res){
+      if(res.error){ showToast('שגיאה בהוספה: '+res.error.message); return; }
+      loadProfessionalsFromSupabase(function(){ renderProfessionalsPage(); });
+      showToast('בעל המקצוע נוסף ✅');
+      var phoneClean = phone.replace(/\D/g,'').replace(/^0/,'');
+      var formUrl = 'https://smartneighborapp.github.io/my-building/supplier-form.html?slug='+slug+'&name='+encodeURIComponent(name)+'&cat='+encodeURIComponent(cat);
+      var waMsg = encodeURIComponent('שלום '+name+', ועד הבית של '+(DB.building&&DB.building.name?DB.building.name:'הבניין')+' מזמין אותך להצטרף לרשימת בעלי המקצוע שלנו.\nלחתימה על הסכם שיתוף פעולה — לחץ על הקישור:\n'+formUrl);
+      window.open('https://wa.me/972'+phoneClean+'?text='+waMsg,'_blank');
+    });
+  }
+}
+
+function deleteProf(id){
+  if(!confirm('למחוק את בעל המקצוע?')) return;
+  sbClient.from('professionals').delete().eq('id', id).then(function(res){
+    if(res.error){ showToast('שגיאה במחיקה: '+res.error.message); return; }
+    loadProfessionalsFromSupabase(function(){ renderProfessionalsPage(); });
+    showToast('בעל המקצוע נמחק');
+  });
+}
+
+function rateProfessional(id, stars){
+  var p = (DB.professionals||[]).find(function(x){ return x.id===id; });
+  if(!p) return;
+  // חישוב ממוצע אמיתי
+  var newCount  = (p.rating_count || 0) + 1;
+  var newRating = Math.round((((p.rating || 0) * (p.rating_count || 0)) + stars) / newCount * 10) / 10;
+  // עדכון מקומי מיידי
+  p.rating       = newRating;
+  p.rating_count = newCount;
+  renderProfessionalsPage();
+  // כתיבה לסופרבייס
+  sbClient.from('professionals').update({
+    rating:       newRating,
+    rating_count: newCount
+  }).eq('id', id).then(function(res){
+    if(res.error){ showToast('שגיאה בשמירת דירוג: '+res.error.message); }
+    else { showToast('דירוג נשמר ✅'); }
+  });
+}
+
