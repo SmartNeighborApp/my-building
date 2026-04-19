@@ -197,6 +197,10 @@ function submitProf(){
       if(res.error){ showToast('שגיאה בהוספה: '+res.error.message); return; }
       loadProfessionalsFromSupabase(function(){ renderProfessionalsPage(); });
       showToast('בעל המקצוע נוסף ✅');
+      var phoneClean = phone.replace(/\D/g,'').replace(/^0/,'');
+      var formUrl = 'https://smartneighborapp.github.io/my-building/supplier-form.html?slug='+slug+'&name='+encodeURIComponent(name)+'&cat='+encodeURIComponent(cat);
+      var waMsg = encodeURIComponent('שלום '+name+', ועד הבית של '+(DB.building&&DB.building.name?DB.building.name:'הבניין')+' מזמין אותך להצטרף לרשימת בעלי המקצוע שלנו.\nלחתימה על הסכם שיתוף פעולה — לחץ על הקישור:\n'+formUrl);
+      window.open('https://wa.me/972'+phoneClean+'?text='+waMsg,'_blank');
     });
   }
 }
